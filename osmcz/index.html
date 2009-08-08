@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+  <meta name="verify-v1" content="HvVG7b0Ndwis85aJxZkNySO6NKzJCzqOKBxg5hvjAD8=" />
+   <TITLE>openstreetmap.cz</TITLE>
+    <script type="text/javascript" src="OpenLayers.js"></script>
+    <script type="text/javascript" src="OpenStreetMap.js"></script>
+    <script type="text/javascript" src="http://openstreetmap.cz/osmcz.js"></script>
+    <script type="text/javascript" src="json.js"></script>
+
+<style type="text/css">
+body {
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+}
+
+div.smallmap {
+  width: 96%;
+  height: 90%;
+  min-height: 100px;
+  border: 1px solid #ddd;
+}
+
+div.right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 250px;
+  margin: 0;
+}
+
+div.box {
+  margin: 2px 0px 10px 0px;
+  padding: 2px 0px 4px 4px;
+  width: 100%;
+}
+
+div.main {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 280px;
+  bottom: 190px;
+}
+
+H1 {
+  font-size:30px;
+  color:blue;
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+div.olControlMousePosition {
+ font-family: Verdana;
+ font-size: 0.5em;
+ bottom: 0em;
+ right: 3px;
+ display: block;
+ position: absolute;
+ font-size: smaller;
+ color: red;
+}
+
+div.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -25%;
+  margin-left: -25%;
+  display: none;
+  z-index:9999;
+  background-color:white;
+  layer-background-color:white;
+}
+</style>
+
+<script>
+function loader_on()
+{
+document.getElementById("loader").style.display = 'block' ;
+}
+
+function loader_off()
+{
+document.getElementById("loader").style.display = 'none' ;
+//#document.getElementById("loader").style.visibility = "hidden";
+}
+
+function div_on(div_id)
+{
+  document.getElementById(div_id).style.display = 'inline' ;
+}
+
+function div_off(div_id)
+{
+  document.getElementById(div_id).style.display = 'none' ;
+}
+function shrink_map(div_id)
+{
+  document.getElementById("main_div").style.right = '280px' ;
+}
+
+function grow_map(div_id)
+{
+  document.getElementById("main_div").style.right = '10px' ;
+}
+
+function init_page()
+{
+  if ( getInternetExplorerVersion() > -1 ) {
+    window.location = "http://openstreetmap.cz/map.html"
+  }
+  init();
+}
+
+</script>
+
+<script type="text/javascript" src="jquery-1.2.2.pack.js"></script>
+<script type="text/javascript" src="animatedcollapse.js">
+/***********************************************
+* Animated Collapsible DIV v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
+***********************************************/
+</script>
+
+<script type="text/javascript">
+  animatedcollapse.addDiv('cat', 'fade=0,speed=400,group=pets,hide=0')
+  animatedcollapse.addDiv('dog', 'fade=0,speed=400,group=pets,persist=1,hide=1')
+  animatedcollapse.addDiv('rabbit', 'fade=0,speed=400,group=pets,hide=1')
+  animatedcollapse.addDiv('fourth', 'fade=0,speed=400,group=pets,hide=1')
+  animatedcollapse.init()
+</script>
+
+</HEAD>
+
+<BODY onload="init_page()" onunload="get_center()">
+
+<div id='loader' class='centered'>
+<p>loading<br><img src="img/loader.gif"></p>
+</div> 
+
+<!--########class=right######################################################-->
+
+<div id="right_box" class="right">
+<h3>Menu</h3>
+<a href="javascript:animatedcollapse.toggle('cat')">[ Informace O projektu ]</a> <sup><a href="javascript:animatedcollapse.show('cat')">v</a><a href="javascript:animatedcollapse.hide('cat')">^</a></sup>
+
+<div id="cat" style="width: 100%">
+
+<div class="box" id="international">
+<a href="http://openstreetmap.cz"><img src="osmcz_logo.png" border="0" alt="osmcz" align="left"></a><br>
+<a href="http://www.openstreetmap.ca/"><img border="0" src="/img/flags/ca.png" alt="Kanada" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.ch/"><img border="0" src="/img/flags/ch.png" alt="Schweiz" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.cl/"><img border="0" src="/img/flags/cl.png" alt="Chile" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.de/"><img border="0" src="/img/flags/de.png" alt="Deutschland" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.es/"><img border="0" src="/img/flags/es.png" alt="Spanien" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.fr/"><img border="0" src="/img/flags/fr.png" alt="Frankreich" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.jp/"><img border="0" src="/img/flags/jp.png" alt="Japan" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.nl/"><img border="0" src="/img/flags/nl.png" alt="Niederlande" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.se/"><img border="0" src="/img/flags/se.png" alt="Schweden" width="24" height="13"/></a>
+<a href="http://openstreetmap.tw/"><img border="0" src="/img/flags/tw.png" alt="Taiwan" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.org.za/"><img border="0" src="/img/flags/za.png" alt="South Africa" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.org"><img border="0" src="/img/flags/terra.png" alt="The World" width="24" height="13"/></a>
+</div>
+<br>
+
+<div id="attribution">
+<table width="100%">
+<tr>
+ <td width="50%" align="right"><a href="http://creativecommons.org/licenses/by-sa/2.0/"><img src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" alt="CC-BY-SA" border=0></a></td>
+ <td width="50%" align="left"><a href="http://openstreetmap.org/"><img height="31" border="0" src="http://wiki.openstreetmap.org/images/8/86/Osm_linkage.png" alt="Openstreetmap.org"></a></td>
+</tr>
+<tr>
+ <td colspan="2" align="center">
+Licensed under the Creative Commons Attribution-Share Alike 2.0 license
+by the OpenStreetMap project and its contributors.
+ </td>
+</tr>
+<tr>
+ <td colspan="2">
+  <a href="credits.html">Přispěvatelé a použité zdroje</a>
+ </td></tr>
+</table>
+</div>
+</div>
+<br>
+<a href="javascript:animatedcollapse.toggle('dog')">[ POI ]</a> <sup><a href="javascript:animatedcollapse.show('dog')">v</a><a href="javascript:animatedcollapse.hide('dog')">^</a></sup>
+<div id="dog" style="width: 100%;">
+<p> Radary:<br>
+<a href="javascript:show_poi(1)">show poi</a><br>
+<a href="javascript:hide_poi(1)">hide poi</a>
+</p>
+<p> Radary:<br>
+<a href="javascript:show_guideposts(1)">Rozcestniky</a><br>
+</p>
+</div>
+<br>
+<a href="javascript:animatedcollapse.toggle('rabbit')">[ Ovládání mapy ]</a><sup><a href="javascript:animatedcollapse.show('rabbit')">v</a><a href="javascript:animatedcollapse.hide('rabbit')">^</a></sup>
+<div id="rabbit" style="width: 100%">
+<ul>
+<li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
+<li><a href="map.html">Fullscreen mapa</a>
+</ul>
+</div>
+<br>
+<a href="javascript:animatedcollapse.toggle('fourth')">[ Odkazy ]</a><sup>v^</sup>
+<div id="fourth" style="width: 100%;">
+<h3>Další odkazy</h3>
+<ul>
+        <li><a href="credits.html">Přispěvatelé a použité zdroje</a>
+        <li><a href="http://wiki.openstreetmap.org/index.php/Cz:Main_Page">Česká sekce openstreetmap.org wiki</a>
+        <li><a href="http://garmin.openstreetmap.cz">Mapy pro Váš garmin zdarma, free garmin map</a>
+        <li><a href="http://fatbozz.towerofglass.net/v2/garmin-mapy/">Seznam volně šiřitelných map pro garmin</a>
+        <li><a href="http://gpsmapsearch.com/?l=cs">Vyhledávání map podle lokace</a>
+        <li><a href="http://walley.org">walley.org</a>
+        <li><a href="http://live.jabbim.cz/chat/openstreetmap@conf.netlab.cz">Openstreetmap jabber chat</a>
+        <li><a href="kct.osm">kct.osm</a>
+        <li><a href="kct.osm">rsdosm.zip</a>
+</ul>
+
+</div>
+</div>
+
+<!--########class=right######################################################-->
+
+<div id="main_div" class="main">
+<h1>openstreetmap.cz - svobodná mapa</h1>
+<div style="position: absolute; top: 50%; right: 0px;xfont-size:0.1em;">
+<a href="javascript:div_on('right_box');shrink_map()">&lt;</a>
+<a href="javascript:div_off('right_box');grow_map()">&gt;</a>
+</div> 
+<div id="map" class="smallmap"></div>
+<br>
+<p>
+<a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci / Map for your navigation</a>
+</p>
+</div>
+
+<div style="position:absolute;bottom:0;">
+
+<script type="text/javascript">
+google_ad_client = "pub-7270111774772584";
+/* 728x90, created 5/21/08 */
+google_ad_slot = "7568601500";
+google_ad_width = 728;
+google_ad_height = 90;
+</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>  
+  
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-308728-3");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<br>
+<a href="http://statistiky.monitoring-serveru.cz/openstreetmap.cz"><img src="http://data.monitoring-serveru.cz/openstreetmap.cz/ikonka3-7173D1.png" width="80" height="15" alt="Dostupnost podle monitoring-serveru.cz" border="0"></a>
+</div>
+</BODY>
+</HTML>
