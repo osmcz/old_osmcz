@@ -328,8 +328,8 @@ function init()
   );
   map.addLayer(layer_osmcz2);
   var layer_osmcz2 = new OpenLayers.Layer.TMS(
-      "blackhex sq TMS",
-      "http://blackhex.no-ip.org/tiles/",
+      "opentracksmap TMS",
+      "http://tracks.openstreetmap.cz/tiles/",
       {
         layername: 'blackhex sq',
         type: 'png', getURL: osm_getTileURL,
@@ -465,13 +465,13 @@ function handler(request)
 {
   AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
     'autoSize': true, 
-    'maxSize': new OpenLayers.Size(100,100)
+    'maxSize': new OpenLayers.Size(300,300)
   });
 
   var markers = new OpenLayers.Layer.Markers( "Markers" );
   map.addLayer(markers);
 
-  alert(request.responseText);
+  //alert(request.responseText);
   a = JSON.decode(request.responseText);
 
   for(i = 0; i < a.length; i++) {
@@ -481,11 +481,11 @@ function handler(request)
     var size   = new OpenLayers.Size(10, 17);
     var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
     var pos    = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
-    alert("X:"+lat+" "+lon+":"+pos.toString());
+    //alert("X:"+lat+" "+lon+":"+pos.toString());
 //    var marker = new OpenLayers.Marker();
 
     popupClass = AutoSizeFramedCloudMaxSize;
-    popupContentHTML = "nazdar <img src='img/guidepost.png'></img>" 
+    popupContentHTML = ""+b.name+"<br>"+b.url+"<br> <img src='img/guidepost/"+b.name+"'></img>" 
     addMarker(markers, pos, popupClass, popupContentHTML, true, true);
 
 //    markers.addMarker(marker);
@@ -495,8 +495,10 @@ function handler(request)
 
 function show_guideposts(x)
 {
+  var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
   var request = OpenLayers.Request.GET({
     url: "http://openstreetmap.cz/guidepost.php",
+     params: {bbox: kokot.toBBOX()},
     callback: handler
   });
 }
