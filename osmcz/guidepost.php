@@ -42,10 +42,16 @@ function show_upload_dialog()
 ################################################################################ 
 {
 
-$PHP_SELF = $_SERVER['PHP_SELF'];
+  $PHP_SELF = $_SERVER['PHP_SELF'];
 
-print "<img src='img/close.png' align=right alt='x' onclick='javascript:upbox_off()'>\n";
-print "
+  print"<script>\n";
+  print "function upbox_off()\n";
+  print "{\n";
+  print "  document.getElementById('upbox').style.display = 'none' ;\n";
+  print "}\n";
+  print"</script>\n";
+
+  print "
 <form action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
    <input type='hidden' name='action' value='file' />
    <input type='hidden' name='MAX_FILE_SIZE' value='500000' />
@@ -85,7 +91,9 @@ function process_file()
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {print "existuje\n";} else {print "neeee\n";}
 
   if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-    echo "Soubor ".basename($_FILES['uploadedfile']['name'])." byl uspesne nahran na server";
+    echo "Soubor ".basename($_FILES['uploadedfile']['name'])." byl uspesne nahran na server do $target_path";
+    $out = system ("/var/www/exifme.pl $target_path autor");
+    print "<br>vystup: $out";
     $result = 1;
   } else {
     echo "Chyba pri otevirani souboru, mozna je prilis velky";
