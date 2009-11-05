@@ -8,6 +8,7 @@
     <script type="text/javascript" src="OpenStreetMap.js"></script>
     <script type="text/javascript" src="http://openstreetmap.cz/osmcz.js"></script>
     <script type="text/javascript" src="json.js"></script>
+    <script type="text/javascript" src="upload.js"></script>
 
 <style type="text/css">
 body {
@@ -75,18 +76,41 @@ div.centered {
   background-color:white;
   layer-background-color:white;
 }
+
+div.uploadbox {
+  display: none;
+  height: 320px; 
+  width: 350px; 
+  position:absolute; 
+  top: 20%; 
+  left: 25%; 
+  border: 3px double;
+  z-index:9998;
+  background-color:white;
+  layer-background-color:white;
+}
+
 </style>
 
 <script>
+function upbox_on()
+{
+  document.getElementById("upbox").style.display = 'block' ;
+}
+
+function upbox_off()
+{
+  document.getElementById("upbox").style.display = 'none' ;
+}
+
 function loader_on()
 {
-document.getElementById("loader").style.display = 'block' ;
+  document.getElementById("loader").style.display = 'block' ;
 }
 
 function loader_off()
 {
-document.getElementById("loader").style.display = 'none' ;
-//#document.getElementById("loader").style.visibility = "hidden";
+  document.getElementById("loader").style.display = 'none' ;
 }
 
 function div_on(div_id)
@@ -141,7 +165,11 @@ function init_page()
 
 <div id='loader' class='centered'>
 <p>loading<br><img src="img/loader.gif"></p>
-</div> 
+</div>
+
+<div id="upbox" class="uploadbox">
+<iframe src="guidepost.php?action=show_dialog" width="346px" height="316px">iframe</iframe>
+</div>
 
 <!--########class=right######################################################-->
 
@@ -153,15 +181,23 @@ function init_page()
 
 <div class="box" id="international">
 <a href="http://openstreetmap.cz"><img src="osmcz_logo.png" border="0" alt="osmcz" align="left"></a><br>
+<a href="http://www.openstreetmap.at"><img border="0" src="/img/flags/at.png" alt="Rakousko" width="24" height="13"/></a>
 <a href="http://www.openstreetmap.ca/"><img border="0" src="/img/flags/ca.png" alt="Kanada" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.ch/"><img border="0" src="/img/flags/ch.png" alt="Schweiz" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.cl/"><img border="0" src="/img/flags/cl.png" alt="Chile" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.de/"><img border="0" src="/img/flags/de.png" alt="Deutschland" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.es/"><img border="0" src="/img/flags/es.png" alt="Spanien" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.fr/"><img border="0" src="/img/flags/fr.png" alt="Frankreich" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.jp/"><img border="0" src="/img/flags/jp.png" alt="Japan" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.nl/"><img border="0" src="/img/flags/nl.png" alt="Niederlande" width="24" height="13"/></a>
-<a href="http://www.openstreetmap.se/"><img border="0" src="/img/flags/se.png" alt="Schweden" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.ch/"><img border="0" src="/img/flags/ch.png" alt="Svicarsko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.cl/"><img border="0" src="/img/flags/cl.png" alt="Cile" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.de/"><img border="0" src="/img/flags/de.png" alt="Nemecko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.es/"><img border="0" src="/img/flags/es.png" alt="Spanelsko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.org.et"><img border="0" src="/img/flags/et.png" alt="Etiopie" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.fr/"><img border="0" src="/img/flags/fr.png" alt="Francie" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.hu/"><img border="0" src="/img/flags/hu.png" alt="Madarsko" width="24" height="13"/></a>
+<a href="http://openstreetmap.it"><img border="0" src="/img/flags/it.png" alt="Svedsko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.jp/"><img border="0" src="/img/flags/jp.png" alt="Japonsko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.nl/"><img border="0" src="/img/flags/nl.png" alt="Nizozemi" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.org.ph"><img border="0" src="/img/flags/ph.png" alt="Filipiny" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.pl"><img border="0" src="/img/flags/pl.png" alt="Polsko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.ro"><img border="0" src="/img/flags/ro.png" alt="Rumunsko" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.se/"><img border="0" src="/img/flags/se.png" alt="Se" width="24" height="13"/></a>
+<a href="http://www.openstreetmap.sk"><img border="0" src="/img/flags/sk.png" alt="Slovensko" width="24" height="13"/></a>
 <a href="http://openstreetmap.tw/"><img border="0" src="/img/flags/tw.png" alt="Taiwan" width="24" height="13"/></a>
 <a href="http://www.openstreetmap.org.za/"><img border="0" src="/img/flags/za.png" alt="South Africa" width="24" height="13"/></a>
 <a href="http://www.openstreetmap.org"><img border="0" src="/img/flags/terra.png" alt="The World" width="24" height="13"/></a>
@@ -194,7 +230,7 @@ by the OpenStreetMap project and its contributors.
 <a href="javascript:show_poi(1)">show poi</a><br>
 <a href="javascript:hide_poi(1)">hide poi</a>
 </p>
-<p> Radary:<br>
+<p> Turistika:<br>
 <a href="javascript:show_guideposts(1)">Rozcestniky</a><br>
 </p>
 </div>
@@ -204,6 +240,7 @@ by the OpenStreetMap project and its contributors.
 <ul>
 <li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
 <li><a href="map.html">Fullscreen mapa</a>
+<li><a href="javascript:upbox_on()">Nahrat obrazek</a>
 </ul>
 </div>
 <br>

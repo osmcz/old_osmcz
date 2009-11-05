@@ -329,7 +329,7 @@ function init()
   map.addLayer(layer_osmcz2);
   var layer_osmcz2 = new OpenLayers.Layer.TMS(
       "opentracksmap TMS",
-      "http://tracks.openstreetmap.cz/tiles/",
+      "http://opentrackmap.no-ip.org/tiles/",
       {
         layername: 'blackhex sq',
         type: 'png', getURL: osm_getTileURL,
@@ -438,7 +438,7 @@ function addMarker(markers, ll, popupClass, popupContentHTML, closeBox, overflow
     var icon   = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost.png');
 
     var feature = new OpenLayers.Feature(markers, ll, icon); 
-    feature.closeBox = closeBox;
+    feature.closeBox = true;
     feature.popupClass = popupClass;
     feature.data.popupContentHTML = popupContentHTML;
     feature.data.overflow = (overflow) ? "auto" : "hidden";
@@ -464,8 +464,8 @@ function addMarker(markers, ll, popupClass, popupContentHTML, closeBox, overflow
 function handler(request) 
 {
   AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
-    'autoSize': true, 
-    'maxSize': new OpenLayers.Size(300,300)
+    'autoSize': true,
+    'maxSize': new OpenLayers.Size(450,450)
   });
 
   var markers = new OpenLayers.Layer.Markers( "Markers" );
@@ -481,12 +481,12 @@ function handler(request)
     var size   = new OpenLayers.Size(10, 17);
     var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
     var pos    = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
-    //alert("X:"+lat+" "+lon+":"+pos.toString());
-//    var marker = new OpenLayers.Marker();
 
     popupClass = AutoSizeFramedCloudMaxSize;
-    popupContentHTML = ""+b.name+"<br>"+b.url+"<br> <img src='img/guidepost/"+b.name+"'></img>" 
-    addMarker(markers, pos, popupClass, popupContentHTML, true, true);
+    html_content = "guidepost by "+b.attribution+"<br>"
+    html_content += "<a href='"+b.url+"'>"+b.name+"</a><br>"
+    html_content += " <img src='img/guidepost/"+b.name+"' width='180' alt='guidepost'>" 
+    addMarker(markers, pos, popupClass, html_content, true, true);
 
 //    markers.addMarker(marker);
   }
