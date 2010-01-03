@@ -58,9 +58,10 @@ function show_upload_dialog()
    <input type='hidden' name='MAX_FILE_SIZE' value='500000' />
    <input type='text' name='lat' value='0' size='10'>
    <input type='text' name='lon' value='0' size='10'>
+   <input type='text' name='author' value='autor' size='10'>
    <label>File:<input name='uploadedfile' type='file' size='20' /></label>
    <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
-   <iframe id='upload_target' name='upload_target' src='#' xstyle='width:0;height:0;border:0px solid #fff;'>blah</iframe>
+   <iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>
    </form>
 
 <script type='text/javascript'>
@@ -117,15 +118,16 @@ function show_upload_dialog()
 }
 
 ################################################################################
-function insert_to_db($lat, $lon, $file, $author)
+function insert_to_db($lat, $lon, $url ,$file, $author)
 ################################################################################
 {
-  $database = new SQLiteDatabase('test.sqlite', 0666, $error);
+  $database = new SQLiteDatabase('guidepost', 0777, $error);
   if (!$database) {
     $error = (file_exists($yourfile)) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
     die($error);
   }
-  $q = "insert into guidepost values (NULL, $lat, $lon, $file, $author)";
+  $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author')";
+print $q;
   $query = $database->queryExec($q, $query_error);
   if ($query_error) {
     print("Error: $query_error"); 
@@ -144,6 +146,8 @@ function process_file()
 {
   global $_POST;
 
+  $result = 0;
+
   print "<hr>name:";
   $filename= $_FILES['uploadedfile']['name'];
   print $filename;
@@ -160,27 +164,33 @@ function process_file()
   print $_POST['lat'];
   print $_POST['lon'];
 
-$lat = $_POST['lat'];
-$lon = $_POST['lon'];
+  $lat = $_POST['lat'];
+  $lon = $_POST['lon'];
+  $author = $_POST['author'];
 
   print "<hr>";
 
+  $file = basename($_FILES['uploadedfile']['name']);
   $target_path = "uploads/";
   $target_path = $target_path . basename($_FILES['uploadedfile']['name']);
-
+  
   print "<br>target:$target_path";
   print "<hr>";
 
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {print "existuje\n";} else {print "neeee\n";}
 
   if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-    echo "Soubor ".basename($_FILES['uploadedfile']['name'])." byl uspesne nahran na server do $target_path";
+    echo "Soubor '$file' byl uspesne nahran na server do $target_path";
     if (!$lat && !$lon) {
       $out = system ("/var/www/exifme.pl $target_path autor img/guidepost/");
       print "<br>vystup: $out";
       $result = 1;
     } else {
-    //insert_to_db($lat, $lon);
+      insert_to_db($lat, $lon, $target_path, $file, $author);
+      if (!copy ("uploads/$file","img/guidepost/$file")) {
+        echo "failed to copy $file...\n";
+        $result = 0;
+      }
     }
   } else {
     echo "Chyba pri otevirani souboru, mozna je prilis velky";
@@ -190,6 +200,7 @@ $lon = $_POST['lon'];
   window.top.window.stopUpload(".$result.", '".$filename."');
   </script>
   \n";
+  return $result;
 }
 
 function create_db()
