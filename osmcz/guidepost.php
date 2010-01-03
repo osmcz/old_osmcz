@@ -22,10 +22,10 @@ function page_header()
   print "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n";
   print "  <title>alfresco upload</title>\n";
   print "  <link href='style/style.css' rel='stylesheet' type='text/css'/>\n";
-  print "  <script language='javascript' type='text/javascript' src='upload.js'>\n";
-  print "  </script>\n";
+  print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
+  print "  <script src='OpenLayers.js'></script>
+  <link href='upload.css' rel='stylesheet' type='text/css'/>";
   print "  </head>\n";
-  print "  <body>\n";
 }
 
 
@@ -52,23 +52,98 @@ function show_upload_dialog()
   print"</script>\n";
 
   print "
-<form action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
+  
+  <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
    <input type='hidden' name='action' value='file' />
    <input type='hidden' name='MAX_FILE_SIZE' value='500000' />
-   <p id='f1_upload_form' align='center'><br/>
-   <label>File:<input name='uploadedfile' type='file' size='25' /></label>
-   <label><input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' /></label>
-   </p>
-   <iframe id='upload_target' name='upload_target' src='#' xstyle='width:0;height:0;border:0px solid #fff;'></iframe>
- </form>
+   <input type='text' name='lat' value='0' size='10'>
+   <input type='text' name='lon' value='0' size='10'>
+   <label>File:<input name='uploadedfile' type='file' size='20' /></label>
+   <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
+   <iframe id='upload_target' name='upload_target' src='#' xstyle='width:0;height:0;border:0px solid #fff;'>blah</iframe>
+   </form>
+
+<script type='text/javascript'>
+    OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
+        defaultHandlerOptions: {
+            'single': true,
+            'double': false,
+            'pixelTolerance': 0,
+            'stopSingle': false,
+            'stopDouble': false
+        },
+
+        initialize: function(options) {
+            this.handlerOptions = OpenLayers.Util.extend(
+                {}, this.defaultHandlerOptions
+            );
+            OpenLayers.Control.prototype.initialize.apply(
+                this, arguments
+            ); 
+            this.handler = new OpenLayers.Handler.Click(
+                this, {
+                    'click': this.trigger
+                }, this.handlerOptions
+            );
+        }, 
+
+        trigger: function(e) {
+            var lonlat = map.getLonLatFromViewPortPx(e.xy);
+            document.coord.lon.value = lonlat.lon;
+            document.coord.lat.value = lonlat.lat;
+        }
+
+        });
+        var map;
+        function init(){
+            map = new OpenLayers.Map('map');
+            var ol_wms = new OpenLayers.Layer.WMS( 'OpenLayers WMS',
+                'http://labs.metacarta.com/wms/vmap0?', {layers: 'basic'} );
+            map.addLayers([ol_wms]);
+            map.addControl(new OpenLayers.Control.LayerSwitcher());
+            map.zoomToMaxExtent();
+            var click = new OpenLayers.Control.Click();
+            map.addControl(click);
+            click.activate();
+        }
+        </script>
+    </head>
+    <body onload='init()'>
+
+
+        <div id='map' class='smallmap'></div>
 ";
 
+}
+
+################################################################################
+function insert_to_db($lat, $lon, $file, $author)
+################################################################################
+{
+  $database = new SQLiteDatabase('test.sqlite', 0666, $error);
+  if (!$database) {
+    $error = (file_exists($yourfile)) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
+    die($error);
+  }
+  $q = "insert into guidepost values (NULL, $lat, $lon, $file, $author)";
+  $query = $database->queryExec($q, $query_error);
+  if ($query_error) {
+    print("Error: $query_error"); 
+    return 0;
+  }
+  if (!$query) {
+    print("Impossible to execute query.");
+    return 0;
+  };
+  return 1;
 }
 
 ################################################################################
 function process_file()
 ################################################################################
 {
+  global $_POST;
+
   print "<hr>name:";
   $filename= $_FILES['uploadedfile']['name'];
   print $filename;
@@ -82,19 +157,31 @@ function process_file()
   print $_FILES['uploadedfile']['error'];
   print "<hr>";
 
+  print $_POST['lat'];
+  print $_POST['lon'];
+
+$lat = $_POST['lat'];
+$lon = $_POST['lon'];
+
+  print "<hr>";
+
   $target_path = "uploads/";
-  $target_path = $target_path . basename( $_FILES['uploadedfile']['name']);
+  $target_path = $target_path . basename($_FILES['uploadedfile']['name']);
 
   print "<br>target:$target_path";
   print "<hr>";
-  
+
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {print "existuje\n";} else {print "neeee\n";}
 
   if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
     echo "Soubor ".basename($_FILES['uploadedfile']['name'])." byl uspesne nahran na server do $target_path";
-    $out = system ("/var/www/exifme.pl $target_path autor");
-    print "<br>vystup: $out";
-    $result = 1;
+    if (!$lat && !$lon) {
+      $out = system ("/var/www/exifme.pl $target_path autor img/guidepost/");
+      print "<br>vystup: $out";
+      $result = 1;
+    } else {
+    //insert_to_db($lat, $lon);
+    }
   } else {
     echo "Chyba pri otevirani souboru, mozna je prilis velky";
     $result = 0;
