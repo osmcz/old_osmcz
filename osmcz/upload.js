@@ -1,3 +1,88 @@
+var lon = 5;
+var lat = 40;
+var zoom = 5;
+var map, select;
+
+OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
+    defaultHandlerOptions: {
+        'single': true,
+        'double': false,
+        'pixelTolerance': 0,
+        'stopSingle': false,
+        'stopDouble': false
+    },
+
+    initialize: function(options) {
+        this.handlerOptions = OpenLayers.Util.extend(
+            {}, this.defaultHandlerOptions
+        );
+        OpenLayers.Control.prototype.initialize.apply(
+            this, arguments
+        ); 
+        this.handler = new OpenLayers.Handler.Click(
+            this, {
+                'click': this.trigger
+            }, this.handlerOptions
+        );
+    }, 
+
+    trigger: function(e) {
+        var lonlat = map.getLonLatFromViewPortPx(e.xy);
+        document.coord.lon.value = lonlat.lon;
+        document.coord.lat.value = lonlat.lat;
+    }
+
+    });
+
+/******************************************************************************/
+function init()
+/******************************************************************************/
+{
+  var options = {
+    projection: new OpenLayers.Projection("EPSG:900913"),
+    displayProjection: new OpenLayers.Projection("EPSG:4326"),
+    units: "m",
+    maxResolution: 156543.0339,
+    maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
+  };
+
+  map = new OpenLayers.Map('map', options);
+  var mapnik = new OpenLayers.Layer.TMS(
+    "OpenStreetMap (Mapnik)",
+    "http://tile.openstreetmap.org/",
+    {
+      type: 'png', getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
+    }
+  );
+
+  map.addLayers([mapnik]);
+  map.zoomToExtent(new OpenLayers.Bounds(15, 49, 16, 50).transform(map.displayProjection, map.projection));
+  var click = new OpenLayers.Control.Click();
+  map.addControl(click);
+  click.activate();
+
+}
+
+/******************************************************************************/
+function osm_getTileURL(bounds)
+/******************************************************************************/
+{
+  var res = this.map.getResolution();
+  var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
+  var y = Math.round((this.maxExtent.top - bounds.top) / (res * this.tileSize.h));
+  var z = this.map.getZoom();
+  var limit = Math.pow(2, z);
+
+  if (y < 0 || y >= limit) {
+    return OpenLayers.Util.getImagesLocation() + "404.png";
+  } else {
+    x = ((x % limit) + limit) % limit;
+    return this.url + z + "/" + x + "/" + y + "." + this.type;
+  }
+}
+
 /******************************************************************************/
 function getHTTPObject()
 /******************************************************************************/
