@@ -50,21 +50,27 @@ function show_upload_dialog()
   print "}\n";
   print"</script>\n";
 
+  print "  </head>
+  <body onload='init()'>\n";
+
   print "
+<label><div id='map' class='smallmap'></div></label>
    <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
    <input type='hidden' name='action' value='file' />
    <input type='hidden' name='MAX_FILE_SIZE' value='500000' />
-   <input type='text' name='lat' value='0' size='10'>
-   <input type='text' name='lon' value='0' size='10'>
-   <input type='text' name='author' value='autor' size='10'>
-   <label>File:<input name='uploadedfile' type='file' size='20' /></label>
-   <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
-   <iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>
+<fieldset>
+<input type='text' name='author' value='autor' size='9'>
+<input name='uploadedfile' type='file' size='20'/>
+<input type='text' name='lat' value='0' size='10'>
+<input type='text' name='lon' value='0' size='10'>
+</fieldset>
+<fieldset>
+<input type='reset' name='reset' value='Reset' />
+<input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
+</fieldset>
    </form>
+  <iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>
 
-  </head>
-  <body onload='init()'>
-    <div id='map' class='smallmap'></div>
 ";
 
 }
