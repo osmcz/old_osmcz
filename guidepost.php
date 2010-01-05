@@ -21,10 +21,9 @@ function page_header()
   print "  <head>\n";
   print "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n";
   print "  <title>alfresco upload</title>\n";
-  print "  <link href='style/style.css' rel='stylesheet' type='text/css'/>\n";
+  print "  <script src='OpenLayers.js'></script>\n";
   print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
-  print "  <script src='OpenLayers.js'></script>
-  <link href='upload.css' rel='stylesheet' type='text/css'/>";
+  print "  <link href='upload.css' rel='stylesheet' type='text/css'/>";
   print "  </head>\n";
 }
 
@@ -52,8 +51,7 @@ function show_upload_dialog()
   print"</script>\n";
 
   print "
-  
-  <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
+   <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
    <input type='hidden' name='action' value='file' />
    <input type='hidden' name='MAX_FILE_SIZE' value='500000' />
    <input type='text' name='lat' value='0' size='10'>
@@ -64,55 +62,9 @@ function show_upload_dialog()
    <iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>
    </form>
 
-<script type='text/javascript'>
-    OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
-        defaultHandlerOptions: {
-            'single': true,
-            'double': false,
-            'pixelTolerance': 0,
-            'stopSingle': false,
-            'stopDouble': false
-        },
-
-        initialize: function(options) {
-            this.handlerOptions = OpenLayers.Util.extend(
-                {}, this.defaultHandlerOptions
-            );
-            OpenLayers.Control.prototype.initialize.apply(
-                this, arguments
-            ); 
-            this.handler = new OpenLayers.Handler.Click(
-                this, {
-                    'click': this.trigger
-                }, this.handlerOptions
-            );
-        }, 
-
-        trigger: function(e) {
-            var lonlat = map.getLonLatFromViewPortPx(e.xy);
-            document.coord.lon.value = lonlat.lon;
-            document.coord.lat.value = lonlat.lat;
-        }
-
-        });
-        var map;
-        function init(){
-            map = new OpenLayers.Map('map');
-            var ol_wms = new OpenLayers.Layer.WMS( 'OpenLayers WMS',
-                'http://labs.metacarta.com/wms/vmap0?', {layers: 'basic'} );
-            map.addLayers([ol_wms]);
-            map.addControl(new OpenLayers.Control.LayerSwitcher());
-            map.zoomToMaxExtent();
-            var click = new OpenLayers.Control.Click();
-            map.addControl(click);
-            click.activate();
-        }
-        </script>
-    </head>
-    <body onload='init()'>
-
-
-        <div id='map' class='smallmap'></div>
+  </head>
+  <body onload='init()'>
+    <div id='map' class='smallmap'></div>
 ";
 
 }

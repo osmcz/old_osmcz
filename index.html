@@ -9,88 +9,7 @@
     <script type="text/javascript" src="http://openstreetmap.cz/osmcz.js"></script>
     <script type="text/javascript" src="json.js"></script>
     <script type="text/javascript" src="upload.js"></script>
-
-<style type="text/css">
-body {
-  border: 0px;
-  margin: 0px;
-  padding: 0px;
-  height: 100%;
-}
-
-div.smallmap {
-  width: 96%;
-  height: 90%;
-  min-height: 100px;
-  border: 1px solid #ddd;
-}
-
-div.right {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 250px;
-  margin: 0;
-}
-
-div.box {
-  margin: 2px 0px 10px 0px;
-  padding: 2px 0px 4px 4px;
-  width: 100%;
-}
-
-div.main {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  right: 280px;
-  bottom: 190px;
-}
-
-H1 {
-  font-size:30px;
-  color:blue;
-  margin-top:1px;
-  margin-bottom:1px;
-}
-
-div.olControlMousePosition {
- font-family: Verdana;
- font-size: 0.5em;
- bottom: 0em;
- right: 3px;
- display: block;
- position: absolute;
- font-size: smaller;
- color: red;
-}
-
-div.centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -25%;
-  margin-left: -25%;
-  display: none;
-  z-index:9999;
-  background-color:white;
-  layer-background-color:white;
-}
-
-div.uploadbox {
-  display: none;
-  height: 320px; 
-  width: 350px; 
-  position:absolute; 
-  top: 20%; 
-  left: 25%; 
-  border: 3px double;
-  z-index:9998;
-  background-color:white;
-  layer-background-color:white;
-}
-
-</style>
+    <link href='index.css' rel='stylesheet' type='text/css'/>
 
 <script>
 function upbox_on()
@@ -168,7 +87,8 @@ function init_page()
 </div>
 
 <div id="upbox" class="uploadbox">
-<iframe src="guidepost.php?action=show_dialog" width="346px" height="316px">iframe</iframe>
+<img src='img/close.png' align=right alt='x' onclick='javascript:upbox_off()'>
+<iframe src="guidepost.php?action=show_dialog" width="90%" height="99%" border="0">iframe</iframe>
 </div>
 
 <!--########class=right######################################################-->
@@ -251,12 +171,13 @@ by the OpenStreetMap project and its contributors.
         <li><a href="credits.html">Přispěvatelé a použité zdroje</a>
         <li><a href="http://wiki.openstreetmap.org/index.php/Cz:Main_Page">Česká sekce openstreetmap.org wiki</a>
         <li><a href="http://garmin.openstreetmap.cz">Mapy pro Váš garmin zdarma, free garmin map</a>
-        <li><a href="http://fatbozz.towerofglass.net/v2/garmin-mapy/">Seznam volně šiřitelných map pro garmin</a>
+        <li><a href="http://gpsfreemaps.net/garmin-mapy">Seznam volně šiřitelných map pro garmin</a>
         <li><a href="http://gpsmapsearch.com/?l=cs">Vyhledávání map podle lokace</a>
         <li><a href="http://walley.org">walley.org</a>
         <li><a href="http://live.jabbim.cz/chat/openstreetmap@conf.netlab.cz">Openstreetmap jabber chat</a>
+        <li><a href="irc://irc.oftc.net/osm">Openstreetmap irc kanal</a>
         <li><a href="kct.osm">kct.osm</a>
-        <li><a href="kct.osm">rsdosm.zip</a>
+        <li><a href="rsdosm.zip">rsdosm.zip</a>
 </ul>
 
 </div>
