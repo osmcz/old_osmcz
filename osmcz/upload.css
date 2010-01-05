@@ -1,5 +1,31 @@
 .smallmap {
 width: 300px;
-height: 200px;
+height: 190px;
 border: 1px solid #ccc;
+}
+
+
+label
+{
+float: left;
+display: block;
+margin: 0 0 0 0;
+font-weight: bold;
+}
+
+input
+{
+xdisplay: block;
+}
+
+input.submit
+{
+clear: both;
+}
+
+fieldset
+{
+display: block;
+margin: 0 0 0 0;
+padding: 0 0 0 0;
 }
