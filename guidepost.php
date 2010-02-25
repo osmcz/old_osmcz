@@ -54,10 +54,12 @@ function show_upload_dialog()
   <body onload='init()'>\n";
 
   print "
-<label><div id='map' class='smallmap'></div></label>
-   <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='startUpload();'>
+<xlabel>
+<div id='map' class='smallmap'></div>
+<x/label>
+   <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
    <input type='hidden' name='action' value='file' />
-   <input type='hidden' name='MAX_FILE_SIZE' value='500000' />
+   <input type='hidden' name='MAX_FILE_SIZE' value='3000000' />
 <fieldset>
 <input type='text' name='author' value='autor' size='9'>
 <input name='uploadedfile' type='file' size='20'/>
@@ -69,7 +71,10 @@ function show_upload_dialog()
 <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
 </fieldset>
    </form>
-  <iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>
+\n";
+
+  print "<p id='upload_process'>Uploading...</p>";
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:300;height:50;border:1px solid #fff;'></iframe>
 
 ";
 
@@ -106,8 +111,10 @@ function process_file()
 
   $result = 0;
 
+  $filename = $_FILES['uploadedfile']['name'];
+  $error_message = "";
+
   print "<hr>name:";
-  $filename= $_FILES['uploadedfile']['name'];
   print $filename;
   print "<br>type:";
   print $_FILES['uploadedfile']['type'];
@@ -128,34 +135,49 @@ function process_file()
 
   print "<hr>";
 
-  $file = basename($_FILES['uploadedfile']['name']);
+  $file = basename($filename);
   $target_path = "uploads/";
-  $target_path = $target_path . basename($_FILES['uploadedfile']['name']);
+  $target_path = $target_path . $file;
   
   print "<br>target:$target_path";
   print "<hr>";
 
-  if (file_exists($_FILES['uploadedfile']['tmp_name'])) {print "existuje\n";} else {print "neeee\n";}
-
-  if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-    echo "Soubor '$file' byl uspesne nahran na server do $target_path";
-    if (!$lat && !$lon) {
-      $out = system ("/var/www/exifme.pl $target_path autor img/guidepost/");
-      print "<br>vystup: $out";
-      $result = 1;
-    } else {
-      insert_to_db($lat, $lon, $target_path, $file, $author);
-      if (!copy ("uploads/$file","img/guidepost/$file")) {
-        echo "failed to copy $file...\n";
-        $result = 0;
-      }
-    }
+  if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
+    print "existuje\n";
+    $result = 1;
   } else {
-    echo "Chyba pri otevirani souboru, mozna je prilis velky";
+    $error_message = "nepodarilo se uploadnout soubor";
     $result = 0;
   }
-  print "<script language='javascript' type='text/javascript'>
-  window.top.window.stopUpload(".$result.", '".$filename."');
+
+  if ($result) {
+    if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+      echo "Soubor '$file' byl uspesne nahran na server do $target_path";
+      if (!$lat && !$lon) {
+        $out = system ("/var/www/exifme.pl $target_path autor img/guidepost/", $errlvl);
+        print "<br>vystup: $out";
+        if ($errlvl) {
+          $result = 0;
+          $error_message = "nepodarilo se zjistit souradnice z exif";
+        } else {
+          $result = 1;
+        }
+      } else {
+        insert_to_db($lat, $lon, $target_path, $file, $author);
+        if (!copy ("uploads/$file","img/guidepost/$file")) {
+          $error_message = "failed to copy $file to destination ...";
+          $result = 0;
+        }
+      }
+    } else {
+      $error_message = "Chyba pri otevirani souboru, mozna je prilis velky";
+      $result = 0;
+    }
+  }
+
+  print "
+  <script language='javascript' type='text/javascript'>
+    parent.stop_upload(".$result.",'".$error_message."', '".$filename."');
   </script>
   \n";
   return $result;

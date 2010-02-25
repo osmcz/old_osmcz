@@ -66,8 +66,8 @@ div.centered {
 
 div.uploadbox {
   display: none;
-  height: 320px;
-  width: 350px;
+  height: 400px;
+  width: 500px;
   position:absolute;
   top: 20%;
   left: 25%;

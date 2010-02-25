@@ -27,7 +27,7 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
     }, 
 
     trigger: function(e) {
-        var lonlat = map.getLonLatFromViewPortPx(e.xy);
+        var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
         document.coord.lon.value = lonlat.lon;
         document.coord.lat.value = lonlat.lat;
     }
@@ -101,30 +101,26 @@ function getHTTPObject()
   }
 
 /******************************************************************************/
-function startUpload()
+function start_upload()
 /******************************************************************************/
 {
-  document.getElementById('f1_upload_process').style.visibility = 'visible';
-  document.getElementById('f1_upload_form').style.visibility = 'hidden';
+  document.getElementById('upload_process').style.visibility = 'visible';
   return true;
 }
 
 /******************************************************************************/
-function stopUpload(success, filename)
+function stop_upload(success, message, filename)
 /******************************************************************************/
 {
   var result = ''; 
   var response = '';
   var out_line = '';
 
-  if (success == 1){
-    result = '<span class="msg">The file was uploaded successfully!<\/span><br/><br/>';
-  } else {
-    result = '<span class="emsg">There was an error during file upload!<\/span><br/><br/>';
+  if (success != 1) {
+    alert(message);
   }
-  document.getElementById('f1_upload_process').style.visibility = 'hidden';
-  document.getElementById('f1_upload_form').innerHTML = result ;
-  document.getElementById('f1_upload_form').style.visibility = 'visible';
+
+  document.getElementById('upload_process').style.visibility = 'hidden';
   var http = getHTTPObject();
   http.open('GET', 'http://localhost/~walley/php/index.php?action=upload&name='+filename, true);
   http.send(null)
@@ -132,7 +128,6 @@ function stopUpload(success, filename)
   {
     if (http.readyState == 4) {
       response = http.responseText;
-      alert(response);
     }
   }
   return true;
