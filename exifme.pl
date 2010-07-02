@@ -13,6 +13,8 @@ $debug = 1;
 
 if ($debug) {print "start<br>\n";}
 
+if (scalar @ARGV == 0) {die("not enough parameters, died");}
+
 $i = $ARGV[0];
 $author = $ARGV[1];
 $new_location = $ARGV[2];
@@ -36,12 +38,13 @@ $lat = $l1[1] + $l1[2] / 60 + $l1[3] / 3600;
 $lon = $l2[1] + $l2[2] / 60 + $l2[3] / 3600;
 if ($debug) {print "vysledek: $lat $lon\n";}
 
+move("uploads/".basename($i),$new_location.basename($i)) or die;
+
 my $dbfile = 'guidepost';
 my $dbh = DBI->connect("dbi:SQLite2:dbname=$dbfile","","",{ RaiseError => 1 },) or die $DBI::errstr;
-$q = "insert into guidepost values (NULL, $lat, $lon, '".$i."','".basename($i)."', '$author');\n";
+$q = "insert into guidepost values (NULL, $lat, $lon, '".$new_location.basename($i)."','".basename($i)."', '$author');\n";
 if ($debug) {print $q;}
-#$dbh->do($q) or die;
+$dbh->do($q) or die;
 $dbh->disconnect();
-#move("uploads/".basename($i),$new_location.basename($i)) or if ($debug) print "nepresunuto na $new_location".basename($i)."<br>";
 if ($debug) {print "done\n";}
 exit 0;
