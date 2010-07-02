@@ -54,30 +54,23 @@ function show_upload_dialog()
   <body onload='init()'>\n";
 
   print "
-<xlabel>
 <div id='map' class='smallmap'></div>
-<x/label>
-   <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
-   <input type='hidden' name='action' value='file' />
-   <input type='hidden' name='MAX_FILE_SIZE' value='3000000' />
-<fieldset>
-<input type='text' name='author' value='autor' size='9'>
-<input name='uploadedfile' type='file' size='20'/>
-<input type='text' name='lat' value='0' size='10'>
-<input type='text' name='lon' value='0' size='10'>
-</fieldset>
-<fieldset>
-<input type='reset' name='reset' value='Reset' />
-<input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
-</fieldset>
-   </form>
-\n";
-
+<form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
+  <input type='hidden' name='action' value='file' />
+  <input type='hidden' name='MAX_FILE_SIZE' value='3000000' />
+  <fieldset>
+    <input type='text' name='author' value='autor' size='9'>
+    <input name='uploadedfile' type='file' size='20'/>
+    <input type='text' name='lat' value='0' size='10'>
+    <input type='text' name='lon' value='0' size='10'>
+  </fieldset>
+  <fieldset>
+    <input type='reset' name='reset' value='Reset' />
+    <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
+  </fieldset>
+</form>\n";
   print "<p id='upload_process'>Uploading...</p>";
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:300;height:50;border:1px solid #fff;'></iframe>
-
-";
-
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>";
 }
 
 ################################################################################
@@ -154,11 +147,11 @@ function process_file()
     if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
       echo "Soubor '$file' byl uspesne nahran na server do $target_path";
       if (!$lat && !$lon) {
-        $out = system ("/var/www/exifme.pl $target_path autor img/guidepost/", $errlvl);
+        $out = system ("/var/www/exifme.pl $target_path $author img/guidepost/", $errlvl);
         print "<br>vystup: $out";
         if ($errlvl) {
           $result = 0;
-          $error_message = "nepodarilo se zjistit souradnice z exif";
+          $error_message = "nepodarilo se zjistit souradnice z exif" + $out;
         } else {
           $result = 1;
         }
