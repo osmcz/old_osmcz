@@ -57,7 +57,21 @@ function init()
     }
   );
 
-  map.addLayers([mapnik]);
+  var layer_kctcz = new OpenLayers.Layer.TMS(
+      "Turisticke stezky",
+      "http://openstreetmap.cz/kct_tiles/",
+      {
+        isBaseLayer:false,
+        layername: 'kctcz',
+        opacity:0.6,
+        type: 'png', 
+        getURL: osm_getTileURL,
+        displayOutsideMaxExtent: true,
+        attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
+      }
+  );
+  map.addLayer(layer_kctcz);
+  map.addLayer(mapnik);
   map.zoomToExtent(new OpenLayers.Bounds(15, 49, 16, 50).transform(map.displayProjection, map.projection));
   var click = new OpenLayers.Control.Click();
   map.addControl(click);

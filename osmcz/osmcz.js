@@ -296,11 +296,12 @@ function init()
     controls: [
         new OpenLayers.Control.PanZoomBar(),
         new OpenLayers.Control.MouseDefaults(),
-        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
+//        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
+ new OpenLayers.Control.LayerSwitcher({'div': OpenLayers.Util.getElement('layerswitcher')}),
         new OpenLayers.Control.ScaleLine(),
         new OpenLayers.Control.Permalink('permalink'),
         new OpenLayers.Control.MousePosition(),
-//                    new OpenLayers.Control.OverviewMap(),
+        //new OpenLayers.Control.OverviewMap(),
         new OpenLayers.Control.KeyboardDefaults()                    ],
         maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
         numZoomLevels: 18,
@@ -327,17 +328,17 @@ function init()
       }
   );
   map.addLayer(layer_osmcz2);
-  var layer_osmcz2 = new OpenLayers.Layer.TMS(
+  var layer_otm = new OpenLayers.Layer.TMS(
       "opentracksmap TMS",
       "http://opentrackmap.no-ip.org/tiles/",
       {
         layername: 'blackhex sq',
         type: 'png', getURL: osm_getTileURL,
         displayOutsideMaxExtent: true,
-        attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
+        attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a><a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
       }
   );
-  map.addLayer(layer_osmcz2);
+  map.addLayer(layer_otm);
 
   var gml_all = new OpenLayers.Layer.GML(
       "KCT vse, pomale!", "http://openstreetmap.cz/kct.osm", 
@@ -360,6 +361,17 @@ function init()
       }
   );
   map.addLayer(layer_kctcz);
+
+  var hiking_tracks = new OpenLayers.Layer.OSM(
+    "OTM Hiking Tracks", 
+    "http://opentrackmap.no-ip.org/tracks/", 
+    {
+      isBaseLayer:false,
+      type: 'png', 
+      numZoomLevels: 19, 
+      getURL: osm_getTileURL
+    });
+  map.addLayer(hiking_tracks);
 
   gml = new OpenLayers.Layer.GML("KCT", "", {format: OpenLayers.Format.OSM, projection: map.displayProjection});
   gml.events.register("loadstart", null, function() { loader_on(); });
@@ -386,11 +398,9 @@ function init()
       lon_get = 17.07;
       lat_get = 49.7;
       zoom_get = 12;
-//      alert("no cookie");
     }
   }
   map.setCenter(new OpenLayers.LonLat(lon_get,lat_get).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")), zoom_get);
-//  get_center();
 }
 
 var poi_layer = [];
