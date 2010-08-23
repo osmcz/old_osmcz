@@ -131,6 +131,7 @@ function process_file()
   $file = basename($filename);
   $target_path = "uploads/";
   $target_path = $target_path . $file;
+  $final_path = "img/guidepost/" . $file;
   
   print "<br>target:$target_path";
   print "<hr>";
@@ -156,10 +157,11 @@ function process_file()
           $result = 1;
         }
       } else {
-        insert_to_db($lat, $lon, $target_path, $file, $author);
         if (!copy ("uploads/$file","img/guidepost/$file")) {
           $error_message = "failed to copy $file to destination ...";
           $result = 0;
+        } else {
+          insert_to_db($lat, $lon, $final_path, $file, $author);
         }
       }
     } else {
