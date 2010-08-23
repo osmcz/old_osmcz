@@ -67,7 +67,7 @@ function init()
         type: 'png', 
         getURL: osm_getTileURL,
         displayOutsideMaxExtent: true,
-        attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
+        attribution: '<a href="http://www.openstreetmap.cz/">OSM CZ</a>'
       }
   );
   map.addLayer(layer_kctcz);
