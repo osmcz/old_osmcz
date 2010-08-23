@@ -57,7 +57,7 @@ function show_upload_dialog()
 <div id='map' class='smallmap'></div>
 <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
   <input type='hidden' name='action' value='file' />
-  <input type='hidden' name='MAX_FILE_SIZE' value='3000000' />
+  <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
   <fieldset>
     <input type='text' name='author' value='autor' size='9'>
     <input name='uploadedfile' type='file' size='20'/>
