@@ -204,7 +204,7 @@ function init()
         layername: 'blackhex sq',
         type: 'png', getURL: osm_getTileURL,
         displayOutsideMaxExtent: true,
-        attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a><a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
+        attribution: '<a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
       }
   );
   map.addLayer(layer_otm);
@@ -226,7 +226,7 @@ function init()
         type: 'png', 
         getURL: osm_getTileURL,
         displayOutsideMaxExtent: true,
-        attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
+        attribution: '<a href="http://openstreetmap.cz/">osmcz</a>'
       }
   );
   map.addLayer(layer_kctcz);
@@ -238,7 +238,8 @@ function init()
       isBaseLayer:false,
       type: 'png', 
       numZoomLevels: 19, 
-      getURL: osm_getTileURL
+      getURL: osm_getTileURL,
+      attribution: '<a href="http://opentrackmap.no-ip.org/">otm</a>'
     });
   map.addLayer(hiking_tracks);
 
