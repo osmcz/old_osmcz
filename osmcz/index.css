@@ -94,6 +94,10 @@ div.leftcolumn {
   xoverflow : scroll;
 }
 
+div.gpslink {
+  z-index: 9997;
+}
+
 p.leftcolumn {
   margin-top:0;
   margin-bottom:0;
