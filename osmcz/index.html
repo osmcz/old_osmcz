@@ -253,14 +253,29 @@ google.friendconnect.container.renderWallGadget(
 <!--########class=right######################################################-->
 
 <div id="main_div" class="main">
-<h1>openstreetmap.cz - svobodná mapa</h1>
+
+<div id="container">
+ <div class="leftcolumn"><p class="leftcolumn">openstreetmap.cz - svobodná mapa</p></div>
+ <div class="rightcolumn">
+ <form action=" http://nominatim.openstreetmap.org/search" type="GET">
+ <input type=text name="q" value="hledej">
+ <input type=hidden name="format"  value="html">
+ <input type="submit" value="hledej">
+ </form>
+ </div>
+ <div class="clear"></div>
+</div>
+
 <div class="handle">
 <a href="javascript:div_on('right_box');shrink_map()">&lt;</a><a href="javascript:div_off('right_box');grow_map()">&gt;</a>
 </div>
 <div id="map" class="smallmap"></div>
+
+<div id="gpslink">
 <p>
 <a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma/ Map for your navigation</a>
 </p>
+</div>
 </div>
 
 <div style="position:absolute;bottom:0;">
