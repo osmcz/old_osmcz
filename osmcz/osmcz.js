@@ -401,9 +401,26 @@ function search_ajax()
 
 function on_search(request)
 {
-  alert(request.responseText);
+//  alert(request.responseText);
   a = JSON.decode(request.responseText);
+  search_result = "<p><ol>";
   for(i = 0; i < a.length; i++) {
-    alert(a[i].lat);
+    search_result += "<li>" + a[i].lat + "," + a[i].lon;
+    search_result += " " + a[i].display_name;
   }
+  search_result += "</ol></p>";
+
+/*
+class: "highway"
+display_name: "Litovel, R35, Nasobůrky, Okres Olomouc, Olomoucký kraj, Czech Republic"
+lat: 49.6875308
+licence: "Data Copyright OpenStreetMap Contributors, Some Rights Reserved. CC-BY-SA 2.0."
+lon: 17.0528042
+osm_id: 25577262
+osm_type: "node"
+place_id: 50891542
+type: "motorway_junction"
+*/
+  alert(search_result);
+  document.getElementById('searchdiv').innerHTML = search_result;
 }
