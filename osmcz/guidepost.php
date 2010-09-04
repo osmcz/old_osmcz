@@ -20,7 +20,7 @@ function page_header()
   print "<html>\n";
   print "  <head>\n";
   print "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n";
-  print "  <title>alfresco upload</title>\n";
+  print "  <title>openstreetmap.cz image upload</title>\n";
   print "  <script src='OpenLayers.js'></script>\n";
   print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
   print "  <link href='upload.css' rel='stylesheet' type='text/css'/>";
