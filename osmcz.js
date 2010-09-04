@@ -385,7 +385,25 @@ function show_guideposts(x)
   var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
   var request = OpenLayers.Request.GET({
     url: "http://openstreetmap.cz/guidepost.php",
-     params: {bbox: kokot.toBBOX()},
+    params: {bbox: kokot.toBBOX()},
     callback: handler
   });
+}
+
+function search_ajax()
+{
+  var request = OpenLayers.Request.GET({
+    url: " http://nominatim.openstreetmap.org/search/",
+    params: {q:"litovel", format:"json"},
+    callback: on_search
+  });
+}
+
+function on_search(request)
+{
+  alert(request.responseText);
+  a = JSON.decode(request.responseText);
+  for(i = 0; i < a.length; i++) {
+    alert(a[i].lat);
+  }
 }
