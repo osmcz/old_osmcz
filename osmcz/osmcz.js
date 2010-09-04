@@ -285,7 +285,7 @@ function show_poi(category)
   });
   map.addLayer(poi_layer[category]);*/
 
-  newl = new OpenLayers.Layer.Text( "text", { 
+  newl = new OpenLayers.Layer.Text( "radary", { 
     location:"./radary.poi",
     projection:map.displayProjection
   });
@@ -315,7 +315,7 @@ function hide_poi(category)
  */
 function addMarker(markers, ll, popupClass, popupContentHTML, closeBox, overflow) {
 
-    var icon   = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost.png');
+    var icon = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost.png');
 
     var feature = new OpenLayers.Feature(markers, ll, icon); 
     feature.closeBox = true;
@@ -338,17 +338,24 @@ function addMarker(markers, ll, popupClass, popupContentHTML, closeBox, overflow
     };
     marker.events.register("mousedown", feature, markerClick);
 
+
     markers.addMarker(marker);
 }
 
 function handler(request) 
 {
+
+    var layers = map.getLayersByName("Rozcestniky");
+    for(var layerIndex = 0; layerIndex < layers.length; layerIndex++) {
+      map.removeLayer(layers[layerIndex]);
+    }
+
   AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
     'autoSize': true,
     'maxSize': new OpenLayers.Size(450,450)
   });
 
-  var markers = new OpenLayers.Layer.Markers( "Markers" );
+  var markers = new OpenLayers.Layer.Markers("Rozcestniky");
   map.addLayer(markers);
 
   //alert(request.responseText);
