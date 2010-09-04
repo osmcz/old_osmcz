@@ -399,7 +399,6 @@ function search_ajax(what)
 
 function on_search(request)
 {
-//  alert(request.responseText);
   a = JSON.decode(request.responseText);
   search_result = "<p><ol>";
   for(i = 0; i < a.length; i++) {
@@ -419,9 +418,7 @@ osm_type: "node"
 place_id: 50891542
 type: "motorway_junction"
 */
-  alert(search_result);
   document.getElementById('searchdiv').innerHTML = search_result;
   set_center(a[0].lon, a[0].lat);
-  alert(a[0].lon+","+a[0].lat);
 }
 
