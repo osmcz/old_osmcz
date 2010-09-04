@@ -157,7 +157,7 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <h4>Turistika</h4>
 <ul>
 <li><a href="javascript:show_guideposts(1)">Rozcestníky</a>
-<li><a href="javascript:upbox_on()">Nahrat obrazek</a>
+<li><a href="javascript:upbox_on()">Nahrát obrázek</a>
 </ul>
 <ul>
 <li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
@@ -171,16 +171,16 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <ul>
         <li><a href="credits.html">Přispěvatelé a použité zdroje</a>
         <li><a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma/ Free map for your navigation device </a>
-        <li><a href="http://openstreetmap.cz/svn/walley/osmcz/">http://openstreetmap.cz/svn/walley/osmcz/Zdrojove kody a html teto stranky (public svn)</a>
+        <li><a href="http://openstreetmap.cz/svn/walley/osmcz/">Zdrojove kody a html teto stranky (public svn)</a>
         <li><a href="http://wiki.openstreetmap.org/index.php/Cz:Main_Page">Česká sekce openstreetmap.org wiki</a>
-        <li><a href="http://tchor.fi.muni.cz:8080/">cyklomapa</a>
-        <li><a href="http://opentrackmap.no-ip.org/">turisticka mapa</a>
+        <li><a href="http://tchor.fi.muni.cz:8080/">Cyklomapa</a>
+        <li><a href="http://opentrackmap.no-ip.org/">Turisticka mapa OTM</a>
         <li><a href="http://garmin.openstreetmap.cz">Mapy pro Váš garmin zdarma, free garmin map</a>
         <li><a href="http://gpsfreemaps.net/garmin-mapy">Seznam volně šiřitelných map pro garmin</a>
         <li><a href="http://gpsmapsearch.com/?l=cs">Vyhledávání map podle lokace</a>
         <li><a href="http://walley.org">walley.org</a>
         <li><a href="http://live.jabbim.cz/chat/openstreetmap@conf.netlab.cz">Openstreetmap jabber chat</a>
-        <li><a href="irc://irc.oftc.net/osm">Openstreetmap irc kanal</a>
+        <li><a href="irc://irc.oftc.net/osm">Openstreetmap irc kanal, anglicky</a>
 </ul>
 
 </div>
@@ -255,11 +255,11 @@ google.friendconnect.container.renderWallGadget(
 <div id="container">
  <div class="leftcolumn"><p class="leftcolumn">openstreetmap.cz - svobodná mapa</p></div>
  <div class="rightcolumn">
- <form action=" http://nominatim.openstreetmap.org/search" type="GET">
+ <form name="searchform" action=" http://nominatim.openstreetmap.org/search" type="GET">
  <input type=text name="q" value="hledej">
  <input type=hidden name="format"  value="html">
  <input type="submit" value="hledej">
- <input type="button" value="ajax" onclick="javascript:search_ajax()">
+ <input type="button" value="ajax" onclick="javascript:search_ajax(document.searchform.q.value)">
  </form>
  </div>
  <div class="clear"></div>

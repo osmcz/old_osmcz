@@ -1,5 +1,11 @@
 var map, gml;
 
+function set_center(lon, lat)
+{
+  var lonlat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+  map.panTo(lonlat);
+}
+
 function getInternetExplorerVersion()
 // Returns the version of Internet Explorer or a -1
 // (indicating the use of another browser).
@@ -140,20 +146,12 @@ function get_cookie(c_name)
 
 function get_center()
 {
-    kill_cookie();
-//alert(document.cookie);
-    b=map.getCenter();
-    a=b.transform(map.getProjectionObject(),map.displayProjection);
-    lat = a.lat;
-    lon = a.lon;
-
-//    zproj = map.getProjectionObject();
-//    kproj = map.displayProjection;
-//    html= lat+"<br>"+lon+"<br>"+zproj+"<br>"+kproj
-//    alert(html);
-
-    set_cookie("osm_position", lon+";"+lat+";12", 2);
-//alert(document.cookie);
+  kill_cookie();
+  b = map.getCenter();
+  a = b.transform(map.getProjectionObject(),map.displayProjection);
+  lat = a.lat;
+  lon = a.lon;
+  set_cookie("osm_position", lon+";"+lat+";12", 2);
 }
 
 
@@ -390,11 +388,11 @@ function show_guideposts(x)
   });
 }
 
-function search_ajax()
+function search_ajax(what)
 {
   var request = OpenLayers.Request.GET({
     url: " http://nominatim.openstreetmap.org/search/",
-    params: {q:"litovel", format:"json"},
+    params: {q:what, format:"json"},
     callback: on_search
   });
 }
@@ -423,4 +421,7 @@ type: "motorway_junction"
 */
   alert(search_result);
   document.getElementById('searchdiv').innerHTML = search_result;
+  set_center(a[0].lon, a[0].lat);
+  alert(a[0].lon+","+a[0].lat);
 }
+
