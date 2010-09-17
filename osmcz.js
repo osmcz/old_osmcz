@@ -340,6 +340,11 @@ function addMarker(markers, ll, popupClass, popupContentHTML, closeBox, overflow
     markers.addMarker(marker);
 }
 
+var  AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
+    'autoSize': true,
+    'maxSize': new OpenLayers.Size(450,450)
+  });
+
 function handler(request) 
 {
 
@@ -348,10 +353,6 @@ function handler(request)
       map.removeLayer(layers[layerIndex]);
     }
 
-  AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
-    'autoSize': true,
-    'maxSize': new OpenLayers.Size(450,450)
-  });
 
   var markers = new OpenLayers.Layer.Markers("Rozcestniky");
   map.addLayer(markers);
@@ -422,3 +423,34 @@ type: "motorway_junction"
   set_center(a[0].lon, a[0].lat);
 }
 
+function parse_data(req) 
+{
+  var markers = new OpenLayers.Layer.Markers("Wikimedia Commons");
+  map.addLayer(markers);
+    
+  g =  new OpenLayers.Format.KML({extractStyles: true});
+  html = ""
+  features = g.read(req.responseText);
+  for(var feat in features) {
+    var lat = features[feat].geometry.y;
+    var lon = features[feat].geometry.x;
+
+    var size   = new OpenLayers.Size(10, 17);
+    var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+    var pos    = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+
+    popupClass = AutoSizeFramedCloudMaxSize;
+    html_content = "guidepost by wikimedia commons "+features[feat].attributes[0]+"<br>";
+    html_content += features[feat].attributes[1];
+    html_content += " <img src='img/guidepost/"+""+"' width='180' alt='guidepost'>";
+for (var j in features[feat].attributes) {
+                html_content += "<li>Attribute "+j+":"+features[feat].attributes[j]+"</li>";
+                            }
+    addMarker(markers, pos, popupClass, html_content, true, true);
+  }
+}
+
+function commons_on() 
+{
+  OpenLayers.loadURL("a.kml", "", null, parse_data);
+}
