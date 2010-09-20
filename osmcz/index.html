@@ -50,6 +50,14 @@ function grow_map(div_id)
   document.getElementById("main_div").style.right = '10px' ;
 }
 
+function request_commons(category)
+{
+  alert("bum"+category);
+  loader_on();
+  commons_on('http://toolserver.org/~para/cgi-bin/kmlexport?project=Commons&article=Category:'+category);
+  loader_off()
+}
+
 function init_page()
 {
   if ( getInternetExplorerVersion() > -1 ) {
@@ -158,11 +166,24 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <ul>
 <li><a href="javascript:show_guideposts(1)">Rozcestníky</a>
 <li><a href="javascript:upbox_on()">Nahrát obrázek</a>
-<li><a href="javascript:commons_on()">Wikimedia Commons</a>
+<li>
+
+<form name="catsel">
+<label>kategorie</label>
+<select name="commons_category" style="width:100px;">
+<option selected="yes">European_long-distance_paths_direction_labels_in_the_Czech_Republic</option>
+<option>Way_of_Saint_James_in_the_Czech_Republic</option>
+<option>Cycling_route_signs_in_the_Czech_Republic</option>
+<option>Czech_hiking_and_footpath_signs_in_Krkonoše</option>
+<option>Cycling_stripe_signs_in_the_Czech_Republic</option>
+</select>
+</form>
+<a href="javascript:request_commons(document.catsel.commons_category.value)">Wikimedia Commons</a>
+</li>
 </ul>
 <ul>
 <li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
-<li><a href="map.html">Fullscreen mapa</a>
+<li><a href="map.html">Fullscreen mapa (pokazene)</a>
 </ul>
 </div>
 <br>

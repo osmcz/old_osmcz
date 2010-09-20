@@ -371,7 +371,7 @@ function handler(request)
     popupClass = AutoSizeFramedCloudMaxSize;
     html_content = "guidepost by "+b.attribution+"<br>"
     html_content += "<a href='"+b.url+"'>"+b.name+"</a><br>"
-    html_content += " <img src='img/guidepost/"+b.name+"' width='180' alt='guidepost'>" 
+    html_content += " <img src='"+b.url+"' width='180' alt='guidepost'>" 
     addMarker(markers, pos, popupClass, html_content, true, true);
 
 //    markers.addMarker(marker);
@@ -427,7 +427,10 @@ function parse_data(req)
 {
   var markers = new OpenLayers.Layer.Markers("Wikimedia Commons");
   map.addLayer(markers);
-    
+  
+  var expr = /<img.*src="(.*?)".*?>/;
+  var exprc = /<center>(.*?)<.center>/;
+
   g =  new OpenLayers.Format.KML({extractStyles: true});
   html = ""
   features = g.read(req.responseText);
@@ -440,17 +443,24 @@ function parse_data(req)
     var pos    = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
 
     popupClass = AutoSizeFramedCloudMaxSize;
-    html_content = "guidepost by wikimedia commons "+features[feat].attributes[0]+"<br>";
-    html_content += features[feat].attributes[1];
-    html_content += " <img src='img/guidepost/"+""+"' width='180' alt='guidepost'>";
-for (var j in features[feat].attributes) {
-                html_content += "<li>Attribute "+j+":"+features[feat].attributes[j]+"</li>";
-                            }
+    html_content = "guidepost by<br>";
+    html_content += "<a href='http://commons.wikimedia.org/'>Wikimedia Commons</a><br>";
+    for (var j in features[feat].attributes) {
+      if (j == "name") {
+        html_content += "Jmeno:"+features[feat].attributes[j]+"<br>";
+      } else {
+        //var matching = expr.exec(features[feat].attributes[j]);
+        //html_content += RegExp.$1;
+        var matching2 = exprc.exec(features[feat].attributes[j]);
+        html_content += RegExp.$1;
+      }
+    }
+
     addMarker(markers, pos, popupClass, html_content, true, true);
   }
 }
 
-function commons_on() 
+function commons_on(url)
 {
-  OpenLayers.loadURL("a.kml", "", null, parse_data);
+  OpenLayers.loadURL(url, "", null, parse_data);
 }
