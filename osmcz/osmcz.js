@@ -427,11 +427,22 @@ function search_ajax(what)
 
 function on_search(request)
 {
+
   a = JSON.decode(request.responseText);
+  if (a.length == 0) {
+    document.getElementById('searchdiv').innerHTML = "<p>nic</p>";
+    return;
+  }
   search_result = "<p><ol>";
   for(i = 0; i < a.length; i++) {
-    search_result += "<li>" + a[i].lat + "," + a[i].lon;
-    search_result += " " + a[i].display_name;
+    search_result += "<li>";
+
+    search_result += "<span onclick='javascript:set_center("+a[i].lon+", "+a[i].lat+")'> <font color='blue'>&gt;&gt;</font> </span>";
+
+//    map.panTo(lonlat);
+
+    search_result += "<a href='http://openstreetmap.cz/?zoom=12&lat="+a[i].lat+"&lon="+a[i].lon+"&layers=B0000FTTFTTT'>"+a[i].display_name+"</a>";
+    search_result +=  a[i].lat + "," + a[i].lon;
   }
   search_result += "</ol></p>";
 
