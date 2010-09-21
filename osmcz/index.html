@@ -52,10 +52,9 @@ function grow_map(div_id)
 
 function request_commons(category)
 {
-  alert("bum"+category);
   loader_on();
   commons_on('http://toolserver.org/~para/cgi-bin/kmlexport?project=Commons&article=Category:'+category);
-  loader_off()
+  loader_off();
 }
 
 function init_page()
@@ -171,7 +170,8 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <form name="catsel">
 <label>kategorie</label>
 <select name="commons_category" style="width:100px;">
-<option selected="yes">European_long-distance_paths_direction_labels_in_the_Czech_Republic</option>
+<option selected="yes">Hiking_and_footpath_fingerposts_in_the_Czech_Republic</option>
+<option>European_long-distance_paths_direction_labels_in_the_Czech_Republic</option>
 <option>Way_of_Saint_James_in_the_Czech_Republic</option>
 <option>Cycling_route_signs_in_the_Czech_Republic</option>
 <option>Czech_hiking_and_footpath_signs_in_Krkonoše</option>

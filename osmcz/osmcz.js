@@ -1,3 +1,21 @@
+/*
+* osmcz.js - openstreetmap.cz support file
+* Copyright (C) 2010  Michal Grezl
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 var map, gml;
 
 function set_center(lon, lat)
@@ -303,7 +321,7 @@ function hide_poi(category)
  *     whether or not to give the popup a close box.
  * 
  * Parameters:
- * markers - layer added by me
+ * to_layer - layer
  * ll - {<OpenLayers.LonLat>} Where to place the marker
  * popupClass - {<OpenLayers.Class>} Which class of popup to bring up 
  *     when the marker is clicked.
@@ -311,48 +329,57 @@ function hide_poi(category)
  * closeBox - {Boolean} Should popup have a close box?
  * overflow - {Boolean} Let the popup overflow scrollbars?
  */
-function addMarker(markers, ll, popupClass, popupContentHTML, closeBox, overflow) {
+function addMarker(to_layer, ll, popupClass, popupContentHTML, closeBox, overflow) 
+{
 
-    var icon = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost.png');
+  var icon_size = new OpenLayers.Size(48, 48);
+  var marker_icon = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost_nice.png', icon_size);
 
-    var feature = new OpenLayers.Feature(markers, ll, icon); 
-    feature.closeBox = true;
-    feature.popupClass = popupClass;
-    feature.data.popupContentHTML = popupContentHTML;
-    feature.data.overflow = (overflow) ? "auto" : "hidden";
+  //not working since 2008 
+  var icon_url = 'http://openstreetmap.cz/img/guidepost.png';
+  var data = {
+    iconURL: icon_url,
+    iconSize: icon_size
+  };
 
-    var marker = feature.createMarker();
+  var feature = new OpenLayers.Feature(to_layer, ll, data);
 
-    var markerClick = function (evt) {
-        if (this.popup == null) {
-            this.popup = this.createPopup(this.closeBox);
-            map.addPopup(this.popup);
-            this.popup.show();
-        } else {
-            this.popup.toggle();
-        }
-        currentPopup = this.popup;
-        OpenLayers.Event.stop(evt);
-    };
-    marker.events.register("mousedown", feature, markerClick);
+  feature.closeBox = true;
+  feature.popupClass = popupClass;
+  feature.data.popupContentHTML = popupContentHTML;
+  feature.data.overflow = (overflow) ? "auto" : "hidden";
+  feature.data.icon = marker_icon;
+  var marker = feature.createMarker();
 
+  var markerClick = function (evt) {
+    if (this.popup == null) {
+      this.popup = this.createPopup(this.closeBox);
+      map.addPopup(this.popup);
+      this.popup.show();
+    } else {
+      this.popup.toggle();
+    }
+      currentPopup = this.popup;
+      OpenLayers.Event.stop(evt);
+  };
 
-    markers.addMarker(marker);
+//  marker.icon = icon;
+  marker.events.register("mousedown", feature, markerClick);
+  to_layer.addMarker(marker);
 }
 
 var  AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
-    'autoSize': true,
-    'maxSize': new OpenLayers.Size(450,450)
-  });
+  'autoSize': true,
+  'maxSize': new OpenLayers.Size(450,450)
+});
 
-function handler(request) 
+function handler(request)
 {
 
-    var layers = map.getLayersByName("Rozcestniky");
-    for(var layerIndex = 0; layerIndex < layers.length; layerIndex++) {
-      map.removeLayer(layers[layerIndex]);
-    }
-
+  var layers = map.getLayersByName("Rozcestniky");
+  for(var layerIndex = 0; layerIndex < layers.length; layerIndex++) {
+    map.removeLayer(layers[layerIndex]);
+  }
 
   var markers = new OpenLayers.Layer.Markers("Rozcestniky");
   map.addLayer(markers);
