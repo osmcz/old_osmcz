@@ -419,12 +419,12 @@ function show_guideposts(x)
 function search_ajax(what)
 {
   var request = OpenLayers.Request.GET({
-    url: " http://nominatim.openstreetmap.org/search/",
+    url: "http://nominatim.openstreetmap.org/search/",
     params: {q:what, format:"json"},
-    callback: on_search
+    callback: on_search,
   });
 }
-
+//c "http://openstreetmap.cz/cgi-bin/proxy.cgi?url="
 function on_search(request)
 {
 

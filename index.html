@@ -277,7 +277,7 @@ google.friendconnect.container.renderWallGadget(
 <div id="container">
  <div class="leftcolumn"><p class="leftcolumn">openstreetmap.cz - svobodná mapa</p></div>
  <div class="rightcolumn">
- <form name="searchform" action=" http://nominatim.openstreetmap.org/search" type="GET">
+ <form name="searchform" action="javascript:search_ajax(document.searchform.q.value)" type="GET">
  <input type=text name="q" value="hledej">
  <input type=hidden name="format"  value="html">
  <input type="button" value="hledej" onclick="javascript:search_ajax(document.searchform.q.value)">
