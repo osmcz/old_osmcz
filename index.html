@@ -156,16 +156,22 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <div id="rabbit" style="width: 100%">
 <h4>Vyhledavani</h4>
 <div id="searchdiv"><p>Zde budou vysledky vyhledavani</p></div>
-<h4>Radary</h4>
-<ul>
-<li><a href="javascript:show_poi(1)">zobraz poi</a><br>
-<li><a href="javascript:hide_poi(1)">skryj poi</a>
-</ul>
+<h4>Test navigace</h4>
+ <form name="navform" action="javascript:directions_ajax()" type="GET">
+ <input type=hidden name="format"  value="html">
+ <input type="button" value="hledej" onclick="javascript:search_ajax(document.searchform.q.value)">
+ </form>
+<div id="directiondiv"><p>Zde budou vysledky navigace</p></div>
 <h4>Turistika</h4>
 <ul>
 <li><a href="javascript:show_guideposts(1)">Rozcestníky</a>
 <li><a href="javascript:upbox_on()">Nahrát obrázek</a>
 <li>
+<h4>Radary</h4>
+<ul>
+<li><a href="javascript:show_poi(1)">zobraz poi</a><br>
+<li><a href="javascript:hide_poi(1)">skryj poi</a>
+</ul>
 
 <form name="catsel">
 <label>kategorie</label>
