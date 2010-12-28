@@ -424,12 +424,81 @@ function search_ajax(what)
     callback: on_search,
   });
 }
-//c "http://openstreetmap.cz/cgi-bin/proxy.cgi?url="
+
+function nav_ajax()
+{
+  navurl = "http://open.mapquestapi.com/directions/v0/route?callback=renderAdvancedNarrative&outFormat=json&routeType=shortest&enhancedNarrative=false&shapeFormat=raw&generalize=200&locale=en_BG&unit=m&from=38.88866,-77.641899&to=38.894669,-77.19042"
+  var request = OpenLayers.Request.GET({
+    url: navurl,
+//    params: {q:what, format:"json"},
+    callback: on_nav,
+  });
+}
+
+//function on_nav(request)
+function on_nav2()
+{
+//  alert(request.responseText);
+
+  var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+  layer_style.fillOpacity = 0.2;
+  layer_style.graphicOpacity = 1;
+
+  var style_green = {
+    strokeColor: "#00FF00",
+    strokeWidth: 3,
+    strokeDashstyle: "dashdot",
+    pointRadius: 6,
+    pointerEvents: "visiblePainted"
+  };
+
+  var line_layer = new OpenLayers.Layer.Vector("Navigace", {style: layer_style});
+  var point = new OpenLayers.Geometry.Point(17.00, 49.5);//.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+
+  // create a line feature from a list of points
+  var pointList = [];
+  var newPoint = point;
+  for(var p=0; p<15; ++p) {
+    newPoint = new OpenLayers.Geometry.Point(newPoint.x + p, newPoint.y + p);
+    pointList.push(newPoint);
+  }
+  pointList.push(pointList[0]);
+
+  var line = new OpenLayers.Geometry.LineString(pointList);
+//  line = line.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+ line = line.transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject());
+  var lineFeature = new OpenLayers.Feature.Vector(line,null,style_green);
+
+  map.addLayer(line_layer);
+  map.setCenter(new OpenLayers.LonLat(point.x, point.y).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")), 13);
+  line_layer.addFeatures([lineFeature]);
+}
+
+function on_nav()
+{
+var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
+map.addLayer(lineLayer); // Assuming that map is your map object
+var points = new Array(
+new OpenLayers.Geometry.Point(17,49.5),
+new OpenLayers.Geometry.Point(50, 18)
+);
+var line = new OpenLayers.Geometry.LineString(points);
+var defaultProj = new OpenLayers.Projection('EPSG:4326');
+line = line.transform(defaultProj, map.getProjectionObject());
+var style = {
+strokeColor: '#0000ff',
+strokeOpacity: 0.5,
+strokeWidth: 5
+};
+lineFeature = new OpenLayers.Feature.Vector(line, null, style);
+lineLayer.addFeatures([lineFeature]);
+}
+
 function on_search(request)
 {
   a = JSON.decode(request.responseText);
   if (a.length == 0) {
-    document.getElementById('searchdiv').innerHTML = "<p>nic</p>";
+    document.getElementById('searchdiv').innerHTML = "<p>nic nenalezeno</p>";
     return;
   }
   search_result = "<p><ol>";
