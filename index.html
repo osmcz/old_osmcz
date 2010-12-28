@@ -151,28 +151,23 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 </div>
 </div>
 <br>
+
 <a href="javascript:animatedcollapse.toggle('rabbit')">[ Ovládání mapy ]</a>
 <!--<sup><a href="javascript:animatedcollapse.show('rabbit')">v</a><a href="javascript:animatedcollapse.hide('rabbit')">^</a></sup>-->
 <div id="rabbit" style="width: 100%">
 <h4>Vyhledavani</h4>
 <div id="searchdiv"><p>Zde budou vysledky vyhledavani</p></div>
 <h4>Test navigace</h4>
- <form name="navform" action="javascript:directions_ajax()" type="GET">
- <input type=hidden name="format"  value="html">
- <input type="button" value="hledej" onclick="javascript:search_ajax(document.searchform.q.value)">
+ <form name="navform" action="javascript:nav_ajax()" type="GET">
+  <input type=hidden name="format"  value="html">
+  <input type="button" value="hledej" onclick="javascript:on_nav()">
  </form>
-<div id="directiondiv"><p>Zde budou vysledky navigace</p></div>
+ <div id="directiondiv"><p>Zde budou vysledky navigace</p></div>
 <h4>Turistika</h4>
 <ul>
 <li><a href="javascript:show_guideposts(1)">Rozcestníky</a>
 <li><a href="javascript:upbox_on()">Nahrát obrázek</a>
 <li>
-<h4>Radary</h4>
-<ul>
-<li><a href="javascript:show_poi(1)">zobraz poi</a><br>
-<li><a href="javascript:hide_poi(1)">skryj poi</a>
-</ul>
-
 <form name="catsel">
 <label>kategorie</label>
 <select name="commons_category" style="width:100px;">
@@ -190,6 +185,11 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <ul>
 <li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
 <li><a href="fs.html">Fullscreen mapa</a>
+</ul>
+<h4>Radary</h4>
+<ul>
+<li><a href="javascript:show_poi(1)">zobraz poi</a><br>
+<li><a href="javascript:hide_poi(1)">skryj poi</a>
 </ul>
 </div>
 <br>
