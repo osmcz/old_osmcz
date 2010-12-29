@@ -38,9 +38,17 @@ div.main {
   bottom: 190px;
 }
 
-H1 {
+h1 {
   font-size:30px;
   color:blue;
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+h4 {
+  border-width : 0px;
+  padding : 0px;
+  margin : 0px;
   margin-top:1px;
   margin-bottom:1px;
 }
