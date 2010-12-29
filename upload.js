@@ -4,35 +4,34 @@ var zoom = 5;
 var map, select;
 
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
-    defaultHandlerOptions: {
-        'single': true,
-        'double': false,
-        'pixelTolerance': 0,
-        'stopSingle': false,
-        'stopDouble': false
-    },
+  defaultHandlerOptions: {
+    'single': true,
+    'double': false,
+    'pixelTolerance': 0,
+    'stopSingle': false,
+    'stopDouble': false
+  },
 
-    initialize: function(options) {
-        this.handlerOptions = OpenLayers.Util.extend(
-            {}, this.defaultHandlerOptions
-        );
-        OpenLayers.Control.prototype.initialize.apply(
-            this, arguments
-        ); 
-        this.handler = new OpenLayers.Handler.Click(
-            this, {
-                'click': this.trigger
-            }, this.handlerOptions
-        );
-    }, 
+  initialize: function(options) {
+    this.handlerOptions = OpenLayers.Util.extend(
+        {}, this.defaultHandlerOptions
+    );
+    OpenLayers.Control.prototype.initialize.apply(
+        this, arguments
+    ); 
+    this.handler = new OpenLayers.Handler.Click(
+      this, {
+        'click': this.trigger
+      }, this.handlerOptions
+    );
+  }, 
 
-    trigger: function(e) {
-        var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
-        document.coord.lon.value = lonlat.lon;
-        document.coord.lat.value = lonlat.lat;
-    }
-
-    });
+  trigger: function(e) {
+    var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
+    document.coord.lon.value = lonlat.lon;
+    document.coord.lat.value = lonlat.lat;
+  }
+});
 
 /******************************************************************************/
 function init()
@@ -58,17 +57,17 @@ function init()
   );
 
   var layer_kctcz = new OpenLayers.Layer.TMS(
-      "Turisticke stezky",
-      "http://openstreetmap.cz/kct_tiles/",
-      {
-        isBaseLayer:false,
-        layername: 'kctcz',
-        opacity:0.6,
-        type: 'png', 
-        getURL: osm_getTileURL,
-        displayOutsideMaxExtent: true,
-        attribution: '<a href="http://www.openstreetmap.cz/">OSM CZ</a>'
-      }
+    "Turisticke stezky",
+    "http://openstreetmap.cz/kct_tiles/",
+    {
+      isBaseLayer:false,
+      layername: 'kctcz',
+      opacity:0.6,
+      type: 'png', 
+      getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      attribution: '<a href="http://www.openstreetmap.cz/">OSM CZ</a>'
+    }
   );
   map.addLayer(layer_kctcz);
   map.addLayer(mapnik);
@@ -101,18 +100,17 @@ function osm_getTileURL(bounds)
 function getHTTPObject()
 /******************************************************************************/
 {
-    if (typeof XMLHttpRequest != 'undefined') {
-      return new XMLHttpRequest();
+  if (typeof XMLHttpRequest != 'undefined') {
+    return new XMLHttpRequest();
   }
-
+  try {
+    return new ActiveXObject('Msxml2.XMLHTTP');
+  } catch (e) {
     try {
-      return new ActiveXObject('Msxml2.XMLHTTP');
-    } catch (e) {
-      try {
-        return new ActiveXObject('Microsoft.XMLHTTP');
-      } catch (e) {}
-    } return false;
-  }
+      return new ActiveXObject('Microsoft.XMLHTTP');
+    } catch (e) {}
+  } return false;
+}
 
 /******************************************************************************/
 function start_upload()

@@ -18,6 +18,41 @@
 
 var map, gml;
 
+OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
+  defaultHandlerOptions: {
+    'single': true,
+    'double': false,
+    'pixelTolerance': 0,
+    'stopSingle': false,
+    'stopDouble': false
+  },
+
+  initialize: function(options) {
+    this.handlerOptions = OpenLayers.Util.extend(
+        {}, this.defaultHandlerOptions
+    );
+    OpenLayers.Control.prototype.initialize.apply(
+        this, arguments
+    ); 
+    this.handler = new OpenLayers.Handler.Click(
+      this, {
+        'click': this.trigger
+      }, this.handlerOptions
+    );
+  }, 
+
+  trigger: function(e) {
+    var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
+    if (document.navform.fromcheck.checked) {
+      document.navform.from.value = lonlat.lat + "," + lonlat.lon;
+    }
+    if (document.navform.tocheck.checked) {
+      document.navform.to.value = lonlat.lat + "," + lonlat.lon;
+    }
+    alert("nazdar  "+lonlat.lon);
+  }
+});
+
 function set_center(lon, lat)
 {
   var lonlat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
@@ -286,6 +321,9 @@ function init()
     }
   }
   map.setCenter(new OpenLayers.LonLat(lon_get,lat_get).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")), zoom_get);
+  var click = new OpenLayers.Control.Click();
+  map.addControl(click);
+  click.activate();
 }
 
 var poi_layer = [];
