@@ -477,7 +477,7 @@ function on_nav2()
 function on_nav()
 {
 var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
-map.addLayer(lineLayer); // Assuming that map is your map object
+map.addLayer(lineLayer);
 var points = new Array(
 new OpenLayers.Geometry.Point(17,49.5),
 new OpenLayers.Geometry.Point(50, 18)
