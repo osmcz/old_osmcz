@@ -427,7 +427,7 @@ function search_ajax(what)
 
 function nav_ajax()
 {
-  navurl = "http://open.mapquestapi.com/directions/v0/route?callback=renderAdvancedNarrative&outFormat=json&routeType=shortest&enhancedNarrative=false&shapeFormat=raw&generalize=200&locale=en_BG&unit=m&from=38.88866,-77.641899&to=38.894669,-77.19042"
+  navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType=shortest&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=200&locale=en_BG&unit=k&from=49.7,17.0&to=49.65,17.1";
   var request = OpenLayers.Request.GET({
     url: navurl,
 //    params: {q:what, format:"json"},
@@ -474,24 +474,43 @@ function on_nav2()
   line_layer.addFeatures([lineFeature]);
 }
 
+//function on_nav(request)
 function on_nav()
 {
-var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
-map.addLayer(lineLayer);
-var points = new Array(
-new OpenLayers.Geometry.Point(17,49.5),
-new OpenLayers.Geometry.Point(50, 18)
-);
-var line = new OpenLayers.Geometry.LineString(points);
-var defaultProj = new OpenLayers.Projection('EPSG:4326');
-line = line.transform(defaultProj, map.getProjectionObject());
-var style = {
-strokeColor: '#0000ff',
-strokeOpacity: 0.5,
-strokeWidth: 5
-};
-lineFeature = new OpenLayers.Feature.Vector(line, null, style);
-lineLayer.addFeatures([lineFeature]);
+  request='{"route":{"hasTollRoad":false,"shape":{"maneuverIndexes":[0,2,4,6,8,11,13,15],"shapePoints":[49.699619,17.000192,49.702922,17.001604,49.702922,17.001604,49.703201,17.001726,49.703201,17.001726,49.691192,17.048229,49.691192,17.048229,49.689445,17.05046,49.689445,17.05046,49.681045,17.06295,49.663738,17.100896,49.663738,17.100896,49.660255,17.103466,49.660255,17.103466,49.654716,17.09626],"legIndexes":[0]},"hasHighway":true,"hasUnpaved":false,"boundingBox":{"ul":{"lng":17.000192,"lat":49.703483},"lr":{"lng":17.103466,"lat":49.654716}},"distance":10.399579048156738,"time":547,"locationSequence":[0,1],"sessionId":"4d1b511e-018b-0000-02b7-16ec-001ec93b8bf0","locations":[{"latLng":{"lng":17,"lat":49.7},"adminArea4":"","adminArea5Type":"City","adminArea4Type":"County","adminArea5":"","street":"","adminArea1":"","adminArea3":"","type":"s","displayLatLng":{"lng":17,"lat":49.7},"linkId":260668,"postalCode":"","sideOfStreet":"N","dragPoint":false,"adminArea1Type":"Country","geocodeQuality":"LATLNG","geocodeQualityCode":"XXXXX","adminArea3Type":"State"},{"latLng":{"lng":17.1,"lat":49.65},"adminArea4":"","adminArea5Type":"City","adminArea4Type":"County","adminArea5":"","street":"","adminArea1":"","adminArea3":"","type":"s","displayLatLng":{"lng":17.1,"lat":49.650001},"linkId":19776580,"postalCode":"","sideOfStreet":"N","dragPoint":false,"adminArea1Type":"Country","geocodeQuality":"LATLNG","geocodeQualityCode":"XXXXX","adminArea3Type":"State"}],"hasSeasonalClosure":false,"legs":[{"hasTollRoad":false,"index":0,"time":547,"distance":10.399579048156738,"hasSeasonalClosure":false,"hasCountryCross":false,"formattedTime":"00:09:07","hasUnpaved":false,"hasHighway":true,"hasFerry":false,"maneuvers":[{"signs":[],"index":0,"maneuverNotes":[],"direction":1,"narrative":"Start out going NORTH on <b>37310<\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/icon-dirs-start_sm.gif","distance":0.4168199896812439,"time":37,"linkIds":[],"streets":["37310"],"attributes":0,"formattedTime":"00:00:37","directionName":"North","turnType":0,"startPoint":{"lng":17.000192,"lat":49.699619}},{"signs":[],"index":1,"maneuverNotes":[],"direction":1,"narrative":"Turn SLIGHTLY RIGHT.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/rs_slight_right_sm.gif","distance":0.03218600153923035,"time":8,"linkIds":[],"streets":[],"attributes":0,"formattedTime":"00:00:08","directionName":"North","turnType":1,"startPoint":{"lng":17.001604,"lat":49.702922}},{"signs":[],"index":2,"maneuverNotes":[],"direction":8,"narrative":"Turn RIGHT onto <b>635<\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/rs_right_sm.gif","distance":3.6982719898223877,"time":228,"linkIds":[],"streets":["635"],"attributes":0,"formattedTime":"00:03:48","directionName":"East","turnType":2,"startPoint":{"lng":17.001726,"lat":49.703201}},{"signs":[],"index":3,"maneuverNotes":[],"direction":4,"narrative":"Turn RIGHT onto <b>slip road<\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/rs_right_sm.gif","distance":0.3202590048313141,"time":21,"linkIds":[],"streets":[],"attributes":0,"formattedTime":"00:00:21","directionName":"South","turnType":2,"startPoint":{"lng":17.048229,"lat":49.691192}},{"signs":[],"index":4,"maneuverNotes":[],"direction":5,"narrative":"Merge onto <b>R35<\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/rs_merge_right_sm.gif","distance":4.662269115447998,"time":160,"linkIds":[],"streets":["R35"],"attributes":128,"formattedTime":"00:02:40","directionName":"Southeast","turnType":10,"startPoint":{"lng":17.05046,"lat":49.689445}},{"signs":[{"text":"256","extraText":"","direction":0,"type":1001,"url":"http://api-signs.mqcdn.com/?s=rs&t=RSEXITRIGHTNUM_SM&n=256&d="}],"index":5,"maneuverNotes":[],"direction":5,"narrative":"Take <b>EXIT<\/b> <b>256<\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/rs_gr_exitright_sm.gif","distance":0.4634909927845001,"time":48,"linkIds":[],"streets":[],"attributes":0,"formattedTime":"00:00:48","directionName":"Southeast","turnType":14,"startPoint":{"lng":17.100896,"lat":49.663738}},{"signs":[],"index":6,"maneuverNotes":[],"direction":6,"narrative":"Turn RIGHT onto <b>449<\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/rs_right_sm.gif","distance":0.8062809705734253,"time":45,"linkIds":[],"streets":["449"],"attributes":0,"formattedTime":"00:00:45","directionName":"Southwest","turnType":2,"startPoint":{"lng":17.103466,"lat":49.660255}},{"signs":[],"index":7,"maneuverNotes":[],"direction":0,"narrative":"Welcome to <b><\/b>.","iconUrl":"http://content.mapquest.com/mqsite/turnsigns/icon-dirs-end_sm.gif","distance":0,"time":0,"linkIds":[],"streets":[],"attributes":0,"formattedTime":"00:00:00","directionName":"","turnType":-1,"startPoint":{"lng":17.096261,"lat":49.654716}}]}],"hasCountryCross":false,"formattedTime":"00:09:07","options":{"mustAvoidLinkIds":[],"countryBoundaryDisplay":true,"generalize":200,"stateBoundaryDisplay":true,"narrativeType":"html","maxLinkId":0,"locale":"en_BG","avoidTimedConditions":false,"destinationManeuverDisplay":true,"enhancedNarrative":false,"timeType":0,"tryAvoidLinkIds":[],"unit":"K","shapeFormat":"raw","routeType":"SHORTEST","sideOfStreetDisplay":true},"hasFerry":false},"info":{"copyright":{"text":"© 2010 MapQuest, Inc.","imageUrl":"http://tile21.mqcdn.com/res/mqlogo.gif","imageAltText":"© 2010 MapQuest, Inc."},"statuscode":0,"messages":[]}}';
+  alert(request.responseText);
+  alert(request);
+//  bla = JSON.decode(request.responseText);
+  bla = JSON.decode(request);
+
+  var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
+  map.addLayer(lineLayer);
+  var points = new Array(
+  );
+  
+  var point;
+  var s = "tady:";
+
+  for (i = 0; i < bla.route.shape.shapePoints.length / 2; i++) {
+    s += bla.route.shape.shapePoints[i * 2]+" "+bla.route.shape.shapePoints[i * 2 + 1] +",";
+    point = new OpenLayers.Geometry.Point(bla.route.shape.shapePoints[i * 2 + 1],
+                                          bla.route.shape.shapePoints[i * 2]);
+    points.push(point);
+  }
+
+  alert(s);
+
+  var line = new OpenLayers.Geometry.LineString(points);
+  var defaultProj = new OpenLayers.Projection('EPSG:4326');
+  line = line.transform(defaultProj, map.getProjectionObject());
+
+  var style = {
+    strokeColor: '#0000ff',
+    strokeOpacity: 0.5,
+    strokeWidth: 5
+  };
+  lineFeature = new OpenLayers.Feature.Vector(line, null, style);
+  lineLayer.addFeatures([lineFeature]);
 }
 
 function on_search(request)
