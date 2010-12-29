@@ -125,15 +125,16 @@ function gup(name)
 {
   name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
   var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null )
-  return "";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.href);
+  if (results == null)
+    return "";
   else
-  return results[1];
+    return results[1];
 }
 
-function kill_cookie(){
+function kill_cookie()
+{
   var kill_time = new Date("January 1, 1970");
   var kill_string = "osm_position=stub;expires=" + kill_time.toGMTString();
   document.cookie = kill_string;
@@ -172,28 +173,28 @@ function get_center()
   set_cookie("osm_position", lon+";"+lat+";12", 2);
 }
 
-
 function init()
 {
   OpenLayers.ProxyHost = "cgi-bin/proxy.cgi?url=";
   OpenLayers.IMAGE_RELOAD_ATTEMPTS=3;
   map = new OpenLayers.Map('map', {
     controls: [
-        new OpenLayers.Control.PanZoomBar(),
-        new OpenLayers.Control.MouseDefaults(),
+      new OpenLayers.Control.PanZoomBar(),
+      new OpenLayers.Control.MouseDefaults(),
 //        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
- new OpenLayers.Control.LayerSwitcher({'div': OpenLayers.Util.getElement('layerswitcher')}),
-        new OpenLayers.Control.ScaleLine(),
-        new OpenLayers.Control.Permalink('permalink'),
-        new OpenLayers.Control.MousePosition(),
-        //new OpenLayers.Control.OverviewMap(),
-        new OpenLayers.Control.KeyboardDefaults()                    ],
-        maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
-        numZoomLevels: 18,
-        maxResolution: 156543.0399,
-        units: 'm',
-        projection: new OpenLayers.Projection("EPSG:900913"),
-        displayProjection: new OpenLayers.Projection("EPSG:4326")
+      new OpenLayers.Control.LayerSwitcher({'div': OpenLayers.Util.getElement('layerswitcher')}),
+      new OpenLayers.Control.ScaleLine(),
+      new OpenLayers.Control.Permalink('permalink'),
+      new OpenLayers.Control.MousePosition(),
+      //new OpenLayers.Control.OverviewMap(),
+      new OpenLayers.Control.KeyboardDefaults()                    
+    ],
+    maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
+    numZoomLevels: 18,
+    maxResolution: 156543.0399,
+    units: 'm',
+    projection: new OpenLayers.Projection("EPSG:900913"),
+    displayProjection: new OpenLayers.Projection("EPSG:4326")
   });
 
   var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
@@ -202,48 +203,49 @@ function init()
   map.addLayers([layerMapnik,layerTah,layerCycle]);
 
   var layer_osmcz2 = new OpenLayers.Layer.TMS(
-      "osm.cz TMS",
-      "http://openstreetmap.cz/tms/",
-      {
-        layername: 'osmcz',
-        type: 'png', 
-        getURL: osm_getTileURL,
-        displayOutsideMaxExtent: true,
-        attribution: "<a href=\"http://www.openstreetmap.org/\">OpenStreetMap</a>"
-      }
+    "osm.cz TMS",
+    "http://openstreetmap.cz/tms/",
+    {
+      layername: 'osmcz',
+      type: 'png', 
+      getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      attribution: "<a href=\"http://www.openstreetmap.org/\">OpenStreetMap</a>"
+    }
   );
   map.addLayer(layer_osmcz2);
   var layer_otm = new OpenLayers.Layer.TMS(
-      "opentracksmap TMS",
-      "http://opentrackmap.no-ip.org/tiles/",
-      {
-        layername: 'blackhex sq',
-        type: 'png', getURL: osm_getTileURL,
-        displayOutsideMaxExtent: true,
-        attribution: '<a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
-      }
+    "opentracksmap TMS",
+    "http://opentrackmap.no-ip.org/tiles/",
+    {
+      layername: 'blackhex sq',
+      type: 'png', getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      attribution: '<a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
+    }
   );
   map.addLayer(layer_otm);
 
   var gml_all = new OpenLayers.Layer.GML(
-      "KCT vse, pomale!", "http://openstreetmap.cz/kct.osm", 
-      {format: OpenLayers.Format.OSM, projection: map.displayProjection});
-    gml_all.setVisibility(false);
-    gml_all.preFeatureInsert = style_osm_feature; 
-    map.addLayer(gml_all);
+    "KCT vse, pomale!", "http://openstreetmap.cz/kct.osm", 
+    {format: OpenLayers.Format.OSM, projection: map.displayProjection}
+  );
+  gml_all.setVisibility(false);
+  gml_all.preFeatureInsert = style_osm_feature; 
+  map.addLayer(gml_all);
 
   var layer_kctcz = new OpenLayers.Layer.TMS(
-      "Turisticke stezky",
-      "http://openstreetmap.cz/kct_tiles/",
-      {
-        isBaseLayer:false,
-        layername: 'kctcz',
-        opacity:0.6,
-        type: 'png', 
-        getURL: osm_getTileURL,
-        displayOutsideMaxExtent: true,
-        attribution: '<a href="http://openstreetmap.cz/">osmcz</a>'
-      }
+    "Turisticke stezky",
+    "http://openstreetmap.cz/kct_tiles/",
+    {
+      isBaseLayer:false,
+      layername: 'kctcz',
+      opacity:0.6,
+      type: 'png', 
+      getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      attribution: '<a href="http://openstreetmap.cz/">osmcz</a>'
+    }
   );
   map.addLayer(layer_kctcz);
 
@@ -256,7 +258,7 @@ function init()
       numZoomLevels: 19, 
       getURL: osm_getTileURL,
       attribution: '<a href="http://opentrackmap.no-ip.org/">otm</a>'
-    });
+  });
   map.addLayer(hiking_tracks);
 
   gml = new OpenLayers.Layer.GML("KCT", "", {format: OpenLayers.Format.OSM, projection: map.displayProjection});
@@ -266,17 +268,14 @@ function init()
   gml.preFeatureInsert = style_osm_feature; 
   map.addLayer(gml);
 
-
   var lat_get = gup('lat');
   var lon_get = gup('lon');
   var zoom_get = gup('zoom');
   if (lat_get == "" || lon_get == "") {
     osm_cookie = get_cookie("osm_position");
-//    osm_cookie = "17.07;49.7;12";
     if (osm_cookie != "") {
       var re = new RegExp("(.*);(.*);(.*)");
       var geo_array = re.exec(osm_cookie);
-//      alert("c:"+osm_cookie+"-> "+geo_array[1]+" "+geo_array[2]+" "+geo_array[3]);
       lon_get = geo_array[1];
       lat_get = geo_array[2];
       zoom_get = geo_array[3];
@@ -294,14 +293,7 @@ var newl;
 
 function show_poi(category)
 {
-/*  poi_layer[category] = new OpenLayers.Layer.GML("KML", "cz.kml",
-  {
-      format: OpenLayers.Format.KML,
-      formatOptions: {extractStyles: false, extractAttributes: false}
-  });
-  map.addLayer(poi_layer[category]);*/
-
-  newl = new OpenLayers.Layer.Text( "radary", { 
+  newl = new OpenLayers.Layer.Text("radary", {
     location:"./radary.poi",
     projection:map.displayProjection
   });
@@ -331,11 +323,9 @@ function hide_poi(category)
  */
 function addMarker(to_layer, ll, popupClass, popupContentHTML, closeBox, overflow) 
 {
-
   var icon_size = new OpenLayers.Size(48, 48);
   var marker_icon = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost_nice.png', icon_size);
 
-  //not working since 2008 
   var icon_url = 'http://openstreetmap.cz/img/guidepost.png';
   var data = {
     iconURL: icon_url,
@@ -359,23 +349,21 @@ function addMarker(to_layer, ll, popupClass, popupContentHTML, closeBox, overflo
     } else {
       this.popup.toggle();
     }
-      currentPopup = this.popup;
-      OpenLayers.Event.stop(evt);
+    currentPopup = this.popup;
+    OpenLayers.Event.stop(evt);
   };
 
-//  marker.icon = icon;
   marker.events.register("mousedown", feature, markerClick);
   to_layer.addMarker(marker);
 }
 
-var  AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
+var AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
   'autoSize': true,
   'maxSize': new OpenLayers.Size(450,450)
 });
 
 function handler(request)
 {
-
   var layers = map.getLayersByName("Rozcestniky");
   for(var layerIndex = 0; layerIndex < layers.length; layerIndex++) {
     map.removeLayer(layers[layerIndex]);
@@ -384,7 +372,6 @@ function handler(request)
   var markers = new OpenLayers.Layer.Markers("Rozcestniky");
   map.addLayer(markers);
 
-  //alert(request.responseText);
   a = JSON.decode(request.responseText);
 
   for(i = 0; i < a.length; i++) {
@@ -400,8 +387,6 @@ function handler(request)
     html_content += "<a href='"+b.url+"'>"+b.name+"</a><br>"
     html_content += " <img src='"+b.url+"' width='180' alt='guidepost'>" 
     addMarker(markers, pos, popupClass, html_content, true, true);
-
-//    markers.addMarker(marker);
   }
   status = request.status;
 }

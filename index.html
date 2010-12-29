@@ -159,8 +159,8 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <div id="searchdiv"><p>Zde budou vysledky vyhledavani</p></div>
 <h4>Test navigace</h4>
  <form name="navform" action="javascript:nav_ajax()" type="GET">
-  <input type=input name="from"  value="49.65,17.1">
-  <input type=input name="to"  value="49.7,17.0">
+  <input type=checkbox name="fromcheck"> Z: <input type=input name="from"  value="49.65,17.1"><br>
+  <input type=checkbox name="tocheck"> Do: <input type=input name="to"  value="49.7,17.0">
   <input type="button" value="cesta" onclick="javascript:nav_ajax(document.navform.from.value,document.navform.to.value)">
  </form>
  <div id="directiondiv"><p>Zde budou vysledky navigace</p></div>
