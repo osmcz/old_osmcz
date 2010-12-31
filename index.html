@@ -164,8 +164,12 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
    <input type=checkbox name="tocheck"> <label>Do:</label> <input type=input name="to"  value="49.7,17.0">
    <center>
     <input type="radio" name="transport_type" value="car" checked>auto
-    <input type="radio" name="transport_type" value="car">kolo
-    <input type="radio" name="transport_type" value="car">clovek
+    <input type="radio" name="transport_type" value="bicycle">kolo
+    <input type="radio" name="transport_type" value="hyooman">clovek
+    </center>
+   <center>
+    <input type="radio" name="route_type" value="fastest" checked>nejrychlejsi
+    <input type="radio" name="route_type" value="shortest">nejkratsi
     </center>
    <input type="button" value="cesta" onclick="javascript:nav_ajax(document.navform.from.value,document.navform.to.value)">
    </fieldset>

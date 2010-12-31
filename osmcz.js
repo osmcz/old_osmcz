@@ -447,9 +447,37 @@ function search_ajax(what)
   });
 }
 
+function get_radio(radio)
+{
+  if(!radio) {
+    return "";
+  }
+
+  if(radio.length == undefined) {
+    if(radio.checked) return radio.value;
+  }
+
+  for(var i = 0; i < radio.length; i++) {
+    if(radio[i].checked) return radio[i].value;
+  }
+
+  return "";
+}
+
 function nav_ajax(from,to)
 {
-  navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType=shortest&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=200&locale=en_BG&unit=k&from=" + from + "&to=" + to;
+  if (get_radio(navform.transport_type) == "car") {
+    if (get_radio(navform.route_type) == "fastest") {
+      route_type = "fastest"; 
+    } else {
+      route_type = "shortest";
+    }
+  } else
+  if (get_radio(navform.transport_type) == "hyooman") {route_type = "pedestrian";} else 
+  if (get_radio(navform.transport_type) == "bicycle") {route_type = "bicycle";}
+
+  navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType="+ route_type +"&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=10&locale=en_BG&unit=k&from=" + from + "&to=" + to;
+
   var request = OpenLayers.Request.GET({
     url: navurl,
 //    params: {q:what, format:"json"},
