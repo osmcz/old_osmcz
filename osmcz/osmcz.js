@@ -49,7 +49,6 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
     if (document.navform.tocheck.checked) {
       document.navform.to.value = lonlat.lat + "," + lonlat.lon;
     }
-    alert("nazdar  "+lonlat.lon);
   }
 });
 
