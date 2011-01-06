@@ -25,7 +25,8 @@ allowedHosts = [
 'toolserver.org',
 "osmxapi.hypercube.telascience.org",
 "nominatim.openstreetmap.org",
-"open.mapquestapi.com"
+"open.mapquestapi.com",
+"routes.cloudmade.com"
 ]
 
 method = os.environ["REQUEST_METHOD"]
