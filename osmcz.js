@@ -464,6 +464,20 @@ function get_radio(radio)
   return "";
 }
 
+function nav_mapquest(from,to)
+{
+}
+
+function nav_cloudmade(from, to)
+{
+  nav_url = "http://routes.cloudmade.com/1ad70c11d13a5b36adeb20679904ca37/api/0.3/47.25976,9.58423,47.26117,9.59882/car.js?units=km&lang=en";
+  var request = OpenLayers.Request.GET({
+    url: navurl,
+//    params: {q:what, format:"json"},
+    callback: on_nav_cloudmade,
+  });
+}
+
 function nav_ajax(from,to)
 {
   if (get_radio(navform.transport_type) == "car") {
@@ -483,6 +497,45 @@ function nav_ajax(from,to)
 //    params: {q:what, format:"json"},
     callback: on_nav,
   });
+}
+
+function on_nav_cloudmade(request)
+{
+  alert(request.responseText);
+  bla = JSON.decode(request.responseText);
+
+  var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
+  map.addLayer(lineLayer);
+  var points = new Array(
+  );
+
+  var point;
+  var s = "tady:";
+
+  for (i = 0; i < bla.route.shape.shapePoints.length / 2; i++) {
+    s += bla.route.shape.shapePoints[i * 2]+" "+bla.route.shape.shapePoints[i * 2 + 1] +",";
+    point = new OpenLayers.Geometry.Point(bla.route.shape.shapePoints[i * 2 + 1],
+                                          bla.route.shape.shapePoints[i * 2]);
+    points.push(point);
+  }
+
+  alert(s);
+
+  draw_line(points,"red");
+}
+
+function draw_line(points, color)
+{  var line = new OpenLayers.Geometry.LineString(points);
+  var defaultProj = new OpenLayers.Projection('EPSG:4326');
+  line = line.transform(defaultProj, map.getProjectionObject());
+
+  var style = {
+    strokeColor: color,
+    strokeOpacity: 0.5,
+    strokeWidth: 5
+  };
+  lineFeature = new OpenLayers.Feature.Vector(line, null, style);
+  lineLayer.addFeatures([lineFeature]);
 }
 
 function on_nav(request)
