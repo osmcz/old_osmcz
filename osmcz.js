@@ -217,7 +217,7 @@ function init()
       new OpenLayers.Control.MouseDefaults(),
 //        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
       new OpenLayers.Control.LayerSwitcher({'div': OpenLayers.Util.getElement('layerswitcher')}),
-      new OpenLayers.Control.ScaleLine(),
+      new OpenLayers.Control.ScaleLine({geodesic: true}),
       new OpenLayers.Control.Permalink('permalink'),
       new OpenLayers.Control.MousePosition(),
       //new OpenLayers.Control.OverviewMap(),
