@@ -512,7 +512,7 @@ function on_nav_cloudmade(request)
   var point;
   var s = "tady:";
 
-  for (i = 0; i < bla.route_geometry.length / 2; i++) {
+  for (i = 0; i < bla.route_geometry.length; i++) {
     s += "2("+bla.route_geometry[i][0]+","+bla.route_geometry[i][1] +"), ";
     var x = bla.route_geometry[i][1];
     var y = bla.route_geometry[i][0];
