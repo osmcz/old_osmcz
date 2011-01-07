@@ -1,7 +1,7 @@
 var lon = 5;
 var lat = 40;
 var zoom = 5;
-var map, select;
+var upload_map, select;
 
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   defaultHandlerOptions: {
@@ -27,7 +27,7 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   }, 
 
   trigger: function(e) {
-    var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
+    var lonlat = upload_map.getLonLatFromViewPortPx(e.xy).transform(upload_map.projection, upload_map.displayProjection);
     document.coord.lon.value = lonlat.lon;
     document.coord.lat.value = lonlat.lat;
   }
@@ -45,7 +45,7 @@ function init()
     maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
   };
 
-  map = new OpenLayers.Map('map', options);
+  upload_map = new OpenLayers.Map('upload_map', options);
   var mapnik = new OpenLayers.Layer.TMS(
     "OpenStreetMap (Mapnik)",
     "http://tile.openstreetmap.org/",
@@ -69,11 +69,11 @@ function init()
       attribution: '<a href="http://www.openstreetmap.cz/">OSM CZ</a>'
     }
   );
-  map.addLayer(layer_kctcz);
-  map.addLayer(mapnik);
-  map.zoomToExtent(new OpenLayers.Bounds(15, 49, 16, 50).transform(map.displayProjection, map.projection));
+  upload_map.addLayer(layer_kctcz);
+  upload_map.addLayer(mapnik);
+  upload_map.zoomToExtent(new OpenLayers.Bounds(15, 49, 16, 50).transform(upload_map.displayProjection, upload_map.projection));
   var click = new OpenLayers.Control.Click();
-  map.addControl(click);
+  upload_map.addControl(click);
   click.activate();
 
 }
@@ -82,10 +82,10 @@ function init()
 function osm_getTileURL(bounds)
 /******************************************************************************/
 {
-  var res = this.map.getResolution();
+  var res = this.upload_map.getResolution();
   var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
   var y = Math.round((this.maxExtent.top - bounds.top) / (res * this.tileSize.h));
-  var z = this.map.getZoom();
+  var z = this.upload_map.getZoom();
   var limit = Math.pow(2, z);
 
   if (y < 0 || y >= limit) {
