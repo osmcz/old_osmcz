@@ -464,7 +464,7 @@ function get_radio(radio)
   return "";
 }
 
-function nav_mapquest(from,to)
+function nav_mapquest(from, to)
 {
   if (get_radio(navform.transport_type) == "car") {
     if (get_radio(navform.route_type) == "fastest") {
