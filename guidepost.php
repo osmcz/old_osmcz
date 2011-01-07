@@ -21,7 +21,7 @@ function page_header()
   print "  <head>\n";
   print "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n";
   print "  <title>openstreetmap.cz image upload</title>\n";
-  print "  <script src='OpenLayers.js'></script>\n";
+  print "  <script src='OpenLayers.2.8.0.js'></script>\n";
   print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
   print "  <link href='upload.css' rel='stylesheet' type='text/css'/>";
   print "  </head>\n";
@@ -51,7 +51,7 @@ function show_upload_dialog()
   print"</script>\n";
 
   print "  </head>
-  <body onload='init()'>\n";
+  <body onload='upload_init()'>\n";
 
   print "
 <div id='map' class='smallmap'></div>

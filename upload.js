@@ -34,7 +34,7 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
 });
 
 /******************************************************************************/
-function init()
+function upload_init()
 /******************************************************************************/
 {
   var options = {
@@ -45,12 +45,12 @@ function init()
     maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
   };
 
-  upload_map = new OpenLayers.Map('upload_map', options);
+  upload_map = new OpenLayers.Map('map', options);
   var mapnik = new OpenLayers.Layer.TMS(
     "OpenStreetMap (Mapnik)",
     "http://tile.openstreetmap.org/",
     {
-      type: 'png', getURL: osm_getTileURL,
+      type: 'png', getURL: upload_getTileURL,
       displayOutsideMaxExtent: true,
       attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
     }
@@ -64,7 +64,7 @@ function init()
       layername: 'kctcz',
       opacity:0.6,
       type: 'png', 
-      getURL: osm_getTileURL,
+      getURL: upload_getTileURL,
       displayOutsideMaxExtent: true,
       attribution: '<a href="http://www.openstreetmap.cz/">OSM CZ</a>'
     }
@@ -79,13 +79,13 @@ function init()
 }
 
 /******************************************************************************/
-function osm_getTileURL(bounds)
+function upload_getTileURL(bounds)
 /******************************************************************************/
 {
-  var res = this.upload_map.getResolution();
+  var res = this.map.getResolution();
   var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
   var y = Math.round((this.maxExtent.top - bounds.top) / (res * this.tileSize.h));
-  var z = this.upload_map.getZoom();
+  var z = this.map.getZoom();
   var limit = Math.pow(2, z);
 
   if (y < 0 || y >= limit) {
