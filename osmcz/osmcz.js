@@ -470,7 +470,17 @@ function nav_mapquest(from,to)
 
 function nav_cloudmade(from, to)
 {
-  nav_url = "http://routes.cloudmade.com/1ad70c11d13a5b36adeb20679904ca37/api/0.3/"+from+","+to+"/car.js?units=km&lang=en";
+  if (get_radio(navform.transport_type) == "car") {route_vehicle = "car";}
+  if (get_radio(navform.transport_type) == "hyooman") {route_vehycle = "pedestrian";} else 
+  if (get_radio(navform.transport_type) == "bicycle") {route_vehicle = "bicycle";}
+
+  if (get_radio(navform.route_type) == "fastest") {
+    route_type = "fastest"; 
+  } else {
+    route_type = "shortest";
+  }
+
+  nav_url = "http://routes.cloudmade.com/1ad70c11d13a5b36adeb20679904ca37/api/0.3/"+from+","+to+"/"+route_vehicle+"/"+route_type+".js?units=km&lang=en";
   var request = OpenLayers.Request.GET({
     url: nav_url,
 //    params: {q:what, format:"json"},
