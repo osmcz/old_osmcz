@@ -221,7 +221,7 @@ function init()
       new OpenLayers.Control.Permalink('permalink'),
       new OpenLayers.Control.MousePosition(),
       //new OpenLayers.Control.OverviewMap(),
-      new OpenLayers.Control.KeyboardDefaults()                    
+      new OpenLayers.Control.KeyboardDefaults()
     ],
     maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
     numZoomLevels: 18,
@@ -248,6 +248,7 @@ function init()
     }
   );
   map.addLayer(layer_osmcz2);
+  
   var layer_otm = new OpenLayers.Layer.TMS(
     "opentracksmap TMS",
     "http://opentrackmap.no-ip.org/tiles/",
@@ -259,6 +260,37 @@ function init()
     }
   );
   map.addLayer(layer_otm);
+
+  var layer_zby = new OpenLayers.Layer.TMS(
+    "test",
+    "http://openstreetmap.cz/uhul_tile.php/",
+    {
+      isBaseLayer:false,
+      opacity: 0.4,
+      layername: 'test',
+      type: 'png', getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      visibility: false,
+      attribution: '<a href="http://opentrackmap.no-ip.org/">uhul</a>'
+    }
+  );
+  map.addLayer(layer_zby);
+
+  var layer_zby2 = new OpenLayers.Layer.TMS(
+    "test2",
+    "http://down.zby.cz/uhul_tile.php/",
+    {
+      isBaseLayer:false,
+      opacity: 0.4,
+      layername: 'test2',
+      type: 'png', getURL: osm_getTileURL,
+      displayOutsideMaxExtent: true,
+      visibility: false,
+      attribution: '<a href="http://opentrackmap.no-ip.org/">uhul</a>'
+    }
+  );
+  map.addLayer(layer_zby2);
+
 
   var gml_all = new OpenLayers.Layer.GML(
     "KCT vse, pomale!", "http://openstreetmap.cz/kct.osm", 
