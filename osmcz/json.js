@@ -133,7 +133,7 @@ JSON = new function(){
 				catch(z){}
 			}
 			else {
-				throw new JSONError("bad data");
+				alert("json error bad data");
 			}
 		};
 		return result;

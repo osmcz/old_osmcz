@@ -215,7 +215,8 @@ switch ($action) {
     page_footer();
     break;
   case "":
-    $bbox = $_GET['bbox'];
+    $bbox = get_param('bbox');
+    if ($bbox == "") {die("No bbox provided\n");}
     list($minlon, $minlat, $maxlon, $maxlat) = split(",", $bbox, 4);
     $db = new SQLiteDatabase('guidepost');
 
