@@ -216,13 +216,17 @@ switch ($action) {
     break;
   case "":
     $bbox = get_param('bbox');
-    if ($bbox == "") {die("No bbox provided\n");}
-    list($minlon, $minlat, $maxlon, $maxlat) = split(",", $bbox, 4);
+    if ($bbox == "") {
+system("/usr/bin/logger no bbox");
+      die("No bbox provided\n");
+    }
+    list($minlon, $minlat, $maxlon, $maxlat) = preg_split('/,/', $bbox, 4);
     $db = new SQLiteDatabase('guidepost');
 
     if ($db) {
       $i = 0;
       $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
+system("/usr/bin/logger $query");
       $result = $db->arrayQuery($query, SQLITE_ASSOC);
       foreach ($result as $entry) {
         $result[$i++] = $entry;
