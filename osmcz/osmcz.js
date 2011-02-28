@@ -463,6 +463,7 @@ function handler(request)
 function show_guideposts(x)
 {
   var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
+alert(kokot+" "+kokot.toBBOX());
   var request = OpenLayers.Request.GET({
     url: "http://openstreetmap.cz/guidepost.php",
     params: {bbox: kokot.toBBOX()},
