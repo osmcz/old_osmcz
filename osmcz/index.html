@@ -161,9 +161,9 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
  <form name="navform" action="javascript:nav_ajax()" type="GET">
   <fieldset>
    <input type=checkbox id="from" name="fromcheck" onclick="javascript:getElementById('to').checked=false"><label>Z:</label>
-   <input type=input name="from" value="49.65,17.1" ><br>
+   <input type=input id="inputfrom" name="from" value="49.65,17.1" ><br>
    <input type=checkbox id="to" name="tocheck" onclick="javascript:getElementById('from').checked=false"><label>Do:</label>
-   <input type=input name="to" value="49.7,17.0">
+   <input type=input id="inputto" name="to" value="49.7,17.0">
    <center>
     <input type="radio" name="transport_type" value="car" checked>auto
     <input type="radio" name="transport_type" value="bicycle">kolo
