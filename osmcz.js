@@ -288,6 +288,7 @@ function init()
   map.addLayer(layer_zby2);
 
 
+  /* zruseno, nevim co zatim s tim
   var gml_all = new OpenLayers.Layer.GML(
     "KCT vse, pomale!", "http://openstreetmap.cz/kct.osm", 
     {format: OpenLayers.Format.OSM, projection: map.displayProjection}
@@ -295,6 +296,7 @@ function init()
   gml_all.setVisibility(false);
   gml_all.preFeatureInsert = style_osm_feature; 
   map.addLayer(gml_all);
+  */
 
   var layer_kctcz = new OpenLayers.Layer.TMS(
     "Turisticke stezky",
@@ -323,16 +325,27 @@ function init()
   });
   map.addLayer(hiking_tracks);
 
-  gml = new OpenLayers.Layer.GML("KCT", "", {format: OpenLayers.Format.OSM, projection: map.displayProjection});
-  gml.events.register("loadstart", null, function() { loader_on(); });
-  gml.events.register("loadend", null, function() { loader_off(); gml.setVisibility(true);});
-  gml.setVisibility(false);
-  gml.preFeatureInsert = style_osm_feature; 
-  map.addLayer(gml);
 
   navmarkers = new OpenLayers.Layer.Markers("Navigace");
   navmarkers.setVisibility(false);
  // map.addLayer(navmarkers);
+//displayInLayerSwitcher
+
+var xmarkers = new OpenLayers.Layer.Markers( "Markersx",{displayInLayerSwitcher:true} );
+map.addLayer(xmarkers);
+
+var size = new OpenLayers.Size(21,25);
+var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+xmarkers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(0,0),icon));
+
+
+  gml = new OpenLayers.Layer.GML("KCT", "", {format: OpenLayers.Format.OSM, projection: map.displayProjection});
+  gml.setVisibility(false);
+  gml.events.register("loadstart", null, function() { loader_on(); });
+  gml.events.register("loadend", null, function() { loader_off(); gml.setVisibility(true);});
+  gml.preFeatureInsert = style_osm_feature; 
+  map.addLayer(gml);
 
   var lat_get = gup('lat');
   var lon_get = gup('lon');
