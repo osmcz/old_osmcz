@@ -253,7 +253,7 @@ function init()
     "opentracksmap TMS",
     "http://opentrackmap.no-ip.org/tiles/",
     {
-      layername: 'blackhex sq',
+      layername: 'opentrackmap',
       type: 'png', getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       attribution: '<a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
@@ -267,7 +267,7 @@ function init()
     {
       isBaseLayer:false,
       opacity: 0.4,
-      layername: 'test',
+      layername: 'uhul 1',
       type: 'png', getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       visibility: false,
@@ -282,7 +282,7 @@ function init()
     {
       isBaseLayer:false,
       opacity: 0.4,
-      layername: 'test2',
+      layername: 'uhul 2',
       type: 'png', getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       visibility: false,
@@ -509,7 +509,7 @@ function nav_mapquest(from, to)
   if (get_radio(navform.transport_type) == "hyooman") {route_type = "pedestrian";} else 
   if (get_radio(navform.transport_type) == "bicycle") {route_type = "bicycle";}
 
-  navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType="+ route_type +"&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=10&locale=en_BG&unit=k&from=" + from + "&to=" + to;
+  navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType="+ route_type +"&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=10&locale=en_GB&unit=k&from=" + from + "&to=" + to;
 
   var request = OpenLayers.Request.GET({
     url: navurl,
@@ -566,10 +566,10 @@ function on_nav_cloudmade(request)
 
   alert(s);
 
-  draw_line(points,"red");
+  draw_line(points, "red", 10);
 }
 
-function draw_line(points, color)
+function draw_line(points, color, width)
 {
   var lineLayer = new OpenLayers.Layer.Vector('Line Layer2');
   map.addLayer(lineLayer);
@@ -588,10 +588,14 @@ function draw_line(points, color)
 
 function on_nav_mapquest(request)
 {
+  alert(request.responseText);
+
   bla = JSON.decode(request.responseText);
 
-  var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
+/*  var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
   map.addLayer(lineLayer);
+*/
+
   var points = new Array(
   );
 
@@ -605,8 +609,11 @@ function on_nav_mapquest(request)
     points.push(point);
   }
 
-//  alert(s);
+  alert(s);
 
+  draw_line(points,"#0000ff", 5);
+
+/*
   var line = new OpenLayers.Geometry.LineString(points);
   var defaultProj = new OpenLayers.Projection('EPSG:4326');
   line = line.transform(defaultProj, map.getProjectionObject());
@@ -618,6 +625,7 @@ function on_nav_mapquest(request)
   };
   lineFeature = new OpenLayers.Feature.Vector(line, null, style);
   lineLayer.addFeatures([lineFeature]);
+*/
 }
 
 function on_search(request)
