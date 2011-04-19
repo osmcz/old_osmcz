@@ -43,11 +43,14 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
 
   trigger: function(e) {
     var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
-    if (document.navform.fromcheck.checked) {
+
+    if (document.getElementById("from").checked) {
       document.navform.from.value = lonlat.lat + "," + lonlat.lon;
+    alert("from"+lonlat.lat + "," + lonlat.lon);
     }
-    if (document.navform.tocheck.checked) {
+    if (document.getElementById("to").checked) {
       document.navform.to.value = lonlat.lat + "," + lonlat.lon;
+    alert("to"+lonlat.lat + "," + lonlat.lon);
     }
   }
 });
@@ -234,21 +237,9 @@ function init()
   var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
   var layerTah    = new OpenLayers.Layer.OSM.Osmarender("Tiles@Home");
   var layerCycle  = new OpenLayers.Layer.OSM.CycleMap("Cycle map");
-  map.addLayers([layerMapnik,layerTah,layerCycle]);
+  var layermq  = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
+  map.addLayers([layerMapnik,layerTah,layerCycle,layermq]);
 
-  var layer_osmcz2 = new OpenLayers.Layer.TMS(
-    "osm.cz TMS",
-    "http://openstreetmap.cz/tms/",
-    {
-      layername: 'osmcz',
-      type: 'png', 
-      getURL: osm_getTileURL,
-      displayOutsideMaxExtent: true,
-      attribution: "<a href=\"http://www.openstreetmap.org/\">OpenStreetMap</a>"
-    }
-  );
-  map.addLayer(layer_osmcz2);
-  
   var layer_otm = new OpenLayers.Layer.TMS(
     "opentracksmap TMS",
     "http://opentrackmap.no-ip.org/tiles/",
@@ -262,7 +253,7 @@ function init()
   map.addLayer(layer_otm);
 
   var layer_zby = new OpenLayers.Layer.TMS(
-    "test",
+    "uhul 1",
     "http://openstreetmap.cz/uhul_tile.php/",
     {
       isBaseLayer:false,
@@ -277,7 +268,7 @@ function init()
   map.addLayer(layer_zby);
 
   var layer_zby2 = new OpenLayers.Layer.TMS(
-    "test2",
+    "uhul 2",
     "http://down.zby.cz/uhul_tile.php/",
     {
       isBaseLayer:false,
@@ -345,12 +336,18 @@ function init()
       lon_get = geo_array[1];
       lat_get = geo_array[2];
       zoom_get = geo_array[3];
+      if (lon_get == 0 && lat_get == 0) {
+        lon_get = 17.07;
+        lat_get = 49.7;
+        zoom_get = 12;
+      }
     } else {
       lon_get = 17.07;
       lat_get = 49.7;
       zoom_get = 12;
     }
   }
+
   map.setCenter(new OpenLayers.LonLat(lon_get,lat_get).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")), zoom_get);
   var click = new OpenLayers.Control.Click();
   map.addControl(click);
@@ -497,6 +494,28 @@ function get_radio(radio)
   return "";
 }
 
+/******************************************************************************/
+
+var nav_line_layer = 0;
+
+function draw_line(points, color, width)
+{
+  nav_line_layer++;
+  var lineLayer = new OpenLayers.Layer.Vector('Line Layer ' + nav_line_layer);
+  map.addLayer(lineLayer);
+  var line = new OpenLayers.Geometry.LineString(points);
+  var defaultProj = new OpenLayers.Projection('EPSG:4326');
+  line = line.transform(defaultProj, map.getProjectionObject());
+
+  var style = {
+    strokeColor: color,
+    strokeOpacity: 0.5,
+    strokeWidth: width
+  };
+  lineFeature = new OpenLayers.Feature.Vector(line, null, style);
+  lineLayer.addFeatures([lineFeature]);
+}
+
 function nav_mapquest(from, to)
 {
   if (get_radio(navform.transport_type) == "car") {
@@ -510,6 +529,8 @@ function nav_mapquest(from, to)
   if (get_radio(navform.transport_type) == "bicycle") {route_type = "bicycle";}
 
   navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType="+ route_type +"&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=10&locale=en_GB&unit=k&from=" + from + "&to=" + to;
+
+alert(navurl);
 
   var request = OpenLayers.Request.GET({
     url: navurl,
@@ -539,11 +560,6 @@ function nav_cloudmade(from, to)
   });
 }
 
-function nav_ajax(from,to)
-{
-  if (navform.cloudmade.checked) {nav_cloudmade(from, to);}
-  if (navform.cloudmade.checked) {nav_mapquest(from, to);}
-}
 
 function on_nav_cloudmade(request)
 {
@@ -569,22 +585,6 @@ function on_nav_cloudmade(request)
   draw_line(points, "red", 10);
 }
 
-function draw_line(points, color, width)
-{
-  var lineLayer = new OpenLayers.Layer.Vector('Line Layer2');
-  map.addLayer(lineLayer);
-  var line = new OpenLayers.Geometry.LineString(points);
-  var defaultProj = new OpenLayers.Projection('EPSG:4326');
-  line = line.transform(defaultProj, map.getProjectionObject());
-
-  var style = {
-    strokeColor: color,
-    strokeOpacity: 0.5,
-    strokeWidth: 10
-  };
-  lineFeature = new OpenLayers.Feature.Vector(line, null, style);
-  lineLayer.addFeatures([lineFeature]);
-}
 
 function on_nav_mapquest(request)
 {
@@ -627,6 +627,15 @@ function on_nav_mapquest(request)
   lineLayer.addFeatures([lineFeature]);
 */
 }
+
+function nav_ajax(from,to)
+{
+  nav_line_layer = 0;
+  if (document.getElementById('checkbox_cloudmade').checked) {nav_cloudmade(from, to);}
+  if (document.getElementById('checkbox_mapquest').checked) {nav_mapquest(from, to);}
+}
+
+/******************************************************************************/
 
 function on_search(request)
 {

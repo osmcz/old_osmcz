@@ -7,7 +7,7 @@ OpenLayers.Util.OSM = {};
  * Constant: MISSING_TILE_URL
  * {String} URL of image to display for missing tiles
  */
-OpenLayers.Util.OSM.MISSING_TILE_URL = "http://openstreetmap.org/openlayers/img/404.png";
+OpenLayers.Util.OSM.MISSING_TILE_URL = "http://openstreetmap.cz/404.png";
 
 /**
  * Property: originalOnImageLoadError
@@ -209,4 +209,20 @@ OpenLayers.Layer.OSM.Maplint = OpenLayers.Class(OpenLayers.Layer.OSM, {
     },
 
     CLASS_NAME: "OpenLayers.Layer.OSM.Maplint"
+});
+
+OpenLayers.Layer.OSM.Mapquest = OpenLayers.Class(OpenLayers.Layer.OSM, {
+  initialize: function(name, options) {
+    var url = [
+      "http://otile1.mqcdn.com/tiles/1.0.0/osm/",
+      "http://otile2.mqcdn.com/tiles/1.0.0/osm/",
+      "http://otile3.mqcdn.com/tiles/1.0.0/osm/",
+      "http://otile4.mqcdn.com/tiles/1.0.0/osm/",
+    ];
+    options = OpenLayers.Util.extend({numZoomLevels: 18, attribution: "mapquest",
+}, options);
+    var newArguments = [name, url, options];
+    OpenLayers.Layer.OSM.prototype.initialize.apply(this, newArguments);
+  },
+  CLASS_NAME: "OpenLayers.Layer.OSM.Mapquest"
 });
