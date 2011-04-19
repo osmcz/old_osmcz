@@ -17,6 +17,7 @@
 */
 
 var map, gml;
+var navmarkers;
 
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   defaultHandlerOptions: {
@@ -41,15 +42,18 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
     );
   }, 
 
+
   trigger: function(e) {
+
     var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.projection, map.displayProjection);
 
     if (document.getElementById("from").checked) {
-      document.navform.from.value = lonlat.lat + "," + lonlat.lon;
+      document.getElementById("inputfrom").value = lonlat.lat + "," + lonlat.lon;
+      addMarker(navmarkers, lonlat, false, "", true, true);
     alert("from"+lonlat.lat + "," + lonlat.lon);
     }
     if (document.getElementById("to").checked) {
-      document.navform.to.value = lonlat.lat + "," + lonlat.lon;
+      document.getElementById("inputto").value = lonlat.lat + "," + lonlat.lon;
     alert("to"+lonlat.lat + "," + lonlat.lon);
     }
   }
@@ -240,6 +244,7 @@ function init()
   var layermq  = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
   map.addLayers([layerMapnik,layerTah,layerCycle,layermq]);
 
+
   var layer_otm = new OpenLayers.Layer.TMS(
     "opentracksmap TMS",
     "http://opentrackmap.no-ip.org/tiles/",
@@ -324,6 +329,10 @@ function init()
   gml.setVisibility(false);
   gml.preFeatureInsert = style_osm_feature; 
   map.addLayer(gml);
+
+  navmarkers = new OpenLayers.Layer.Markers("Navigace");
+  navmarkers.setVisibility(false);
+ // map.addLayer(navmarkers);
 
   var lat_get = gup('lat');
   var lon_get = gup('lon');
