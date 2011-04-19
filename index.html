@@ -160,8 +160,10 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <h4>Test navigace</h4>
  <form name="navform" action="javascript:nav_ajax()" type="GET">
   <fieldset>
-   <input type=checkbox name="fromcheck"><label> Z:</label> <input type=input name="from"  value="49.65,17.1"><br>
-   <input type=checkbox name="tocheck"> <label>Do:</label> <input type=input name="to"  value="49.7,17.0">
+   <input type=checkbox id="from" name="fromcheck" onclick="javascript:getElementById('to').checked=false"><label>Z:</label>
+   <input type=input name="from" value="49.65,17.1" ><br>
+   <input type=checkbox id="to" name="tocheck" onclick="javascript:getElementById('from').checked=false"><label>Do:</label>
+   <input type=input name="to" value="49.7,17.0">
    <center>
     <input type="radio" name="transport_type" value="car" checked>auto
     <input type="radio" name="transport_type" value="bicycle">kolo
@@ -171,8 +173,8 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
     <input type="radio" name="route_type" value="fastest" checked>nejrychlejsi
     <input type="radio" name="route_type" value="shortest">nejkratsi
    </center>
-   <input type="checkbox" name="mapquest">mapquest
-   <input type="checkbox" name="cloudmade">cloudmade
+   <input type="checkbox" name="mapquest" id="checkbox_mapquest">mapquest
+   <input type="checkbox" name="cloudmade" id="checkbox_cloudmade">cloudmade
 
    <input type="button" value="cesta" onclick="javascript:nav_ajax(document.navform.from.value,document.navform.to.value)">
    </fieldset>
@@ -312,7 +314,7 @@ google.friendconnect.container.renderWallGadget(
  <div class="leftcolumn"><p class="leftcolumn">openstreetmap.cz - svobodná mapa</p></div>
  <div class="rightcolumn">
  <form name="searchform" action="javascript:search_ajax(document.searchform.q.value)" type="GET">
- <input type=text name="q" value="hledej">
+ <input type=text name="q" value="hledej" onFocus="this.select()">
  <input type=hidden name="format"  value="html">
  <input type="button" value="hledej" onclick="javascript:search_ajax(document.searchform.q.value)">
  </form>
