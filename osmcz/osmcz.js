@@ -49,7 +49,7 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
 
     if (document.getElementById("from").checked) {
       document.getElementById("inputfrom").value = lonlat.lat + "," + lonlat.lon;
-      addMarker(navmarkers, lonlat, false, "", true, true);
+      add_simple_marker(navmarkers, lonlat.lon, lonlat.lat);
     alert("from"+lonlat.lat + "," + lonlat.lon);
     }
     if (document.getElementById("to").checked) {
@@ -58,6 +58,14 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
     }
   }
 });
+
+function add_simple_marker(layer, lon, lat)
+{
+  var size = new OpenLayers.Size(21,25);
+  var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+  var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+  layer.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")),icon));
+}
 
 function set_center(lon, lat)
 {
@@ -326,21 +334,32 @@ function init()
   map.addLayer(hiking_tracks);
 
 
-  navmarkers = new OpenLayers.Layer.Markers("Navigace");
-  navmarkers.setVisibility(false);
- // map.addLayer(navmarkers);
-//displayInLayerSwitcher
+  navmarkers = new OpenLayers.Layer.Markers("Navigace",{
+    displayInLayerSwitcher:true,
+    visibility: false,
+  });
+  map.addLayer(navmarkers);
 
-var xmarkers = new OpenLayers.Layer.Markers( "Markersx",{displayInLayerSwitcher:true} );
-map.addLayer(xmarkers);
+  var xmarkers = new OpenLayers.Layer.Markers( "Markersx",{
+    displayInLayerSwitcher:true,
+    visibility: false,
+  });
+  map.addLayer(xmarkers);
+
+  add_simple_marker(navmarkers, 30, 30);
 
 var size = new OpenLayers.Size(21,25);
 var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
 var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-xmarkers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(0,0),icon));
+xmarkers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(10,10),icon));
 
 
-  gml = new OpenLayers.Layer.GML("KCT", "", {format: OpenLayers.Format.OSM, projection: map.displayProjection});
+  gml = new OpenLayers.Layer.GML("KCT", "", {
+          format: OpenLayers.Format.OSM, 
+          projection: map.displayProjection,
+          displayInLayerSwitcher:false
+        });
+
   gml.setVisibility(false);
   gml.events.register("loadstart", null, function() { loader_on(); });
   gml.events.register("loadend", null, function() { loader_off(); gml.setVisibility(true);});
