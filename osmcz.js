@@ -19,6 +19,10 @@
 var map, gml;
 var navmarkers;
 
+var debug = true;
+var newWindow;
+var debug_window_content;
+
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   defaultHandlerOptions: {
     'single': true,
@@ -50,11 +54,10 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
     if (document.getElementById("from").checked) {
       document.getElementById("inputfrom").value = lonlat.lat + "," + lonlat.lon;
       add_simple_marker(navmarkers, lonlat.lon, lonlat.lat);
-    alert("from"+lonlat.lat + "," + lonlat.lon);
     }
     if (document.getElementById("to").checked) {
       document.getElementById("inputto").value = lonlat.lat + "," + lonlat.lon;
-    alert("to"+lonlat.lat + "," + lonlat.lon);
+      add_simple_marker(navmarkers, lonlat.lon, lonlat.lat);
     }
   }
 });
@@ -224,6 +227,16 @@ function get_center()
 
 function init()
 {
+
+  if (debug) {
+    newWindow = window.open("","","status,height=200,width=300");
+    var newContent = "<HTML><HEAD><TITLE>A New Doc</TITLE></HEAD>";
+    newContent += "<BODY BGCOLOR='coral'><H1>This document is brand new.</H1>";
+    newWindow.document.write(newContent);
+
+    debug_window_content = "<h1>start</h1><br>";
+  }
+
   OpenLayers.ProxyHost = "cgi-bin/proxy.cgi?url=";
   OpenLayers.IMAGE_RELOAD_ATTEMPTS=3;
   map = new OpenLayers.Map('map', {
@@ -501,7 +514,7 @@ function handler(request)
 function show_guideposts(x)
 {
   var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-alert(kokot+" "+kokot.toBBOX());
+debug_alert(kokot+" "+kokot.toBBOX());
   var request = OpenLayers.Request.GET({
     url: "http://openstreetmap.cz/guidepost.php",
     params: {bbox: kokot.toBBOX()},
@@ -571,7 +584,7 @@ function nav_mapquest(from, to)
 
   navurl = "http://open.mapquestapi.com/directions/v0/route?outFormat=json&routeType="+ route_type +"&narrativeType=html&enhancedNarrative=false&shapeFormat=raw&generalize=10&locale=en_GB&unit=k&from=" + from + "&to=" + to;
 
-alert(navurl);
+debug_alert(navurl);
 
   var request = OpenLayers.Request.GET({
     url: navurl,
@@ -604,7 +617,7 @@ function nav_cloudmade(from, to)
 
 function on_nav_cloudmade(request)
 {
-  alert(request.responseText);
+  debug_alert(request.responseText);
   bla = JSON.decode(request.responseText);
 
   var points = new Array(
@@ -621,21 +634,25 @@ function on_nav_cloudmade(request)
     points.push(point);
   }
 
-  alert(s);
+  debug_alert(s);
 
   draw_line(points, "red", 10);
 }
 
 
+function debug_alert(s)
+{
+  if (newWindow.closed) {
+    newWindow = window.open("","","scrolling=auto,status,height=200,width=300");
+  }
+  newWindow.document.write("<hr>" + s + "<br>");
+}
+
 function on_nav_mapquest(request)
 {
-  alert(request.responseText);
+  debug_alert(request.responseText);
 
   bla = JSON.decode(request.responseText);
-
-/*  var lineLayer = new OpenLayers.Layer.Vector('Line Layer');
-  map.addLayer(lineLayer);
-*/
 
   var points = new Array(
   );
@@ -650,23 +667,9 @@ function on_nav_mapquest(request)
     points.push(point);
   }
 
-  alert(s);
-
+  debug_alert(s);
   draw_line(points,"#0000ff", 5);
 
-/*
-  var line = new OpenLayers.Geometry.LineString(points);
-  var defaultProj = new OpenLayers.Projection('EPSG:4326');
-  line = line.transform(defaultProj, map.getProjectionObject());
-
-  var style = {
-    strokeColor: '#0000ff',
-    strokeOpacity: 0.5,
-    strokeWidth: 5
-  };
-  lineFeature = new OpenLayers.Feature.Vector(line, null, style);
-  lineLayer.addFeatures([lineFeature]);
-*/
 }
 
 function nav_ajax(from,to)
