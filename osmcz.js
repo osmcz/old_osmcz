@@ -19,7 +19,7 @@
 var map, gml;
 var navmarkers;
 
-var debug = true;
+var debug = false;
 var newWindow;
 var debug_window_content;
 
@@ -203,15 +203,20 @@ function set_cookie(c_name,value,expiredays)
 
 function get_cookie(c_name)
 {
+  debug_alert("cookie name:" + c_name);
   if (document.cookie.length>0) {
     c_start=document.cookie.indexOf(c_name + "=");
+    debug_alert("cookie: " + document.cookie);
     if (c_start!=-1) {
       c_start=c_start + c_name.length+1; 
       c_end=document.cookie.indexOf(";",c_start);
       if (c_end==-1) c_end=document.cookie.length;
-      return unescape(document.cookie.substring(c_start,c_end));
+      retc = unescape(document.cookie.substring(c_start,c_end));
+      debug_alert("cookie result: " + retc);
+      return retc;
     }
   }
+  debug_alert("neni cookie");
   return "";
 }
 
@@ -229,11 +234,10 @@ function init()
 {
 
   if (debug) {
-    newWindow = window.open("","","status,height=200,width=300");
-    var newContent = "<HTML><HEAD><TITLE>A New Doc</TITLE></HEAD>";
-    newContent += "<BODY BGCOLOR='coral'><H1>This document is brand new.</H1>";
+    newWindow = window.open("","","scrollbar,status,height=200,width=300");
+    var newContent = "<HTML><HEAD><TITLE>Debug window, do not worry</TITLE></HEAD>";
+    newContent += "<BODY BGCOLOR='coral'><H1>This is debug window, site is being debugged.</H1>";
     newWindow.document.write(newContent);
-
     debug_window_content = "<h1>start</h1><br>";
   }
 
@@ -353,19 +357,7 @@ function init()
   });
   map.addLayer(navmarkers);
 
-  var xmarkers = new OpenLayers.Layer.Markers( "Markersx",{
-    displayInLayerSwitcher:true,
-    visibility: false,
-  });
-  map.addLayer(xmarkers);
-
   add_simple_marker(navmarkers, 30, 30);
-
-var size = new OpenLayers.Size(21,25);
-var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-xmarkers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(10,10),icon));
-
 
   gml = new OpenLayers.Layer.GML("KCT", "", {
           format: OpenLayers.Format.OSM, 
@@ -384,7 +376,7 @@ xmarkers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(10,10),icon));
   var zoom_get = gup('zoom');
   if (lat_get == "" || lon_get == "") {
     osm_cookie = get_cookie("osm_position");
-    if (osm_cookie != "") {
+    if (osm_cookie != "" && osm_cookie != "stub") {
       var re = new RegExp("(.*);(.*);(.*)");
       var geo_array = re.exec(osm_cookie);
       lon_get = geo_array[1];
@@ -642,6 +634,7 @@ function on_nav_cloudmade(request)
 
 function debug_alert(s)
 {
+  if (!debug) return;
   if (newWindow.closed) {
     newWindow = window.open("","","scrolling=auto,status,height=200,width=300");
   }
