@@ -11,6 +11,18 @@
     <link href='index.css' rel='stylesheet' type='text/css'>
 
 <script type="text/javascript">
+/* <![CDATA[ */
+    (function() {
+        var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+        t.parentNode.insertBefore(s, t);
+    })();
+/* ]]> */
+</script>
+
+<script type="text/javascript">
 function upbox_on()
 {
   document.getElementById("upbox").style.display = 'block' ;
@@ -101,6 +113,15 @@ function init_page()
 <!--########class=right######################################################-->
 
 <div id="right_box" class="right">
+<div>
+<a title="Post to Google Buzz" class="google-buzz-button" href="http://www.google.com/buzz/post" data-button-style="small-count"></a><script type="text/javascript" src="http://www.google.com/buzz/api/button.js"></script>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#appId=134976729912304&amp;xfbml=1"></script><fb:like href="https://www.facebook.com/pages/openstreetmapcz/141059862622270" send="false" layout="button_count" width="40" show_faces="false" font=""></fb:like>
+<a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="https://flattr.com/profile/walley"></a>
+<noscript><a href="http://flattr.com/thing/248568/walley-on-Flattr" target="_blank">
+<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+
+</div>
 <h3>Menu</h3>
 <a href="javascript:animatedcollapse.toggle('cat')">[ Informace o Openstreetmap ]</a>
 
@@ -146,7 +167,12 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <tr>
  <td colspan="2">
   <a href="credits.html">Přispěvatelé a použité zdroje</a>
- </td></tr>
+ </td>
+</tr>
+<tr>
+ <td colspan="2">
+ </td>
+</tr>
 </table>
 </div>
 </div>
@@ -311,7 +337,7 @@ google.friendconnect.container.renderWallGadget(
 <div id="main_div" class="main">
 
 <div id="container">
- <div class="leftcolumn"><p class="leftcolumn">openstreetmap.cz - svobodná mapa</p></div>
+ <div class="leftcolumn"><p class="leftcolumn"><img alt="openstreetmap.cz - svobodná mapa" src="img/osmtitle.png"></p></div>
  <div class="rightcolumn">
  <form name="searchform" action="javascript:search_ajax(document.searchform.q.value)" type="GET">
  <input type=text name="q" value="hledej" onFocus="this.select()">
@@ -361,7 +387,6 @@ google_ad_height = 90;
 </script>
 
 <br>
-<a href="http://statistiky.monitoring-serveru.cz/openstreetmap.cz"><img src="http://data.monitoring-serveru.cz/openstreetmap.cz/ikonka3-7173D1.png" width="80" height="15" alt="Dostupnost podle monitoring-serveru.cz" border="0"></a>
 </div>
 </body>
 </html>
