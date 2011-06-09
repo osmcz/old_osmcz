@@ -2,6 +2,8 @@
 #lat-y
 #lon-x
 
+$global_error_message = "";
+
 ################################################################################
 function get_param($param)
 ################################################################################
@@ -77,20 +79,20 @@ function show_upload_dialog()
 function insert_to_db($lat, $lon, $url ,$file, $author)
 ################################################################################
 {
+  global $global_error_message;
   $database = new SQLiteDatabase('guidepost', 0777, $error);
   if (!$database) {
-    $error = (file_exists($yourfile)) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
-    die($error);
+    $global_error_message = (file_exists($yourfile)) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
+    return 0;
   }
   $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author')";
-print $q;
   $query = $database->queryExec($q, $query_error);
   if ($query_error) {
-    print("Error: $query_error"); 
+    $global_error_message = "Error: $query_error"; 
     return 0;
   }
   if (!$query) {
-    print("Impossible to execute query.");
+    $global_error_message = "Impossible to execute query.";
     return 0;
   };
   return 1;
@@ -101,6 +103,7 @@ function process_file()
 ################################################################################
 {
   global $_POST;
+  global $global_error_message;
 
   $result = 0;
 
@@ -132,9 +135,11 @@ function process_file()
   $target_path = "uploads/";
   $target_path = $target_path . $file;
   $final_path = "img/guidepost/" . $file;
-  
+
   print "<br>target:$target_path";
   print "<hr>";
+
+  $error_message = "OK";
 
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
     print "existuje\n";
@@ -161,7 +166,11 @@ function process_file()
           $error_message = "failed to copy $file to destination ...";
           $result = 0;
         } else {
-          insert_to_db($lat, $lon, $final_path, $file, $author);
+          $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author);
+          if (!$ret_db) {
+            $error_message = "failed to insert to db" . $global_error_message;
+            $result = 0;
+          }
         }
       }
     } else {
