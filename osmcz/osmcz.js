@@ -19,7 +19,7 @@
 var map, gml;
 var navmarkers;
 
-var debug = false;
+var debug = true;
 var newWindow;
 var debug_window_content;
 
@@ -331,6 +331,7 @@ function init()
       layername: 'kctcz',
       opacity:0.6,
       type: 'png', 
+      numZoomLevels: 16,
       getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       attribution: '<a href="http://openstreetmap.cz/">osmcz</a>'
@@ -476,7 +477,18 @@ var AutoSizeFramedCloudMaxSize = OpenLayers.Class(OpenLayers.Popup.FramedCloud, 
 
 function handler(request)
 {
+
+  if(request.status == 500) {
+    debug_alert("handler(): 500");
+  }
+  if(request.status == 413) {
+    debug_alert("handler(): 413");
+  }
+
   var layers = map.getLayersByName("Rozcestniky");
+
+  debug_alert("handler():");
+
   for(var layerIndex = 0; layerIndex < layers.length; layerIndex++) {
     map.removeLayer(layers[layerIndex]);
   }
@@ -485,6 +497,8 @@ function handler(request)
   map.addLayer(markers);
 
   a = JSON.decode(request.responseText);
+
+  debug_alert("result:"+a);
 
   for(i = 0; i < a.length; i++) {
     b = a[i];
@@ -506,7 +520,7 @@ function handler(request)
 function show_guideposts(x)
 {
   var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-debug_alert(kokot+" "+kokot.toBBOX());
+  debug_alert("show_guidepost():"+kokot+" "+kokot.toBBOX());
   var request = OpenLayers.Request.GET({
     url: "http://openstreetmap.cz/guidepost.php",
     params: {bbox: kokot.toBBOX()},

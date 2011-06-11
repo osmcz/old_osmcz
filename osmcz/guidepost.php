@@ -187,7 +187,9 @@ function process_file()
   return $result;
 }
 
+################################################################################
 function create_db()
+################################################################################
 {
   global $db;
   global $create_query;
@@ -226,7 +228,7 @@ switch ($action) {
   case "":
     $bbox = get_param('bbox');
     if ($bbox == "") {
-system("/usr/bin/logger no bbox");
+      system("/usr/bin/logger no bbox");
       die("No bbox provided\n");
     }
     list($minlon, $minlat, $maxlon, $maxlat) = preg_split('/,/', $bbox, 4);
@@ -235,7 +237,7 @@ system("/usr/bin/logger no bbox");
     if ($db) {
       $i = 0;
       $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
-system("/usr/bin/logger $query");
+#print $query;
       $result = $db->arrayQuery($query, SQLITE_ASSOC);
       foreach ($result as $entry) {
         $result[$i++] = $entry;
