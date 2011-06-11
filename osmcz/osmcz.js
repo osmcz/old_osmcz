@@ -19,7 +19,7 @@
 var map, gml;
 var navmarkers;
 
-var debug = true;
+var debug = false;
 var newWindow;
 var debug_window_content;
 
@@ -331,7 +331,7 @@ function init()
       layername: 'kctcz',
       opacity:0.6,
       type: 'png', 
-      numZoomLevels: 16,
+      numZoomLevels: 18,
       getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       attribution: '<a href="http://openstreetmap.cz/">osmcz</a>'

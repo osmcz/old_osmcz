@@ -91,10 +91,24 @@ function init_page()
 <script type="text/javascript">
   animatedcollapse.addDiv('cat', 'fade=0,speed=400,group=pets,hide=0')
   animatedcollapse.addDiv('dog', 'fade=0,speed=400,group=pets,persist=1,hide=1')
-  animatedcollapse.addDiv('rabbit', 'fade=0,speed=400,group=pets,hide=1')
+  animatedcollapse.addDiv('third', 'fade=0,speed=400,group=pets,hide=1')
   animatedcollapse.addDiv('fourth', 'fade=0,speed=400,group=pets,hide=1')
   animatedcollapse.addDiv('fifth', 'fade=0,speed=400,group=pets,hide=1')
   animatedcollapse.init()
+</script>
+
+<script type="text/javascript" src="ddtabmenufiles/ddtabmenu.js">
+/***********************************************
+* DD Tab Menu script-Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+***********************************************/
+</script>
+<link rel="stylesheet" type="text/css" href="ddtabmenufiles/chromemenu.css" />
+
+<script type="text/javascript">
+ddtabmenu.definemenu("ddtabs", 0)
+//initialize Tab Menu #1 with 1st tab selected
 </script>
 
 </HEAD>
@@ -113,15 +127,16 @@ function init_page()
 <!--########class=right######################################################-->
 
 <div id="right_box" class="right">
+
 <div>
 <a title="Post to Google Buzz" class="google-buzz-button" href="http://www.google.com/buzz/post" data-button-style="small-count"></a><script type="text/javascript" src="http://www.google.com/buzz/api/button.js"></script>
-<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 <div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#appId=134976729912304&amp;xfbml=1"></script><fb:like href="https://www.facebook.com/pages/openstreetmapcz/141059862622270" send="false" layout="button_count" width="40" show_faces="false" font=""></fb:like>
 <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="https://flattr.com/profile/walley"></a>
-<noscript><a href="http://flattr.com/thing/248568/walley-on-Flattr" target="_blank">
-<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
-
+<!--
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+-->
 </div>
+
 <h3>Menu</h3>
 <a href="javascript:animatedcollapse.toggle('cat')">[ Informace o Openstreetmap ]</a>
 
@@ -178,12 +193,24 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 </div>
 <br>
 
-<a href="javascript:animatedcollapse.toggle('rabbit')">[ Ovládání mapy ]</a>
-<!--<sup><a href="javascript:animatedcollapse.show('rabbit')">v</a><a href="javascript:animatedcollapse.hide('rabbit')">^</a></sup>-->
-<div id="rabbit" style="width: 100%">
-<h4>Vyhledavani</h4>
-<div id="searchdiv"><p>Zde budou vysledky vyhledavani</p></div>
-<h4>Test navigace</h4>
+<a href="javascript:animatedcollapse.toggle('third')">[ Ovládání mapy ]</a>
+<!--<sup><a href="javascript:animatedcollapse.show('third')">v</a><a href="javascript:animatedcollapse.hide('third')">^</a></sup>-->
+<div id="third" style="width: 100%">
+<div>
+<div id="ddtabs" class="chromemenu">
+<ul>
+<li><a href="http://www.dynamicdrive.com" rel="cm1">Navigace</a></li>
+<li><a href="http://www.dynamicdrive.com/new.htm" rel="cm2">Turistika</a></li>
+<li><a href="http://www.dynamicdrive.com/style/" rel="cm3">Radary</a></li>
+</ul>
+</div>
+
+<DIV class="tabcontainer">
+
+<div id="cm1" class="tabcontent">
+<h4>Vyhledávání</h4>
+<div id="searchdiv"><p>Zde budou výsledky vyhledávání</p></div>
+<h4>Navigace</h4>
  <form name="navform" action="javascript:nav_ajax()" type="GET">
   <fieldset>
    <input type=checkbox id="from" name="fromcheck" onclick="javascript:getElementById('to').checked=false"><label>Z:</label>
@@ -205,7 +232,11 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
    <input type="button" value="cesta" onclick="javascript:nav_ajax(document.getElementById('inputfrom').value,document.getElementById('inputto').value)">
    </fieldset>
   </form>
- <div id="directiondiv"><p>Zde budou vysledky navigace</p></div>
+ <div id="directiondiv"><p>Zde budou výsledky navigace</p></div>
+
+</div>
+
+<div id="cm2" class="tabcontent">
 <h4>Turistika</h4>
 <ul>
 <li><a href="javascript:show_guideposts(1)">Rozcestníky</a>
@@ -213,34 +244,33 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <li>
 <form name="catsel">
 <label>kategorie</label>
-<select name="commons_category" style="width:100px;">
-<option selected="yes">Hiking_and_footpath_fingerposts_in_the_Czech_Republic</option>
-
-<option>European long-distance paths direction labels in the Czech Republic</option>
-<option value="Hiking_and_footpath_fingerposts_in_Central_Bohemian_Region" >S - Hiking in Central Bohemian Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Zlín_Region"             >Z - Hiking in Zlín Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Hradec_Králové_Region"   >H - Hiking in Hradec Králové Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Karlovy_Vary_Region"     >K - Hiking in Karlovy Vary Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Liberec_Region"          >L + Hiking in Liberec Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Jablonec_nad_Nisou_District">'-- Jablonec nad Nisou District</option>
-<option value="Hiking_and_footpath_fingerposts_in_Liberec_District"           >'-- Liberec District</option>
-<option value="Hiking_and_footpath_fingerposts_in_Semily_District"            >'-- Semily District</option>
-<option value="Hiking_and_footpath_fingerposts_in_Česká_Lípa_District"        >'-- Česká Lípa District</option>
-
-<option value="Hiking_and_footpath_fingerposts_in_Moravian-Silesian_Region">T - Hiking in Moravian-Silesian Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Olomouc_Region"          >M - Hiking in Olomouc Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Pardubice_Region"        >E - Hiking in Pardubice Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Plzeň_Region"            >P - Hiking in Plzeň Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Prague"                  >A - Hiking in Prague</option>
-<option value="Hiking_and_footpath_fingerposts_in_South_Bohemian_Region"   >C - Hiking in South Bohemian Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_South_Moravian_Region"   >B - Hiking in South Moravian Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Vysočina_Region"         >J - Hiking in Vysočina Region</option>
-<option value="Hiking_and_footpath_fingerposts_in_Ústí_nad_Labem_Region"   >U - Hiking in Ústí nad Labem Region</option>
-<option>Way_of_Saint_James_in_the_Czech_Republic</option>
-<option>Cycling_route_signs_in_the_Czech_Republic</option>
-<option>Czech_hiking_and_footpath_signs_in_Krkonoše</option>
-<option>Cycling_stripe_signs_in_the_Czech_Republic</option>
-</select>
+ <select name="commons_category" style="width:100px;">
+  <option selected="yes">Hiking_and_footpath_fingerposts_in_the_Czech_Republic</option>
+  <option>European long-distance paths direction labels in the Czech Republic</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Central_Bohemian_Region" >S - Hiking in Central Bohemian Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Zlín_Region"             >Z - Hiking in Zlín Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Hradec_Králové_Region"   >H - Hiking in Hradec Králové Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Karlovy_Vary_Region"     >K - Hiking in Karlovy Vary Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Liberec_Region"          >L + Hiking in Liberec Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Jablonec_nad_Nisou_District">'-- Jablonec nad Nisou District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Liberec_District"           >'-- Liberec District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Semily_District"            >'-- Semily District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Česká_Lípa_District"        >'-- Česká Lípa District</option>
+ 
+  <option value="Hiking_and_footpath_fingerposts_in_Moravian-Silesian_Region">T - Hiking in Moravian-Silesian Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Olomouc_Region"          >M - Hiking in Olomouc Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Pardubice_Region"        >E - Hiking in Pardubice Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Plzeň_Region"            >P - Hiking in Plzeň Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Prague"                  >A - Hiking in Prague</option>
+  <option value="Hiking_and_footpath_fingerposts_in_South_Bohemian_Region"   >C - Hiking in South Bohemian Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_South_Moravian_Region"   >B - Hiking in South Moravian Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Vysočina_Region"         >J - Hiking in Vysočina Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Ústí_nad_Labem_Region"   >U - Hiking in Ústí nad Labem Region</option>
+  <option>Way_of_Saint_James_in_the_Czech_Republic</option>
+  <option>Cycling_route_signs_in_the_Czech_Republic</option>
+  <option>Czech_hiking_and_footpath_signs_in_Krkonoše</option>
+  <option>Cycling_stripe_signs_in_the_Czech_Republic</option>
+ </select>
 </form>
 <a href="javascript:request_commons(document.catsel.commons_category.value)">Wikimedia Commons</a>
 </li>
@@ -249,26 +279,35 @@ poskytnuta projektem OpenStreetMap a jeho přispěvateli</font>
 <li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
 <li><a href="fs.html">Fullscreen mapa</a>
 </ul>
-<h4>Radary</h4>
-<ul>
-<li><a href="javascript:show_poi(1)">zobraz poi</a><br>
-<li><a href="javascript:hide_poi(1)">skryj poi</a>
-</ul>
 </div>
+
+<div id="cm3" class="tabcontent">
+ <h4>Radary</h4>
+ <ul>
+ <li><a href="javascript:show_poi(1)">zobraz poi</a><br>
+ <li><a href="javascript:hide_poi(1)">skryj poi</a>
+ </ul>
+</div>
+
+</DIV><!--tabcontainer-->
+</span>
+</div><!--rabit-->
+
 <br>
 <a href="javascript:animatedcollapse.toggle('fourth')">[ Odkazy ]</a>
 <div id="fourth" style="width: 100%;">
-<h3>Další odkazy</h3>
-<ul>
- <li><a href="credits.html">Přispěvatelé a použité zdroje</a>
- <li><a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma/ Free map for your navigation device </a>
- <li><a href="http://openstreetmap.cz/svn/walley/osmcz/">Zdrojove kody a html teto stranky (public svn)</a>
- <li><a href="http://wiki.openstreetmap.org/index.php/Cz:Main_Page">Česká sekce openstreetmap.org wiki</a>
- <li><a href="odkazy.html">Ostatní</a>
-</ul>
-
+ <h3>Další odkazy</h3>
+ <ul>
+  <li><a href="credits.html">Přispěvatelé a použité zdroje</a>
+  <li><a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma/ Free map for your navigation device </a>
+  <li><a href="http://openstreetmap.cz/svn/walley/osmcz/">Zdrojove kody a html teto stranky (public svn)</a>
+  <li><a href="http://wiki.openstreetmap.org/index.php/Cz:Main_Page">Česká sekce openstreetmap.org wiki</a>
+  <li><a href="odkazy.html">Ostatní</a>
+ </ul>
 </div>
+
 <br>
+
 <a href="javascript:animatedcollapse.toggle('fifth')">[ Google Friend Connect ]</a>
 <div id="fifth" style="width: 100%;">
 <p>Google Friend Connect</p>
