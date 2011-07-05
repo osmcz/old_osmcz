@@ -247,11 +247,11 @@ function init()
     controls: [
       new OpenLayers.Control.PanZoomBar(),
       new OpenLayers.Control.MouseDefaults(),
-//        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
       new OpenLayers.Control.LayerSwitcher({'div': OpenLayers.Util.getElement('layerswitcher')}),
       new OpenLayers.Control.ScaleLine({geodesic: true}),
       new OpenLayers.Control.Permalink('permalink'),
       new OpenLayers.Control.MousePosition(),
+      new OpenLayers.Control.Attribution(),
       //new OpenLayers.Control.OverviewMap(),
       new OpenLayers.Control.KeyboardDefaults()
     ],
@@ -266,7 +266,7 @@ function init()
   var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
   var layerTah    = new OpenLayers.Layer.OSM.Osmarender("Tiles@Home");
   var layerCycle  = new OpenLayers.Layer.OSM.CycleMap("Cycle map");
-  var layermq  = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
+  var layermq     = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
   map.addLayers([layerMapnik,layerTah,layerCycle,layermq]);
 
 
