@@ -35,7 +35,8 @@ div.main {
   top: 2px;
   left: 2px;
   right: 280px;
-  bottom: 190px;
+  bottom: 220px;
+  border: 1px solid #ddd;
 }
 
 h1 {
