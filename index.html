@@ -372,22 +372,27 @@ google.friendconnect.container.renderWallGadget(
 
 <div id="main_div" class="main">
 
-<div id="container">
- <div class="leftcolumn"><p class="leftcolumn"><img alt="openstreetmap.cz - svobodná mapa" src="img/osmtitle.png"></p></div>
+ <div class="leftcolumn">
+  <p class="leftcolumn">
+  <img alt="openstreetmap.cz - svobodná mapa" src="img/osmtitle.png">
+  </p>
+ </div>
  <div class="rightcolumn">
- <form name="searchform" action="javascript:search_ajax(document.searchform.q.value)" type="GET">
- <input type=text name="q" value="hledej" onFocus="this.select()">
- <input type=hidden name="format"  value="html">
- <input type="button" value="hledej" onclick="javascript:search_ajax(document.searchform.q.value)">
- </form>
+  <form name="searchform" action="javascript:search_ajax(document.searchform.q.value)" type="GET">
+  <input type=text name="q" value="hledej" onFocus="this.select()">
+  <input type=hidden name="format"  value="html">
+  <input type="button" value="hledej" onclick="javascript:search_ajax(document.searchform.q.value)">
+  </form>
  </div>
  <div class="clear"></div>
-</div>
 
 <div class="handle">
 <a href="javascript:div_on('right_box');shrink_map()">&lt;</a><a href="javascript:div_off('right_box');grow_map()">&gt;</a>
 </div>
+
+<div>
 <div id="map" class="smallmap"></div>
+</div>
 
 <div class="gpslink">
 <p><a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma / Map for your GPS navigation device <img src="img/external_link.png" border="0"></a></p>
