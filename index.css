@@ -5,9 +5,34 @@ body {
   height: 100%;
 }
 
+h1 {
+  font-size:30px;
+  color:blue;
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+h4 {
+  border-width : 0px;
+  padding : 0px;
+  margin : 0px;
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+div.main {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 280px;
+  bottom: 180px;
+  border: 1px solid #ddd;
+}
+
 div.smallmap {
+  position: absolute;
   width: 96%;
-  height:90%;
+  height:80%;
   border: 1px solid #ddd;
 }
 
@@ -31,28 +56,11 @@ div.box {
   width: 100%;
 }
 
-div.main {
+div.gpslink {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  right: 280px;
-  bottom: 180px;
-  border: 1px solid #ddd;
-}
-
-h1 {
-  font-size:30px;
-  color:blue;
-  margin-top:1px;
-  margin-bottom:1px;
-}
-
-h4 {
-  border-width : 0px;
-  padding : 0px;
-  margin : 0px;
-  margin-top:1px;
-  margin-bottom:1px;
+  top: 90%;
+  left: 0px;
+  z-index: 9997;
 }
 
 div.olControlMousePosition {
@@ -104,9 +112,6 @@ div.leftcolumn {
   xoverflow : scroll;
 }
 
-div.gpslink {
-  z-index: 9997;
-}
 
 p.leftcolumn {
   margin-top:0;
