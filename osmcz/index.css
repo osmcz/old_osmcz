@@ -99,9 +99,6 @@ div.uploadbox {
   layer-background-color:white;
 }
 
-iframe {
-  border: 0px solid #ffffff;
-}
 
 div.leftcolumn { 
   width:250px; 
@@ -112,6 +109,18 @@ div.leftcolumn {
   xoverflow : scroll;
 }
 
+div.bottomright {
+  position: absolute;
+  bottom: 1;
+  right: 1;
+  border: 1px solid #ddd;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+iframe {
+  border: 0px solid #ffffff;
+}
 
 p.leftcolumn {
   margin-top:0;
