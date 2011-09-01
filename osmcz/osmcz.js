@@ -267,7 +267,7 @@ function init()
   var layerTah    = new OpenLayers.Layer.OSM.Osmarender("Tiles@Home");
   var layerCycle  = new OpenLayers.Layer.OSM.CycleMap("Cycle map");
   var layermq     = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
-  map.addLayers([layerMapnik,layerTah,layerCycle,layermq]);
+  map.addLayers([layermq,layerMapnik,layerTah,layerCycle]);
 
 
   var layer_otm = new OpenLayers.Layer.TMS(
@@ -277,6 +277,7 @@ function init()
       layername: 'opentrackmap',
       type: 'png', getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
+      visibility: false,
       attribution: '<a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
     }
   );
@@ -346,6 +347,7 @@ function init()
       isBaseLayer:false,
       type: 'png', 
       numZoomLevels: 19, 
+      visibility: false,
       getURL: osm_getTileURL,
       attribution: '<a href="http://opentrackmap.no-ip.org/">otm</a>'
   });
