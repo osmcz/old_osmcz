@@ -263,13 +263,6 @@ function init()
     displayProjection: new OpenLayers.Projection("EPSG:4326")
   });
 
-  var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
-  var layerTah    = new OpenLayers.Layer.OSM.Osmarender("Tiles@Home");
-  var layerCycle  = new OpenLayers.Layer.OSM.CycleMap("Cycle map");
-  var layermq     = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
-  map.addLayers([layermq,layerMapnik,layerTah,layerCycle]);
-
-
   var layer_otm = new OpenLayers.Layer.TMS(
     "opentracksmap TMS",
     "http://opentrackmap.no-ip.org/tiles/",
@@ -281,49 +274,53 @@ function init()
       attribution: '<a href="http://opentrackmap.no-ip.org/">opentrackmap</a>'
     }
   );
-  map.addLayer(layer_otm);
 
-  var layer_zby = new OpenLayers.Layer.TMS(
-    "uhul 1",
+  var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
+  var layerTah    = new OpenLayers.Layer.OSM.Osmarender("Tiles@Home");
+  var layerCycle  = new OpenLayers.Layer.OSM.CycleMap("Cycle map");
+  var layermq     = new OpenLayers.Layer.OSM.Mapquest("Mapquest");
+  map.addLayers([layermq,layerMapnik,layerCycle]);
+
+  var layer_uhul = new OpenLayers.Layer.TMS(
+    "Letecke snimky uhul",
     "http://openstreetmap.cz/uhul_tile.php/",
     {
       isBaseLayer:false,
       opacity: 0.4,
-      layername: 'uhul 1',
+/*  resolutions:    [
+      360/(1<<(8+14)),
+      360/(1<<(8+15)),
+      360/(1<<(8+16)),
+      360/(1<<(8+17)),
+      360/(1<<(8+18))
+  ],
+      numZoomLevels: 19,
+*/
+      layername: 'uhul_ortofoto',
       type: 'png', getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       visibility: false,
-      attribution: '<a href="http://opentrackmap.no-ip.org/">uhul</a>'
+      attribution: '<a href="http://www.uhul.cz/">uhul</a>'
     }
   );
-  map.addLayer(layer_zby);
+  map.addLayer(layer_uhul);
 
+/*
   var layer_zby2 = new OpenLayers.Layer.TMS(
     "uhul 2",
     "http://down.zby.cz/uhul_tile.php/",
     {
       isBaseLayer:false,
       opacity: 0.4,
-      layername: 'uhul 2',
+      layername: 'Letecke snimky uhul',
       type: 'png', getURL: osm_getTileURL,
       displayOutsideMaxExtent: true,
       visibility: false,
       attribution: '<a href="http://opentrackmap.no-ip.org/">uhul</a>'
     }
   );
-  map.addLayer(layer_zby2);
-
-
-  /* zruseno, nevim co zatim s tim
-  var gml_all = new OpenLayers.Layer.GML(
-    "KCT vse, pomale!", "http://openstreetmap.cz/kct.osm", 
-    {format: OpenLayers.Format.OSM, projection: map.displayProjection}
-  );
-  gml_all.setVisibility(false);
-  gml_all.preFeatureInsert = style_osm_feature; 
-  map.addLayer(gml_all);
-  */
-
+//  map.addLayer(layer_zby2);
+*/
   var layer_kctcz = new OpenLayers.Layer.TMS(
     "Turisticke stezky",
     "http://openstreetmap.cz/kct_tiles/",
@@ -340,7 +337,7 @@ function init()
   );
   map.addLayer(layer_kctcz);
 
-  var hiking_tracks = new OpenLayers.Layer.OSM(
+/*  var hiking_tracks = new OpenLayers.Layer.OSM(
     "OTM Hiking Tracks", 
     "http://opentrackmap.no-ip.org/tracks/", 
     {
@@ -352,7 +349,7 @@ function init()
       attribution: '<a href="http://opentrackmap.no-ip.org/">otm</a>'
   });
   map.addLayer(hiking_tracks);
-
+*/
 
   navmarkers = new OpenLayers.Layer.Markers("Navigace",{
     displayInLayerSwitcher:true,

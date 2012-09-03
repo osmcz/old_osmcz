@@ -219,8 +219,11 @@ OpenLayers.Layer.OSM.Mapquest = OpenLayers.Class(OpenLayers.Layer.OSM, {
       "http://otile3.mqcdn.com/tiles/1.0.0/osm/",
       "http://otile4.mqcdn.com/tiles/1.0.0/osm/",
     ];
-    options = OpenLayers.Util.extend({numZoomLevels: 18, attribution: "mapquest",
-}, options);
+    options = OpenLayers.Util.extend(
+      {
+        numZoomLevels: 18, 
+        attribution: "<a href='http://open.mapquest.com/'>mapquest</a>",
+      }, options);
     var newArguments = [name, url, options];
     OpenLayers.Layer.OSM.prototype.initialize.apply(this, newArguments);
   },
