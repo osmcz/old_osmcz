@@ -137,7 +137,7 @@ ddtabmenu.definemenu("ddtabs", 0)
 <li><a href="#" rel="cm0"><img src="img/lupa.png"></a></li>
 <li><a href="#" rel="cm1"><img src="img/car.png"></a></li>
 <li><a href="#" rel="cm2"><img src="img/kctred.png"></a></li>
-<li><a href="#" rel="cm3">Radary atp.</a></li>
+<li><a href="#" rel="cm3">POI</a></li>
 </ul>
 </div>
 
@@ -177,11 +177,12 @@ ddtabmenu.definemenu("ddtabs", 0)
 <div id="cm2" class="tabcontent">
 <h4>Turistika</h4>
 <ul>
-<li><a href="javascript:show_guideposts(1)">Rozcestníky</a>
-<li><a href="javascript:upbox_on()">Nahrát obrázek</a>
+<li><a href="javascript:show_guideposts(1)">Zobrazit rozcestníky</a>
+<li><a href="javascript:upbox_on()">Vložit obrázek rozcestníku</a>
 <li>
+<h5>Rozcestníky z Wikimedia Commons</h5>
 <form name="catsel">
-<label>kategorie</label>
+<label>Vyber kategorii</label>
  <select name="commons_category" style="width:100px;">
   <option selected="yes">Hiking_and_footpath_fingerposts_in_the_Czech_Republic</option>
   <option>European long-distance paths direction labels in the Czech Republic</option>
@@ -213,7 +214,7 @@ ddtabmenu.definemenu("ddtabs", 0)
   <option>Cycling fingerposts with stripe signs in the Czech Republic</option>
  </select>
 </form>
-<a href="javascript:request_commons(document.catsel.commons_category.value)">Wikimedia Commons</a>
+<a href="javascript:request_commons(document.catsel.commons_category.value)">Zobraz kliknutím zde</a>
 </li>
 </ul>
 <ul>
@@ -300,7 +301,6 @@ google_ad_height = 90;
 
 <div class="bottomright">
 <a href="about.html">[O Projektu]</a><br>
-<a href="friendconnect.html">[Google Friend Connect]</a><br>
 <a href="odkazy.html">[Odkazy]</a><br>
 
 <!--buttons-->
@@ -308,9 +308,12 @@ google_ad_height = 90;
 <a href="https://plus.google.com/101537650520682759804?prsrc=3" style="text-decoration:none;"><img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/></a>
 <div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#appId=134976729912304&amp;xfbml=1"></script><fb:like href="https://www.facebook.com/pages/openstreetmapcz/141059862622270" send="false" layout="button_count" width="40" show_faces="false" font=""></fb:like>
 <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="https://flattr.com/profile/walley"></a>
-<!--
-<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
--->
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="GZYJ36AMVVDV4">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
 <!--/buttons-->
 <!--bottomright-->
 </div>
