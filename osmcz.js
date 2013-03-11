@@ -251,6 +251,13 @@ function init()
       new OpenLayers.Control.ScaleLine({geodesic: true}),
       new OpenLayers.Control.Permalink('permalink'),
       new OpenLayers.Control.MousePosition(),
+
+      new OpenLayers.Control.TouchNavigation({
+            dragPanOptions: {
+            enableKinetic: true
+          }
+      }),
+
       new OpenLayers.Control.Attribution(),
       //new OpenLayers.Control.OverviewMap(),
       new OpenLayers.Control.KeyboardDefaults()
