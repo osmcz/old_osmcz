@@ -444,7 +444,6 @@ function addMarker(to_layer, ll, popupClass, popupContentHTML, closeBox, overflo
 {
   var icon_size = new OpenLayers.Size(48, 48);
   var marker_icon = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost_nice.png', icon_size);
-
   var icon_url = 'http://openstreetmap.cz/img/guidepost.png';
   var data = {
     iconURL: icon_url,

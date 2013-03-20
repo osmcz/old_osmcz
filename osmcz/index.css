@@ -74,6 +74,11 @@ div.olControlMousePosition {
  color: red;
 }
 
+.olPopupCloseBox {
+  background: url("/img/close.png") no-repeat;
+  cursor: pointer;
+}
+
 div.centered {
   position: absolute;
   top: 50%;
