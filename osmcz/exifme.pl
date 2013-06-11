@@ -9,7 +9,7 @@ use File::Copy;
 
 # insert into guidepost values (NULL, 50.1, 17.1, 'x', 'znacka');
 
-$debug = 1;
+$debug = 0;
 
 if ($debug) {print "start<br>\n";}
 
