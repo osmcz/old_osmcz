@@ -5,6 +5,15 @@
 $global_error_message = "";
 
 ################################################################################
+function printdebug($x)
+################################################################################
+{
+  //let it print when debugging
+  return;
+  print $x;
+}
+
+################################################################################
 function get_param($param)
 ################################################################################
 {
@@ -18,6 +27,8 @@ function get_param($param)
 function page_header()
 ################################################################################
 {
+  if (get_param("source") == "mobile") { return; }
+
   print "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>\n";
   print "<html>\n";
   print "  <head>\n";
@@ -34,6 +45,8 @@ function page_header()
 function page_footer()
 ################################################################################
 {
+  if (get_param("source") == "mobile") { return; }
+
   print "  </body>\n";
   print "</html>\n";
 }
@@ -71,8 +84,9 @@ function show_upload_dialog()
     <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
   </fieldset>
 </form>\n";
-  print "<p id='upload_process'>Uploading...</p>";
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:0;height:0;border:0px solid #fff;'></iframe>";
+  print "<p id='upload_process'>Uploading...</p>\n";
+  //set widht and height to display debug output
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100;height:100;border:0px solid #fff;'></iframe>\n";
 }
 
 ################################################################################
@@ -110,39 +124,36 @@ function process_file()
   $filename = $_FILES['uploadedfile']['name'];
   $error_message = "";
 
-  print "<hr>name:";
-  print $filename;
-  print "<br>type:";
-  print $_FILES['uploadedfile']['type'];
-  print "<br>size:";
-  print $_FILES['uploadedfile']['size'];
-  print "<br>tmp:";
-  print $_FILES['uploadedfile']['tmp_name'];
-  print "<br>error";
-  print $_FILES['uploadedfile']['error'];
-  print "<hr>";
+  printdebug("<hr>name:");
+  printdebug($filename);
+  printdebug("<br>type:");
+  printdebug($_FILES['uploadedfile']['type']);
+  printdebug("<br>size:");
+  printdebug($_FILES['uploadedfile']['size']);
+  printdebug("<br>tmp:");
+  printdebug($_FILES['uploadedfile']['tmp_name']);
+  printdebug("<br>error");
+  printdebug($_FILES['uploadedfile']['error']);
+  printdebug("<hr>");
 
-  print $_POST['lat'];
-  print $_POST['lon'];
 
   $lat = $_POST['lat'];
   $lon = $_POST['lon'];
   $author = $_POST['author'];
 
-  print "<hr>";
+  printdebug("lat:lon:author<br> $lat:$lon:$author<hr>");
 
   $file = basename($filename);
   $target_path = "uploads/";
   $target_path = $target_path . $file;
   $final_path = "img/guidepost/" . $file;
 
-  print "<br>target:$target_path";
-  print "<hr>";
+  printdebug("<br>target:$target_path<hr>");
 
   $error_message = "OK";
 
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
-    print "existuje\n";
+    printdebug("soubor existuje<br>\n");
     $result = 1;
   } else {
     $error_message = "nepodarilo se uploadnout soubor";
@@ -151,15 +162,17 @@ function process_file()
 
   if ($result) {
     if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-      echo "Soubor '$file' byl uspesne nahran na server do $target_path";
+      printdebug("Soubor '$file' byl uspesne nahran na server do $target_path<hr>");
       if (!$lat && !$lon) {
-        $out = system ("/var/www/exifme.pl $target_path $author img/guidepost/", $errlvl);
-        print "<br>vystup: $out";
-        if ($errlvl) {
-          $result = 0;
-          $error_message = "nepodarilo se zjistit souradnice z exif" + $out;
-        } else {
+        $command = "/var/www/mapy/exifme.pl $target_path $author img/guidepost/";
+        $out = system ($command, $errlvl);
+        printdebug("<br>command:vystup(exit code)<br> $command:$out ($errlvl)");
+        if (!$errlvl) {
           $result = 1;
+        } else {
+          $result = 0;
+          $error_message = "nepodarilo se zjistit souradnice z exif" . $out;
+          printdebug("exifme error $error_message<br>");
         }
       } else {
         if (!copy ("uploads/$file","img/guidepost/$file")) {
@@ -179,11 +192,19 @@ function process_file()
     }
   }
 
+  if ($result == 0 and $error_message == "") {
+    $error_message = "Divna chyba";
+  }
+
+  if (get_param("source") == "mobile") {
+    print "$result-$error_message";
+  } else {
   print "
   <script language='javascript' type='text/javascript'>
     parent.stop_upload(".$result.",'".$error_message."', '".$filename."');
   </script>
   \n";
+  }
   return $result;
 }
 

@@ -129,7 +129,7 @@ function stop_upload(success, message, filename)
   var out_line = '';
 
   if (success != 1) {
-    alert(message);
+    alert("error: " + message);
   }
 
   document.getElementById('upload_process').style.visibility = 'hidden';
