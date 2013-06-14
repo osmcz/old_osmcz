@@ -9,8 +9,9 @@ function printdebug($x)
 ################################################################################
 {
   //let it print when debugging
-  return;
-  print $x;
+  //return;
+//  print $x;
+  system ("/usr/bin/logger '$x'");
 }
 
 ################################################################################
@@ -152,11 +153,21 @@ function process_file()
 
   $error_message = "OK";
 
+  if ($_FILES['uploadedfile']['error'] == "1") {
+    $error_message = "soubor je prilis velky";
+    $result = 0;
+  }
+
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
     printdebug("soubor existuje<br>\n");
     $result = 1;
   } else {
     $error_message = "nepodarilo se uploadnout soubor";
+    $result = 0;
+  }
+
+  if ($author == "") {
+    $error_message = "author nezadan";
     $result = 0;
   }
 
@@ -176,7 +187,10 @@ function process_file()
         }
       } else {
         if (!copy ("uploads/$file","img/guidepost/$file")) {
-          $error_message = "failed to copy $file to destination ...";
+          $error_message = "failed to copy $file to destination ... ";
+          if (file_exists("img/guidepost/$file")) {
+            $error_message .= "file already exists but cannot be overwritten (rights?), it probably is in db too";
+          }
           $result = 0;
         } else {
           $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author);
