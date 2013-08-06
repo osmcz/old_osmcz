@@ -207,11 +207,10 @@ function process_file()
   if (get_param("source") == "mobile") {
     print "$result-$error_message";
   } else {
-  print "
+    print "
   <script language='javascript' type='text/javascript'>
     parent.stop_upload(".$result.",'".$error_message."', '".$filename."');
-  </script>
-  \n";
+  </script>\n";
   }
   return $result;
 }
