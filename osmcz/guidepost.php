@@ -10,8 +10,8 @@ function printdebug($x)
 {
   //let it print when debugging
   //return;
-//  print $x;
-  system ("/usr/bin/logger '$x'");
+//  print $x."<br>";
+  system ("/usr/bin/logger -t guidepost '$x'");
 }
 
 ################################################################################
@@ -125,31 +125,25 @@ function process_file()
   $filename = $_FILES['uploadedfile']['name'];
   $error_message = "";
 
-  printdebug("<hr>name:");
-  printdebug($filename);
-  printdebug("<br>type:");
-  printdebug($_FILES['uploadedfile']['type']);
-  printdebug("<br>size:");
-  printdebug($_FILES['uploadedfile']['size']);
-  printdebug("<br>tmp:");
-  printdebug($_FILES['uploadedfile']['tmp_name']);
-  printdebug("<br>error");
-  printdebug($_FILES['uploadedfile']['error']);
-  printdebug("<hr>");
+  printdebug("name: $filename");
+  printdebug("type:".$_FILES['uploadedfile']['type']);
+  printdebug("size:".$_FILES['uploadedfile']['size']);
+  printdebug("tmp:".$_FILES['uploadedfile']['tmp_name']);
+  printdebug("error".$_FILES['uploadedfile']['error']);
 
 
   $lat = $_POST['lat'];
   $lon = $_POST['lon'];
   $author = $_POST['author'];
 
-  printdebug("lat:lon:author<br> $lat:$lon:$author<hr>");
+  printdebug("lat:lon:author - $lat:$lon:$author");
 
   $file = basename($filename);
   $target_path = "uploads/";
   $target_path = $target_path . $file;
   $final_path = "img/guidepost/" . $file;
 
-  printdebug("<br>target:$target_path<hr>");
+  printdebug("target:$target_path");
 
   $error_message = "OK";
 
@@ -159,7 +153,7 @@ function process_file()
   }
 
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
-    printdebug("soubor existuje<br>\n");
+    printdebug("soubor existuje\n");
     $result = 1;
   } else {
     $error_message = "nepodarilo se uploadnout soubor";
@@ -263,7 +257,7 @@ switch ($action) {
   case "":
     $bbox = get_param('bbox');
     if ($bbox == "") {
-      system("/usr/bin/logger no bbox");
+      system("/usr/bin/logger -t guidepost no bbox");
       die("No bbox provided\n");
     }
     list($minlon, $minlat, $maxlon, $maxlat) = preg_split('/,/', $bbox, 4);
@@ -279,7 +273,7 @@ switch ($action) {
       }
       print json_encode($result);
     } else {
-        die($err);
+      die($err);
     }
   break;
 }
