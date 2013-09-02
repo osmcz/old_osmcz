@@ -38,11 +38,21 @@ $lat = $l1[1] + $l1[2] / 60 + $l1[3] / 3600;
 $lon = $l2[1] + $l2[2] / 60 + $l2[3] / 3600;
 if ($debug) {print "vysledek: $lat $lon\n";}
 
-move("uploads/".basename($i),$new_location.basename($i)) or die;
+my $filename;
+if (-e $new_location.basename($i)) {
+  $r = int(rand(1000));
+  $url = $new_location.$r.basename($i);
+  $filename = $r.basename($i);
+} else {
+  $url = $new_location.basename($i);
+  $filename = $r.basename($i);
+}
+
+  move("uploads/".basename($i),$new_location.basename($i)) or die;
 
 my $dbfile = 'guidepost';
 my $dbh = DBI->connect("dbi:SQLite2:dbname=$dbfile","","",{ RaiseError => 1 },) or die $DBI::errstr;
-$q = "insert into guidepost values (NULL, $lat, $lon, '".$new_location.basename($i)."','".basename($i)."', '$author');\n";
+$q = "insert into guidepost values (NULL, $lat, $lon, '".$url."','".$filename."', '$author');\n";
 if ($debug) {print $q;}
 $dbh->do($q) or die;
 $dbh->disconnect();

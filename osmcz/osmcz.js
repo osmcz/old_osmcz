@@ -492,7 +492,7 @@ function handler(request)
 
   var layers = map.getLayersByName("Rozcestniky");
 
-  debug_alert("handler():");
+  debug_alert("debugging handler():");
 
   for(var layerIndex = 0; layerIndex < layers.length; layerIndex++) {
     map.removeLayer(layers[layerIndex]);
@@ -503,7 +503,8 @@ function handler(request)
 
   a = JSON.decode(request.responseText);
 
-  debug_alert("result:"+a);
+  debug_alert("input" + request.responseText);
+  debug_alert("result of JSON.decode:" + a);
 
   for(i = 0; i < a.length; i++) {
     b = a[i];
