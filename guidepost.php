@@ -23,7 +23,6 @@ function get_param($param)
   return "";
 }
 
-
 ################################################################################
 function page_header()
 ################################################################################
@@ -97,7 +96,7 @@ function insert_to_db($lat, $lon, $url ,$file, $author)
   global $global_error_message;
   $database = new SQLiteDatabase('guidepost', 0777, $error);
   if (!$database) {
-    $global_error_message = (file_exists($yourfile)) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
+    $global_error_message = (file_exists('guidepost')) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
     return 0;
   }
   $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author')";
@@ -153,7 +152,7 @@ function process_file()
   }
 
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
-    printdebug("soubor existuje\n");
+    printdebug("soubor byl uspesne uploadnut\n");
     $result = 1;
   } else {
     $error_message = "nepodarilo se uploadnout soubor";
@@ -255,23 +254,31 @@ switch ($action) {
     break;
   case "":
     $bbox = get_param('bbox');
+    system("/usr/bin/logger -t guidepost start");
     if ($bbox == "") {
       system("/usr/bin/logger -t guidepost no bbox");
       die("No bbox provided\n");
+    } else {
+      system("/usr/bin/logger -t guidepost bbox: " + $bbox);
     }
+
     list($minlon, $minlat, $maxlon, $maxlat) = preg_split('/,/', $bbox, 4);
+
     $db = new SQLiteDatabase('guidepost');
 
     if ($db) {
       $i = 0;
       $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
-#print $query;
+
+      system("/usr/bin/logger -t guidepost query " + $query);
+
       $result = $db->arrayQuery($query, SQLITE_ASSOC);
       foreach ($result as $entry) {
         $result[$i++] = $entry;
       }
       print json_encode($result);
     } else {
+      system("/usr/bin/logger -t guidepost db open error: " + $err);
       die($err);
     }
   break;
