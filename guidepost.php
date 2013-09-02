@@ -94,21 +94,17 @@ function insert_to_db($lat, $lon, $url ,$file, $author)
 ################################################################################
 {
   global $global_error_message;
-  $database = new SQLiteDatabase('guidepost', 0777, $error);
+  $database = new SQLite3('guidepost');;
   if (!$database) {
     $global_error_message = (file_exists('guidepost')) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
     return 0;
   }
   $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author')";
-  $query = $database->queryExec($q, $query_error);
-  if ($query_error) {
+  $query = $database->exec($q);
+  if (!$query) {
     $global_error_message = "Error: $query_error"; 
     return 0;
   }
-  if (!$query) {
-    $global_error_message = "Impossible to execute query.";
-    return 0;
-  };
   return 1;
 }
 
@@ -155,6 +151,7 @@ function process_file()
     printdebug("soubor byl uspesne uploadnut\n");
     $result = 1;
   } else {
+    printdebug("cannot upload file\n");
     $error_message = "nepodarilo se uploadnout soubor";
     $result = 0;
   }
@@ -170,20 +167,21 @@ function process_file()
       if (!$lat && !$lon) {
         $command = "/var/www/mapy/exifme.pl $target_path $author img/guidepost/";
         $out = system ($command, $errlvl);
-        printdebug("<br>command:vystup(exit code)<br> $command:$out ($errlvl)");
+        printdebug("command:output(exit code) - $command:$out($errlvl)");
         if (!$errlvl) {
           $result = 1;
         } else {
           $result = 0;
           $error_message = "nepodarilo se zjistit souradnice z exif" . $out;
-          printdebug("exifme error $error_message<br>");
+          printdebug("exifme error $error_message");
         }
       } else {
+        if (file_exists("img/guidepost/$file")) {
+          $error_message = "file $file already exists, please rename your copy";
+          $result = 0;
+        }
         if (!copy ("uploads/$file","img/guidepost/$file")) {
           $error_message = "failed to copy $file to destination ... ";
-          if (file_exists("img/guidepost/$file")) {
-            $error_message .= "file already exists but cannot be overwritten (rights?), it probably is in db too";
-          }
           $result = 0;
         } else {
           $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author);
@@ -254,31 +252,30 @@ switch ($action) {
     break;
   case "":
     $bbox = get_param('bbox');
-    system("/usr/bin/logger -t guidepost start");
     if ($bbox == "") {
-      system("/usr/bin/logger -t guidepost no bbox");
+      printdebug("no bbox");
       die("No bbox provided\n");
     } else {
-      system("/usr/bin/logger -t guidepost bbox: " + $bbox);
+      printdebug("bbox: " + $bbox);
     }
 
     list($minlon, $minlat, $maxlon, $maxlat) = preg_split('/,/', $bbox, 4);
 
-    $db = new SQLiteDatabase('guidepost');
+    $db = new SQLite3('guidepost');
 
     if ($db) {
       $i = 0;
       $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
 
-      system("/usr/bin/logger -t guidepost query " + $query);
+      printdebug("query " + $query);
 
-      $result = $db->arrayQuery($query, SQLITE_ASSOC);
-      foreach ($result as $entry) {
-        $result[$i++] = $entry;
+      $results = $db->query($query);
+      while ($row = $results->fetchArray()) {
+        $result[$i++] = $row;
       }
       print json_encode($result);
     } else {
-      system("/usr/bin/logger -t guidepost db open error: " + $err);
+      printdebug("db open error: " + $err);
       die($err);
     }
   break;
