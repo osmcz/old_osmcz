@@ -11,7 +11,7 @@ use File::Copy;
 
 $debug = 0;
 
-if ($debug) {print "start<br>\n";}
+ &debuglog("exifme", "start");
 
 if (scalar @ARGV == 0) {die("not enough parameters, died");}
 
@@ -20,11 +20,14 @@ $author = $ARGV[1];
 $new_location = $ARGV[2];
 @output = `jhead $i`;
 
+print @output;
+&debuglog("params:",$i,$author,$new_location);
+
 @exiflat = grep(/^GPS Latitude/, @output);
 @exiflon = grep(/^GPS Longitude/, @output);
 
 if (!scalar(@exiflat) || !scalar(@exiflon)) {
-  if ($debug) {print "No geo info\n"};
+  &debuglog("No geo info");
   exit 1;
 }
 
@@ -36,25 +39,50 @@ foreach (@l2) {chop();}
 
 $lat = $l1[1] + $l1[2] / 60 + $l1[3] / 3600;
 $lon = $l2[1] + $l2[2] / 60 + $l2[3] / 3600;
-if ($debug) {print "vysledek: $lat $lon\n";}
+&debuglog( "vysledek: $lat $lon");
 
 my $filename;
 if (-e $new_location.basename($i)) {
   $r = int(rand(1000));
   $url = $new_location.$r.basename($i);
   $filename = $r.basename($i);
+  &debuglog("file exists, renamed to $filename");
 } else {
   $url = $new_location.basename($i);
   $filename = $r.basename($i);
 }
 
-  move("uploads/".basename($i),$new_location.basename($i)) or die;
+$res = move("uploads/".basename($i),$url);
+
+if (!$res) {
+  &debuglog("moving failed","uploads/".basename($i),$url);
+  die;
+}
 
 my $dbfile = 'guidepost';
-my $dbh = DBI->connect("dbi:SQLite2:dbname=$dbfile","","",{ RaiseError => 1 },) or die $DBI::errstr;
+my $dbh = DBI->connect( "dbi:SQLite:$dbfile" );
+if (!$dbh) {
+  &debuglog("db failed","Cannot connect: ".$DBI::errstr);
+  die;
+}
+
 $q = "insert into guidepost values (NULL, $lat, $lon, '".$url."','".$filename."', '$author');\n";
-if ($debug) {print $q;}
-$dbh->do($q) or die;
+&debuglog($q);
+
+$res = $dbh->do($q);
+if (!$res) {
+  &debuglog("query failed","Cannot connect: $DBI::errstr");
+  die;
+}
 $dbh->disconnect();
-if ($debug) {print "done\n";}
+
+&debuglog("done");
 exit 0;
+
+#  $row_id = $dbh->sqlite_last_insert_rowid();
+
+sub debuglog
+{
+  $x = join("-",@_);
+  system ("/usr/bin/logger -t guidepost '$x'");
+}
