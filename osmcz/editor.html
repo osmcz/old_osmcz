@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>load demo</title>
+<style>
+body{ font-size: 12px; font-family: Arial; }
+</style>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+</head>
+<script>
+
+function response(response, status, xhr) {
+if (status == "error") {
+var msg = "Sorry but there was an error: ";
+$("#error").html(msg + xhr.status + " " + xhr.statusText);
+}
+}
+
+function left()
+{
+  alert("kokot");
+  $("#new-nav").load("http://openstreetmap.cz/table", response);
+}
+
+</script>
+<body>
+
+<a href="#" onclick="javascript:left()"><</a>
+<a href="#" onclick="javascript:right()"><</a>
+
+<b>Footer navigation:</b>
+<div id="new-nav"></div>
+<b>Error Response:</b>
+<div id="error"></div>
+<script>
+$("#new-nav").load("http://openstreetmap.cz/table", response);
+</script>
+</body>
+</html>
