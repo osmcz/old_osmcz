@@ -5,24 +5,47 @@ use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::URI ();
 use APR::URI ();
+use Apache2::Connection ();
+use Apache2::RequestRec ();
 
 use APR::Const -compile => qw(URI_UNP_REVEALPASSWORD);
 use Apache2::Const -compile => qw(OK);
 
 use DBI;
 
+use Data::Dumper;
 
-sub handler {
-  my($r) = @_;    # grab the request info "object" that mod_perl has
-#      my $r = shift;
+my $dbh;
+
+sub connection_info
+{
+  my ($c) = @_;
+  print $c->id();
+  print $c->local_addr();
+  print $c->remote_addr();
+  print $c->local_host();
+  print $c->get_remote_host();
+  print $c->remote_host();
+  print $c->local_ip();
+  print $c->remote_ip();
+}
+
+sub handler 
+{
+#  my($r) = @_;    # grab the request info "object" that mod_perl has
+  my $r = shift;
   $r->content_type('text/html');
+
+print Dumper(\%ENV);
+
+  connection_info($r->connection);
 
 #    %ENV  = $r->cgi_env;
   my $uri = $r->uri;      # what does the URI (URL) look like ?
-  print $uri;
+  print "Uri: $uri";
 
   my $query_string = $r->args;
-  $r->print( "Hello world! Your query string was: $query_string\n" );
+  $r->print("query string was: $query_string\n" );
 
   if ($uri =~ "table\/all") {
     print "<h1>all</h1>\n";
@@ -59,11 +82,15 @@ sub handler {
 #    $r->send_http_header;   # Now send the http headers.
 
 my $dbfile = '/var/www/mapy/guidepost';
-my $dbh = DBI->connect( "dbi:SQLite:$dbfile" );
+$dbh = DBI->connect( "dbi:SQLite:$dbfile" );
 if (!$dbh) {
   &debuglog("db failed","Cannot connect: ".$DBI::errstr);
   die;
 }
+
+
+&get_gp_count();
+
 print "result\n";
 
 my $query = "select * from guidepost where id < 30";
@@ -77,12 +104,7 @@ print'<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
 
 foreach my $row (@$res) {
   my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
-  print "<p>\n";
-  print "$id, $lat, $lon, $url, $name, $attribution";
-  print "</p>\n";
-
-  print "<p>\n";
-  print "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
+  &gp_line($id, $lat, $lon, $url, $name, $attribution);
 
 #print '
 #<div id="map" style="width:200px;height:200px;"></div>
@@ -113,4 +135,37 @@ foreach my $row (@$res) {
    $dbh->disconnect;
    return Apache2::Const::OK;
 }
+
+sub gp_line()
+{
+  my ($id, $lat, $lon, $url, $name, $attribution) = @_;
+
+  print "<hr>\n";
+  print "<p>\n";
+  print "$id";
+  print "lat lon:$lat $lon";
+  print "by $attribution";
+  $full_uri = "http://openstreetmap.cz/".$url;
+  print "<a href='$full_uri'><img src='$full_uri' width='100px'>$name</a>";
+  print "</p>\n";
+
+  print "<p>\n";
+  print "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
+  print "<hr>\n";
+
+}
+
+sub get_gp_count
+{
+  print "<hr>count c\n";
+
+  my $query = "select count() from guidepost";
+  my $sth = $dbh->prepare($query);
+  my $rv = $sth->execute() or die $DBI::errstr;
+  while(my @row = $sth->fetchrow_array()) {
+    print "ID = ". $row[0] . "\n";
+  }
+  return $row[0];
+}
+
 1;
