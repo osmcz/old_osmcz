@@ -14,6 +14,7 @@ use Apache2::Const -compile => qw(OK);
 use DBI;
 
 use Data::Dumper;
+use Scalar::Util qw(looks_like_number);
 
 my $dbh;
 
@@ -93,7 +94,16 @@ if (!$dbh) {
 
 print "result\n";
 
-my $query = "select * from guidepost where id < 30";
+$i = 10;
+if (looks_like_number($i)) {
+  my $query = "select * from guidepost LIMIT 10 OFFSET $i";
+} else {
+  print "error";
+}
+
+  my $query = "select * from guidepost LIMIT 10 OFFSET $i";
+
+print $query;
 $res = $dbh->selectall_arrayref($query);
 
 print $DBI::errstr;
@@ -123,6 +133,8 @@ foreach my $row (@$res) {
   print "</p>\n";
 
 }
+
+print "end result\n";
 
 
 #   foreach( @$res ) {
