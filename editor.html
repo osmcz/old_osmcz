@@ -11,29 +11,67 @@ body{ font-size: 12px; font-family: Arial; }
 <script>
 
 function response(response, status, xhr) {
-if (status == "error") {
-var msg = "Sorry but there was an error: ";
-$("#error").html(msg + xhr.status + " " + xhr.statusText);
+  if (status == "error") {
+    var msg = "Sorry but there was an error: ";
+    $("#error").html(msg + xhr.status + " " + xhr.statusText);
+  }
+//  alert("done "+response+status);
 }
-}
+
+var page = 0;
+var page_length = 2;
 
 function left()
 {
-  alert("kokot");
-  $("#new-nav").load("http://openstreetmap.cz/table", response);
+  page--;
+  if (page < 0) {
+    page = 10;
+  }
+  load_page(page);
+}
+
+
+function right()
+{
+  page++;
+  if (page > 10) {
+    page = 0;
+  }
+  load_page(page);
+}
+
+function load_page(page)
+{
+  alert("kokot"+page);
+  var from = page * page_length;
+  var to = from + page_length;
+
+  uri = "http://openstreetmap.cz/table/get/" + from + "/" + to;
+//  alert(uri);
+
+  $("#new-nav").load("http://openstreetmap.cz/table/get/" + from + "/" + to, response);
 }
 
 </script>
 <body>
 
+<h1>
 <a href="#" onclick="javascript:left()"><</a>
-<a href="#" onclick="javascript:right()"><</a>
+<a href="#" onclick="javascript:right()">></a>
+</h1>
 
 <b>Footer navigation:</b>
 <div id="new-nav"></div>
 <b>Error Response:</b>
 <div id="error"></div>
 <script>
+var gp_count = $.ajax({
+  url: "http://openstreetmap.cz/table/count",
+  async: false
+ }).responseText;
+
+document.write(gp_count);
+document.write("<h1>x</h1>");
 $("#new-nav").load("http://openstreetmap.cz/table", response);
 </script>
 </body>

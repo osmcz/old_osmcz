@@ -31,31 +31,9 @@ sub connection_info
   print $c->remote_ip();
 }
 
-sub handler 
+sub rrr
 {
-#  my($r) = @_;    # grab the request info "object" that mod_perl has
-  my $r = shift;
-  $r->content_type('text/html');
-
-print Dumper(\%ENV);
-
-  connection_info($r->connection);
-
-#    %ENV  = $r->cgi_env;
-  my $uri = $r->uri;      # what does the URI (URL) look like ?
-  print "Uri: $uri";
-
-  my $query_string = $r->args;
-  $r->print("query string was: $query_string\n" );
-
-  if ($uri =~ "table\/all") {
-    print "<h1>all</h1>\n";
-  } elsif ($uri =~ /goodbye/) {
-    say_goodbye($r);
-  } elsif ($uri =~ "/table/get") {
-
-    print "<hr>\n";
-    $parsed_uri = $r->parsed_uri();
+   $parsed_uri = $r->parsed_uri();
 
     print "s".$parsed_uri->scheme;print "<br>";
     print "u".$parsed_uri->user;print "<br>";
@@ -67,41 +45,70 @@ print Dumper(\%ENV);
     print "q".$parsed_uri->query;print "<br>";
     print "f".$parsed_uri->fragment;print "<br>";
     print "<hr>\n";
+ }
+
+sub connect_db
+{
+  my $dbfile = '/var/www/mapy/guidepost';
+  $dbh = DBI->connect( "dbi:SQLite:$dbfile" );
+  if (!$dbh) {
+    &debuglog("db failed","Cannot connect: ".$DBI::errstr);
+    die;
+  }
+}
+
+sub handler 
+{
+#  my($r) = @_;    # grab the request info "object" that mod_perl has
+  my $r = shift;
+  $r->content_type('text/html');
+
+
+#    %ENV  = $r->cgi_env;
+  my $uri = $r->uri;      # what does the URI (URL) look like ?
+&connect_db();
+
+  if ($uri =~ "table\/all") {
+    print "<h1>all</h1>\n";
+  } elsif ($uri =~ /goodbye/) {
+    say_goodbye($r);
+  } elsif ($uri =~ "/table/count") {
+    print &get_gp_count();
+    return;
+  } elsif ($uri =~ "/table/get") {
+
+#    print Dumper(\%ENV);
+    connection_info($r->connection);
+
+    print "Uri: $uri";
+    my $query_string = $r->args;
+    $r->print("query string was: $query_string\n" );
+
+    print "<hr>\n";
   
     @uri_components = split("/", $uri);
     foreach my $i (@uri_components) {
       print "x:".$i;
     }
-    my $from_gp = $uri_components[2];
-    my $to_gp = $uri_components[3];
-    print "<h1>$from_gp $to_gp</h1><hr>";
-  }
+    my $from_gp = $uri_components[3];
+    my $to_gp = $uri_components[4];
+    print "<h1>from ($from_gp) ($to_gp)</h1><hr>";
 
-     print "mod_perl 2.0 rocks!\n";
-
-#    $r->status = 200;       # All's ok, so set a "200 OK" status
-#    $r->send_http_header;   # Now send the http headers.
-
-my $dbfile = '/var/www/mapy/guidepost';
-$dbh = DBI->connect( "dbi:SQLite:$dbfile" );
-if (!$dbh) {
-  &debuglog("db failed","Cannot connect: ".$DBI::errstr);
-  die;
-}
-
-
-&get_gp_count();
+&connect_db();
 
 print "result\n";
 
 $i = 10;
-if (looks_like_number($i)) {
-  my $query = "select * from guidepost LIMIT 10 OFFSET $i";
+
+  my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
+  print $query;
+
+if (looks_like_number($from_gp) and looks_like_number($to_gp)) {
+  print $query;
 } else {
   print "error";
+  return;
 }
-
-  my $query = "select * from guidepost LIMIT 10 OFFSET $i";
 
 print $query;
 $res = $dbh->selectall_arrayref($query);
@@ -115,7 +122,25 @@ print'<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
 foreach my $row (@$res) {
   my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
   &gp_line($id, $lat, $lon, $url, $name, $attribution);
+  print "</p>\n";
+}
 
+
+  }
+
+
+
+
+
+#    $r->status = 200;       # All's ok, so set a "200 OK" status
+#    $r->send_http_header;   # Now send the http headers.
+
+#my $dbfile = '/var/www/mapy/guidepost';
+#$dbh = DBI->connect( "dbi:SQLite:$dbfile" );
+#if (!$dbh) {
+#  &debuglog("db failed","Cannot connect: ".$DBI::errstr);
+#  die;
+#}
 #print '
 #<div id="map" style="width:200px;height:200px;"></div>
 #<script type="text/javascript">
@@ -130,9 +155,7 @@ foreach my $row (@$res) {
 #</script>
 #';
 
-  print "</p>\n";
 
-}
 
 print "end result\n";
 
@@ -145,6 +168,7 @@ print "end result\n";
 #   }
 
    $dbh->disconnect;
+   print "mod_perl 2.0 rocks!\n";
    return Apache2::Const::OK;
 }
 
@@ -169,14 +193,10 @@ sub gp_line()
 
 sub get_gp_count
 {
-  print "<hr>count c\n";
-
   my $query = "select count() from guidepost";
   my $sth = $dbh->prepare($query);
   my $rv = $sth->execute() or die $DBI::errstr;
-  while(my @row = $sth->fetchrow_array()) {
-    print "ID = ". $row[0] . "\n";
-  }
+  my @row = $sth->fetchrow_array();
   return $row[0];
 }
 
