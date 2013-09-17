@@ -1,14 +1,61 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>load demo</title>
+  <meta charset="utf-8">
+  <title>load demo</title>
+
+<!--jQuery-->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+<link id="ui-theme" rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.0/themes/ui-lightness/jquery-ui.css"/>
+
+<!--jui_pagination-->
+<link rel="stylesheet" type="text/css" href="http://pontikis.github.com/jui_pagination/v2.0.0/jquery.jui_pagination.css"/>
+<script type="text/javascript" src="http://pontikis.github.com/jui_pagination/v2.0.0/jquery.jui_pagination.min.js"></script>
+<script type="text/javascript" src="http://pontikis.github.com/jui_pagination/v2.0.0/i18n/en.js"></script>
+
 <style>
-body{ font-size: 12px; font-family: Arial; }
+/* demo pag1 ---------------------------------------------------------------- */
+.container1 {
+  width: 700px;
+  padding: 10px;
+  line-height: 1;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+ 
+.slider1 {
+  width: 400px;
+  margin: 10px auto;
+}
+ 
+.rows-per-page1 {
+  display: inline-block !important;
+  background: url("images/page.png") no-repeat left center !important;
+  padding: 0px 0px 0px 20px !important;
+  margin: 3px 10px 3px 10px !important;
+  width: 30px;
+  vertical-align: middle;
+  height: 18px !important;
+}
+ 
+.goto-page1 {
+  display: inline-block !important;
+  background: url("images/bullet_go.png") no-repeat left center !important;
+  padding: 0px 0px 0px 20px !important;
+  margin: 3px 10px 3px 10px !important;
+  width: 30px;
+  vertical-align: middle;
+  height: 18px !important;
+}
 </style>
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+
 </head>
 <script>
+
+var page = 0;
+var page_length = 5;
+var gp_count = 0;
 
 function response(response, status, xhr) {
   if (status == "error") {
@@ -18,8 +65,10 @@ function response(response, status, xhr) {
 //  alert("done "+response+status);
 }
 
-var page = 0;
-var page_length = 2;
+function get_page_count()
+{
+  return Math.floor(gp_count / page_length);
+}
 
 function left()
 {
@@ -34,7 +83,7 @@ function left()
 function right()
 {
   page++;
-  if (page > 10) {
+  if (page > get_page_count()) {
     page = 0;
   }
   load_page(page);
@@ -42,7 +91,7 @@ function right()
 
 function load_page(page)
 {
-  alert("kokot"+page);
+//  alert("kokot"+page);
   var from = page * page_length;
   var to = from + page_length;
 
@@ -54,18 +103,8 @@ function load_page(page)
 
 </script>
 <body>
-
-<h1>
-<a href="#" onclick="javascript:left()"><</a>
-<a href="#" onclick="javascript:right()">></a>
-</h1>
-
-<b>Footer navigation:</b>
-<div id="new-nav"></div>
-<b>Error Response:</b>
-<div id="error"></div>
 <script>
-var gp_count = $.ajax({
+gp_count = $.ajax({
   url: "http://openstreetmap.cz/table/count",
   async: false
  }).responseText;
@@ -74,5 +113,71 @@ document.write(gp_count);
 document.write("<h1>x</h1>");
 $("#new-nav").load("http://openstreetmap.cz/table", response);
 </script>
+
+<script>
+$(function() {
+ 
+  $("#demo_pag1").jui_pagination({
+    currentPage: 8,
+    visiblePageLinks: 5,
+    totalPages: get_page_count(),
+    containerClass: 'container1',
+ 
+    useSlider: true,
+    sliderInsidePane: true,
+    sliderClass: 'slider1',
+ 
+    disableSelectionNavPane: true,
+ 
+    navRowsPerPageClass: 'rows-per-page1  ui-state-default ui-corner-all',
+    navGoToPageClass: 'goto-page1 ui-state-default ui-corner-all',
+ 
+    onChangePage: function(event, page_num) {
+      if(isNaN(page_num) || page_num <= 0) {
+        alert('Invalid page' + ' (' + page_num + ')');
+      } else {
+        page = page_num;
+        load_page(page_num);
+      }
+    },
+    onSetRowsPerPage: function(event, rpp) {
+      if(isNaN(rpp) || rpp <= 0) {
+        alert('Invalid rows per page' + ' (' + rpp + ')');
+      } else {
+        alert('rows per page successfully changed' + ' (' + rpp + ')');
+        $(this).jui_pagination({
+          rowsPerPage: rpp
+        })
+      }
+    },
+    onDisplay: function() {
+      var showRowsInfo = $(this).jui_pagination('getOption', 'showRowsInfo');
+      if(showRowsInfo) {
+        var prefix = $(this).jui_pagination('getOption', 'nav_rows_info_id_prefix');
+        $("#" + prefix + $(this).attr("id")).text('Total rows: XXX');
+      }
+    }
+  });
+ 
+  $("#result").html('Current page is: ' + $("#demo_pag1").jui_pagination('getOption', 'currentPage'));
+ 
+});
+</script>
+
+<div id="demo_pag1"></div>
+ 
+<p id="result"></p>
+
+<h1>
+<a href="#" onclick="javascript:left()"><</a>
+<a href="#" onclick="javascript:right()">></a>
+</h1>
+
+<p>after</p>
+
+<b>Footer navigation:</b>
+<div id="new-nav"></div>
+<b>Error Response:</b>
+<div id="error"></div>
 </body>
 </html>

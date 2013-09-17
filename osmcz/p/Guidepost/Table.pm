@@ -59,14 +59,11 @@ sub connect_db
 
 sub handler 
 {
-#  my($r) = @_;    # grab the request info "object" that mod_perl has
   my $r = shift;
   $r->content_type('text/html');
-
-
-#    %ENV  = $r->cgi_env;
   my $uri = $r->uri;      # what does the URI (URL) look like ?
-&connect_db();
+
+  &connect_db();
 
   if ($uri =~ "table\/all") {
     print "<h1>all</h1>\n";
@@ -74,18 +71,17 @@ sub handler
     say_goodbye($r);
   } elsif ($uri =~ "/table/count") {
     print &get_gp_count();
-    return;
   } elsif ($uri =~ "/table/get") {
 
 #    print Dumper(\%ENV);
     connection_info($r->connection);
 
-    print "Uri: $uri";
+#    print "Uri: $uri";
     my $query_string = $r->args;
-    $r->print("query string was: $query_string\n" );
+#    $r->print("query string was: $query_string\n" );
 
-    print "<hr>\n";
-  
+#    print "<hr>\n";
+
     @uri_components = split("/", $uri);
     foreach my $i (@uri_components) {
       print "x:".$i;
@@ -157,8 +153,6 @@ foreach my $row (@$res) {
 
 
 
-print "end result\n";
-
 
 #   foreach( @$res ) {
 #    foreach $i (0..$#$_) {
@@ -168,7 +162,6 @@ print "end result\n";
 #   }
 
    $dbh->disconnect;
-   print "mod_perl 2.0 rocks!\n";
    return Apache2::Const::OK;
 }
 
@@ -178,7 +171,7 @@ sub gp_line()
 
   print "<hr>\n";
   print "<p>\n";
-  print "$id";
+  print "<h2>$id</h2>";
   print "lat lon:$lat $lon";
   print "by $attribution";
   $full_uri = "http://openstreetmap.cz/".$url;
