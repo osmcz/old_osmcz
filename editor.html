@@ -14,43 +14,8 @@
 <script type="text/javascript" src="http://pontikis.github.com/jui_pagination/v2.0.0/jquery.jui_pagination.min.js"></script>
 <script type="text/javascript" src="http://pontikis.github.com/jui_pagination/v2.0.0/i18n/en.js"></script>
 
-<style>
-/* demo pag1 ---------------------------------------------------------------- */
-.container1 {
-  width: 700px;
-  padding: 10px;
-  line-height: 1;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
- 
-.slider1 {
-  width: 400px;
-  margin: 10px auto;
-}
- 
-.rows-per-page1 {
-  display: inline-block !important;
-  background: url("images/page.png") no-repeat left center !important;
-  padding: 0px 0px 0px 20px !important;
-  margin: 3px 10px 3px 10px !important;
-  width: 30px;
-  vertical-align: middle;
-  height: 18px !important;
-}
- 
-.goto-page1 {
-  display: inline-block !important;
-  background: url("images/bullet_go.png") no-repeat left center !important;
-  padding: 0px 0px 0px 20px !important;
-  margin: 3px 10px 3px 10px !important;
-  width: 30px;
-  vertical-align: middle;
-  height: 18px !important;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="editor.css"/>
 
-</head>
 <script>
 
 var page = 0;
@@ -101,32 +66,22 @@ function load_page(page)
   $("#new-nav").load("http://openstreetmap.cz/table/get/" + from + "/" + to, response);
 }
 
-</script>
-<body>
-<script>
-gp_count = $.ajax({
-  url: "http://openstreetmap.cz/table/count",
-  async: false
- }).responseText;
-
-document.write(gp_count);
-document.write("<h1>x</h1>");
-$("#new-nav").load("http://openstreetmap.cz/table", response);
-</script>
-
-<script>
-$(function() {
- 
+function paginator() 
+{
+  $(function() {
   $("#demo_pag1").jui_pagination({
-    currentPage: 8,
-    visiblePageLinks: 5,
+    currentPage: 1,
+    visiblePageLinks: 8,
     totalPages: get_page_count(),
     containerClass: 'container1',
  
     useSlider: true,
     sliderInsidePane: true,
     sliderClass: 'slider1',
- 
+
+    showGoToPage: true,
+    showNavButtons: true,
+
     disableSelectionNavPane: true,
  
     navRowsPerPageClass: 'rows-per-page1  ui-state-default ui-corner-all',
@@ -136,8 +91,8 @@ $(function() {
       if(isNaN(page_num) || page_num <= 0) {
         alert('Invalid page' + ' (' + page_num + ')');
       } else {
-        page = page_num;
-        load_page(page_num);
+        page = page_num - 1;
+        load_page(page);
       }
     },
     onSetRowsPerPage: function(event, rpp) {
@@ -152,28 +107,46 @@ $(function() {
     },
     onDisplay: function() {
       var showRowsInfo = $(this).jui_pagination('getOption', 'showRowsInfo');
+      var page_num = $(this).jui_pagination('getOption', 'currentPage');
       if(showRowsInfo) {
         var prefix = $(this).jui_pagination('getOption', 'nav_rows_info_id_prefix');
         $("#" + prefix + $(this).attr("id")).text('Total rows: XXX');
       }
+      page = page_num - 1;
+      load_page(page);
     }
   });
- 
+
   $("#result").html('Current page is: ' + $("#demo_pag1").jui_pagination('getOption', 'currentPage'));
- 
+
 });
+}
+
+</script>
+</head>
+
+<body>
+
+<script>
+  gp_count = $.ajax({
+    url: "http://openstreetmap.cz/table/count",
+    async: false
+  }).responseText;
+  paginator();
+  load_page(1);
 </script>
 
+<h1>Guidepost editor</h1>
 <div id="demo_pag1"></div>
- 
-<p id="result"></p>
+<p id="result">blah</p>
 
 <h1>
-<a href="#" onclick="javascript:left()"><</a>
-<a href="#" onclick="javascript:right()">></a>
+
+<a href="#" onclick="javascript:left()"> &lt; </a>
+<a href="#" onclick="javascript:right()"> &gt; </a>
 </h1>
 
-<p>after</p>
+<hr><p>openstreetmap.cz</p>
 
 <b>Footer navigation:</b>
 <div id="new-nav"></div>
@@ -181,3 +154,4 @@ $(function() {
 <div id="error"></div>
 </body>
 </html>
+
