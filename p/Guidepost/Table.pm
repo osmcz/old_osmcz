@@ -47,7 +47,9 @@ sub rrr
     print "<hr>\n";
  }
 
+################################################################################
 sub connect_db
+################################################################################
 {
   my $dbfile = '/var/www/mapy/guidepost';
   $dbh = DBI->connect( "dbi:SQLite:$dbfile" );
@@ -57,7 +59,9 @@ sub connect_db
   }
 }
 
+################################################################################
 sub handler 
+################################################################################
 {
   my $r = shift;
   $r->content_type('text/html');
@@ -72,9 +76,14 @@ sub handler
   } elsif ($uri =~ "/table/count") {
     print &get_gp_count();
   } elsif ($uri =~ "/table/get") {
+    &table_get();
+  }
+
+sub table_get
+{
 
 #    print Dumper(\%ENV);
-    connection_info($r->connection);
+#    connection_info($r->connection);
 
 #    print "Uri: $uri";
     my $query_string = $r->args;
@@ -83,48 +92,28 @@ sub handler
 #    print "<hr>\n";
 
     @uri_components = split("/", $uri);
-    foreach my $i (@uri_components) {
-      print "x:".$i;
-    }
-    my $from_gp = $uri_components[3];
-    my $to_gp = $uri_components[4];
+
+#    foreach my $i (@uri_components) {
+#      print "x:".$i;
+#    }
+    my $from_gp = looks_like_number($uri_components[3]) ? $uri_components[3] : 0;
+    my $to_gp = looks_like_number($uri_components[4]) ? $uri_components[4] : 0;
     print "<h1>from ($from_gp) ($to_gp)</h1><hr>";
 
-&connect_db();
-
-print "result\n";
-
-$i = 10;
+    &connect_db();
 
   my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
   print $query;
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
 
-if (looks_like_number($from_gp) and looks_like_number($to_gp)) {
-  print $query;
-} else {
-  print "error";
-  return;
-}
-
-print $query;
-$res = $dbh->selectall_arrayref($query);
-
-print $DBI::errstr;
-
-print'<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
-<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>
-';
-
-foreach my $row (@$res) {
-  my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
-  &gp_line($id, $lat, $lon, $url, $name, $attribution);
-  print "</p>\n";
-}
-
-
+  foreach my $row (@$res) {
+    my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution);
+    print "</p>\n";
   }
 
-
+}
 
 
 
@@ -165,11 +154,14 @@ foreach my $row (@$res) {
    return Apache2::Const::OK;
 }
 
+################################################################################
 sub gp_line()
+################################################################################
 {
   my ($id, $lat, $lon, $url, $name, $attribution) = @_;
 
   print "<hr>\n";
+  print "<div class='gp_line'>\n";
   print "<p>\n";
   print "<h2>$id</h2>";
   print "lat lon:$lat $lon";
@@ -181,10 +173,13 @@ sub gp_line()
   print "<p>\n";
   print "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
   print "<hr>\n";
+  print "</div>\n";
 
 }
 
+################################################################################
 sub get_gp_count
+################################################################################
 {
   my $query = "select count() from guidepost";
   my $sth = $dbh->prepare($query);
