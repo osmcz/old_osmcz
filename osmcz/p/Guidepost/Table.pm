@@ -162,18 +162,30 @@ sub gp_line()
 
   print "<hr>\n";
   print "<div class='gp_line'>\n";
-  print "<p>\n";
+  print "<p class='close'>\n";
   print "<h2>$id</h2>";
-  print "lat lon:$lat $lon";
-  print "by $attribution";
-  $full_uri = "http://openstreetmap.cz/".$url;
-  print "<a href='$full_uri'><img src='$full_uri' width='100px'>$name</a>";
+  print "latitude: $lat<br>";
+  print "longtitude: $lon<br>";
+  print "by $attribution<br>";
   print "</p>\n";
 
-  print "<p>\n";
+  print "<ul>";
+  print "<li><a href='http://maps.yahoo.com/#mvt=m&lat=$lat&lon=$lon&mag=6&q1=$lat,$lon'>Yahoo</a>";
+  print "<li><a href='http://www.openstreetmap.org/?mlat=$lat&mlon=$lon&zoom=16#map=16/$lat/$lon'>OSM</a>";
+  print "<li><a href='https://maps.google.com/maps?ll=$lat,$lon&q=loc:$lat,$lon&hl=en&t=m&z=16'>Google</a>";
+  print "<li><a href='http://www.bing.com/maps/?v=2&cp=$lat~$lon&style=r&lvl=16'>Bing</a>";
+  print "<li><a href='http://www.mapy.cz/?st=search&fr=loc:".$lat."N ".$lon."E'>Mapy.cz</a>";
+  print "</ul>\n";
+
+  $full_uri = "http://openstreetmap.cz/".$url;
+  print "<p class='home'>\n";
+  print "<a href='$full_uri'><img src='$full_uri' width='100px'><br>$name</a>";
+  print "</p>\n";
+  print "<span class='staticmap'>\n";
   print "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
-  print "<hr>\n";
+  print "</span>\n";
   print "</div>\n";
+  print "<hr>\n";
 
 }
 
