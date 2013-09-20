@@ -29,10 +29,17 @@ div.main {
   border: 1px solid #ddd;
 }
 
+div.mainx {
+  position: relative;
+  border: 1px solid #ddd;
+  width:800px;
+  height:600px;
+}
+
 div.smallmap {
   position: absolute;
   width: 96%;
-  height:80%;
+  height:85%;
   border: 1px solid #ddd;
 }
 
@@ -58,8 +65,8 @@ div.box {
 
 div.gpslink {
   position: absolute;
-  top: 90%;
   left: 0px;
+  bottom: 0px;
   z-index: 9997;
 }
 
