@@ -26,7 +26,7 @@ div.main {
   left: 2px;
   right: 280px;
   bottom: 180px;
-  border: 1px solid #ddd;
+  border: 0px solid #ddd;
 }
 
 div.mainx {
@@ -38,9 +38,9 @@ div.mainx {
 
 div.smallmap {
   position: absolute;
-  width: 96%;
-  height:85%;
-  border: 1px solid #ddd;
+  width: 97%;
+  height:90%;
+  border: 0px solid #ddd;
 }
 
 div.handle {
