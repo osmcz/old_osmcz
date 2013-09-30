@@ -69,6 +69,9 @@ sub handler
 
   &connect_db();
 
+  my $query_string = $r->args;
+  @uri_components = split("/", $uri);
+
   if ($uri =~ "table\/all") {
     print "<h1>all</h1>\n";
   } elsif ($uri =~ /goodbye/) {
@@ -76,46 +79,11 @@ sub handler
   } elsif ($uri =~ "/table/count") {
     print &get_gp_count();
   } elsif ($uri =~ "/table/get") {
-    &table_get();
+    &table_get($uri_components[3], $uri_components[4]);
   }
-
-sub table_get
-{
 
 #    print Dumper(\%ENV);
 #    connection_info($r->connection);
-
-#    print "Uri: $uri";
-    my $query_string = $r->args;
-#    $r->print("query string was: $query_string\n" );
-
-#    print "<hr>\n";
-
-    @uri_components = split("/", $uri);
-
-#    foreach my $i (@uri_components) {
-#      print "x:".$i;
-#    }
-    my $from_gp = looks_like_number($uri_components[3]) ? $uri_components[3] : 0;
-    my $to_gp = looks_like_number($uri_components[4]) ? $uri_components[4] : 0;
-    print "<h1>from ($from_gp) ($to_gp)</h1><hr>";
-
-    &connect_db();
-
-  my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
-  print $query;
-  $res = $dbh->selectall_arrayref($query);
-  print $DBI::errstr;
-
-  foreach my $row (@$res) {
-    my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution);
-    print "</p>\n";
-  }
-
-}
-
-
 
 #    $r->status = 200;       # All's ok, so set a "200 OK" status
 #    $r->send_http_header;   # Now send the http headers.
@@ -140,18 +108,35 @@ sub table_get
 #</script>
 #';
 
-
-
-
-#   foreach( @$res ) {
-#    foreach $i (0..$#$_) {
-#       print "$_->[$i] ";
-#       }
-#    print "\n";
-#   }
-
    $dbh->disconnect;
    return Apache2::Const::OK;
+}
+
+################################################################################
+sub table_get
+################################################################################
+{
+
+  my ($pf, $pt) = @_;
+
+
+    my $from_gp = looks_like_number($pf) ? $pf : 0;
+    my $to_gp = looks_like_number($pt) ? $pt : 0;
+    print "<h1>from ($pf $pt) ($from_gp) ($to_gp)</h1><hr>";
+
+    &connect_db();
+
+  my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
+  print $query;
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  foreach my $row (@$res) {
+    my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution);
+    print "</p>\n";
+  }
+
 }
 
 ################################################################################
