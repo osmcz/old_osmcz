@@ -27,19 +27,19 @@ function response(response, status, xhr) {
     var msg = "Sorry but there was an error: ";
     $("#error").html(msg + xhr.status + " " + xhr.statusText);
   }
-//  alert("done "+response+status);
+  alert("done, status:"+ status);
 }
 
 function get_page_count()
 {
-  return Math.floor(gp_count / page_length);
+  return Math.ceil(gp_count / page_length);
 }
 
 function left()
 {
   page--;
   if (page < 0) {
-    page = 10;
+    page = get_page_count();;
   }
   load_page(page);
 }
@@ -56,7 +56,7 @@ function right()
 
 function load_page(page)
 {
-//  alert("kokot"+page);
+  alert("page "+page);
   var from = page * page_length;
   var to = from + page_length;
 
@@ -64,6 +64,7 @@ function load_page(page)
 //  alert(uri);
 
   $("#new-nav").load("http://openstreetmap.cz/table/get/" + from + "/" + to, response);
+  $("#currpage").html("page:"+page);
 }
 
 function paginator() 
@@ -110,16 +111,16 @@ function paginator()
       var page_num = $(this).jui_pagination('getOption', 'currentPage');
       if(showRowsInfo) {
         var prefix = $(this).jui_pagination('getOption', 'nav_rows_info_id_prefix');
-        $("#" + prefix + $(this).attr("id")).text('Total rows: XXX');
+        $("#" + prefix + $(this).attr("id")).text('Total rows: ');
       }
       page = page_num - 1;
       load_page(page);
     }
   });
 
-  $("#result").html('Current page is: ' + $("#demo_pag1").jui_pagination('getOption', 'currentPage'));
+//  $("#result").html('Current page : ' + $("#demo_pag1").jui_pagination('getOption', 'currentPage'));
 
-});
+  });
 }
 
 </script>
@@ -132,18 +133,19 @@ function paginator()
     url: "http://openstreetmap.cz/table/count",
     async: false
   }).responseText;
+  alert(gp_count);
   paginator();
   load_page(1);
 </script>
 
 <h1>Guidepost editor</h1>
 <div id="demo_pag1"></div>
-<p id="result">blah</p>
 
 <h1>
-
+My pager:
 <a href="#" onclick="javascript:left()"> &lt; </a>
 <a href="#" onclick="javascript:right()"> &gt; </a>
+<div id="currpage">currpage</div>
 </h1>
 
 <hr><p>openstreetmap.cz</p>

@@ -1,0 +1,51 @@
+/* demo pag1 ---------------------------------------------------------------- */
+.container1 {
+  width: 700px;
+  padding: 10px;
+  line-height: 1;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+ 
+.slider1 {
+  width: 400px;
+  margin: 10px auto;
+}
+ 
+.rows-per-page1 {
+  display: inline-block !important;
+  background: url("images/page.png") no-repeat left center !important;
+  padding: 0px 0px 0px 20px !important;
+  margin: 3px 10px 3px 10px !important;
+  width: 30px;
+  vertical-align: middle;
+  height: 18px !important;
+}
+ 
+.goto-page1 {
+  display: inline-block !important;
+  background: url("images/bullet_go.png") no-repeat left center !important;
+  padding: 0px 0px 0px 20px !important;
+  margin: 3px 10px 3px 10px !important;
+  width: 30px;
+  vertical-align: middle;
+  height: 18px !important;
+}
+
+div.gp_line {
+  position: relative;
+  height: 220px;
+}
+
+div.gp_line:hover {
+  background-color:red;
+}
+
+.location {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.maplinks { position: absolute; top: 0; left: 20em; }
+.image { position: absolute; top: 0; right: 0; }
+.staticmap { position: absolute; top: 1px; left: 500px; }
