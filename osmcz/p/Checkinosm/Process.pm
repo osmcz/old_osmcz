@@ -4,13 +4,18 @@ use Apache2::Reload;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::URI ();
-use APR::URI ();
 use Apache2::Connection ();
 use Apache2::RequestRec ();
 use Apache2::Access ();
 #http://perl.apache.org/docs/2.0/api/Apache2/Access.html
-use APR::Const -compile => qw(URI_UNP_REVEALPASSWORD);
 use Apache2::Const -compile => qw(OK);
+
+use Apache2::RequestRec ();
+use Apache2::Access ();
+use Apache2::Const -compile => qw(OK DECLINED HTTP_UNAUTHORIZED);
+
+use APR::URI ();
+use APR::Const -compile => qw(URI_UNP_REVEALPASSWORD);
 
 use DBI;
 
@@ -36,6 +41,30 @@ sub handler
 {
   my $r = shift;
   $r->content_type('text/html');
+
+  # get the client-supplied credentials
+  my ($status, $password) = $r->get_basic_auth_pw;
+  my ($auth_type, $auth_name) = ($r->auth_type, $r->auth_name);
+
+  # only continue if Apache says everything is OK
+  return $status unless $status == Apache::OK;
+
+  if ($r->user eq "") {
+    $r->note_basic_auth_failure;
+    return Apache2::Const::HTTP_UNAUTHORIZED;
+  }
+
+
+  # user1/basic1 is ok
+  if ($r->user eq 'walley' && $password eq 'a') {
+  } else {
+    $r->note_basic_auth_failure;
+    return Apache2::Const::HTTP_UNAUTHORIZED;
+#    return Apache2::DECLINED;
+  }
+
+  print $r->user . " $status, $password, $auth_type, $auth_name";
+
   my $uri = $r->uri;      # what does the URI (URL) look like ?
 
   &connect_db();
