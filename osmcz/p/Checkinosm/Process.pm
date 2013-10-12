@@ -116,11 +116,34 @@ sub get_nearby
   return $json;
 }
 
+################################################################################
+sub get_user_id
+################################################################################
+{
+  my ($user) = @_;
+  $query = "select id from users where users.name='$user'";
+  print $query;
+  $query_handle = $dbh->prepare($query) or print "konec>".$DBI::errstr;;
+  $query_handle->execute() or die $DBI::errstr;
+  while(@data = $query_handle->fetchrow_array()) {
+   print $data[0];
+   $id = $data[0];
+  }
+  
+  print "<hr>";
+  print "k";
+  return $id;
+}
+
+################################################################################
 sub checkin
+################################################################################
 {
 
   my ($user, $place) = @_;
-  $user = 1;
+
+  my $user = &get_user_id($user);
+
   my $time = time;
   $query = "insert into checkins values (NULL, $user, $time, $place)";
   print $user.$place.$query;
