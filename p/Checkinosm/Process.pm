@@ -27,7 +27,7 @@ use JSON;
 sub connect_db
 ################################################################################
 {
-  my $dbfile = '/var/www/mapy/guidepost';
+  my $dbfile = '/home/walley/www/mapy/c';
   $dbh = DBI->connect( "dbi:SQLite:$dbfile" );
   if (!$dbh) {
     &debuglog("db failed","Cannot connect: ".$DBI::errstr);
@@ -42,7 +42,6 @@ sub handler
 {
   my $r = shift;
   $r->content_type('text/html');
-
 
   # get the client-supplied credentials
   my ($status, $password) = $r->get_basic_auth_pw;
@@ -78,9 +77,10 @@ sub handler
 #    $r->allow_methods(1, qw(GET));
     my ($a0, $a1, $lat, $lon)  = split("/", $uri);
     print &get_nearby($lat, $lon);
-  } elsif ($uri =~ "/checkin/") {
-    print "<h1>checkin</h1>\n";
-#    &table_get($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "/checkin/checkin/") {
+    
+    my ($a0, $a1, $a2, $place)  = split("/", $uri);
+    &checkin($r->user, $place)
   }
 
    $dbh->disconnect;
@@ -114,6 +114,20 @@ sub get_nearby
   my $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
 
   return $json;
+}
+
+sub checkin
+{
+
+  my ($user, $place) = @_;
+  $user = 1;
+  my $time = time;
+  $query = "insert into checkins values (NULL, $user, $time, $place)";
+  print $user.$place.$query;
+  $query_handle = $dbh->prepare($query) or print "konec>";
+  $query_handle->execute();
+  print $DBI::errstr;
+
 }
 
 1;
