@@ -1,0 +1,21 @@
+-- blah
+
+create table users (
+  id INTEGER PRIMARY KEY,
+  name varchar
+);
+
+create table places (
+  id INTEGER PRIMARY KEY,
+  osm_id integer,
+  name varchar,
+  image varchar,
+  int rating
+);
+
+create table checkins (
+  id INTEGER PRIMARY KEY,
+  user int,
+  date int,
+  place int 
+);

@@ -35,12 +35,14 @@ sub connect_db
   }
 }
 
+
 ################################################################################
 sub handler 
 ################################################################################
 {
   my $r = shift;
   $r->content_type('text/html');
+
 
   # get the client-supplied credentials
   my ($status, $password) = $r->get_basic_auth_pw;
@@ -54,8 +56,6 @@ sub handler
     return Apache2::Const::HTTP_UNAUTHORIZED;
   }
 
-
-  # user1/basic1 is ok
   if ($r->user eq 'walley' && $password eq 'a') {
   } else {
     $r->note_basic_auth_failure;
@@ -63,7 +63,8 @@ sub handler
 #    return Apache2::DECLINED;
   }
 
-  print $r->user . " $status, $password, $auth_type, $auth_name";
+
+#  print $r->user . " $status, $password, $auth_type, $auth_name";
 
   my $uri = $r->uri;      # what does the URI (URL) look like ?
 
@@ -74,7 +75,7 @@ sub handler
 #  @uri_components = split("/", $uri);
 
   if ($uri =~ "/nearby/") {
-$r->allow_methods(1, qw(GET));
+#    $r->allow_methods(1, qw(GET));
     my ($a0, $a1, $lat, $lon)  = split("/", $uri);
     print &get_nearby($lat, $lon);
   } elsif ($uri =~ "/checkin/") {
@@ -86,7 +87,9 @@ $r->allow_methods(1, qw(GET));
    return Apache2::Const::OK;
 }
 
+################################################################################
 sub get_nearby
+################################################################################
 {
   my ($lat, $lon) = @_;
 
@@ -95,28 +98,18 @@ sub get_nearby
   $minlat = $lat - 0.1;
   $minlon = $lon - 0.1;
 
-  my %rec_hash = ('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
-  my $json = encode_json \%rec_hash;
-
   @AoA = (
-           [ "49.0", "17.0", "hospoda u pajzlu", "www.pajzl.cz","5" ],
-           [ "49.1", "17.1", "hospoda u aajzlu", "www.pajzl.cz","5" ],
-           [ "49.2", "17.2", "hospoda u bajzlu", "www.pajzl.cz","5" ],
-           [ "49.3", "17.3", "hospoda u cajzlu", "www.pajzl.cz","5" ],
-           [ "49.4", "17.4", "hospoda u dajzlu", "www.pajzl.cz","5" ],
-           [ "49.5", "17.5", "hospoda u eajzlu", "www.pajzl.cz","5" ],
-           [ "49.6", "17.6", "hospoda u gajzlu", "www.pajzl.cz","5" ],
-           [ "49.7", "17.7", "hospoda u hajzlu", "www.pajzl.cz","5" ],
+           [ "49.0", "17.0", "hospoda u pajzlu1", "www.pajzl.cz","1" ],
+           [ "49.1", "17.1", "hospoda u aajzlu2", "www.pajzl.cz","2" ],
+           [ "49.2", "17.2", "hospoda u bajzlu3", "www.pajzl.cz","3" ],
+           [ "49.3", "17.3", "hospoda u cajzlu4", "www.pajzl.cz","4" ],
+           [ "49.4", "17.4", "hospoda u dajzlu5", "www.pajzl.cz","5" ],
+           [ "49.5", "17.5", "hospoda u eajzlu6", "www.pajzl.cz","6" ],
+           [ "49.6", "17.6", "hospoda u gajzlu7", "www.pajzl.cz","7" ],
+           [ "49.7", "17.7", "hospoda u hajzlu8", "www.pajzl.cz","8" ],
     );
 
-#   $ref_to_AoA = [
-#        [ "fred", "barney", "pebbles", "bambam", "dino", ],
-#        [ "homer", "bart", "marge", "maggie", ],
-#        [ "george", "jane", "elroy", "judy", ],
-#    ];
-
   $json = encode_json \@AoA;
-#  $json = encode_json $ref_to_AoA;
 
   my $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
 
