@@ -19,3 +19,5 @@ create table checkins (
   date int,
   place int 
 );
+
+insert into users values (null, "walley");
