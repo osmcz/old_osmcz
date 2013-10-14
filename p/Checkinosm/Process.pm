@@ -74,11 +74,11 @@ sub handler
 #  @uri_components = split("/", $uri);
 
   if ($uri =~ "/nearby/") {
-#    $r->allow_methods(1, qw(GET));
+## list nearby
     my ($a0, $a1, $lat, $lon)  = split("/", $uri);
     print &get_nearby($lat, $lon);
   } elsif ($uri =~ "/checkin/checkin/") {
-    
+## checkin
     my ($a0, $a1, $a2, $place)  = split("/", $uri);
     &checkin($r->user, $place)
   }
