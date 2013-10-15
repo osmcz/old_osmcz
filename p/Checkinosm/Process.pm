@@ -81,6 +81,10 @@ sub handler
 ## checkin
     my ($a0, $a1, $a2, $place)  = split("/", $uri);
     &checkin($r->user, $place)
+  } elsif ($uri =~ "/checkin/history/") {
+## checkin
+    my ($a0, $a1, $a2, $place)  = split("/", $uri);
+    &history($r->user);
   }
 
    $dbh->disconnect;
@@ -99,14 +103,17 @@ sub get_nearby
   $minlon = $lon - 0.1;
 
   @AoA = (
-           [ "49.0", "17.0", "hospoda u pajzlu1", "www.pajzl.cz","1" ],
-           [ "49.1", "17.1", "hospoda u aajzlu2", "www.pajzl.cz","2" ],
-           [ "49.2", "17.2", "hospoda u bajzlu3", "www.pajzl.cz","3" ],
-           [ "49.3", "17.3", "hospoda u cajzlu4", "www.pajzl.cz","4" ],
-           [ "49.4", "17.4", "hospoda u dajzlu5", "www.pajzl.cz","5" ],
-           [ "49.5", "17.5", "hospoda u eajzlu6", "www.pajzl.cz","6" ],
-           [ "49.6", "17.6", "hospoda u gajzlu7", "www.pajzl.cz","7" ],
-           [ "49.7", "17.7", "hospoda u hajzlu8", "www.pajzl.cz","8" ],
+           [ "1234567890", "49.0", "17.0", "hospoda u pajzlu1", "www.pajzl.cz","1" ],
+           [ "1234567891", "49.1", "17.1", "hospoda u aajzlu2", "www.pajzl.cz","2" ],
+           [ "1234567892", "49.2", "17.2", "hospoda u bajzlu3", "www.pajzl.cz","3" ],
+           [ "1234567893", "49.3", "17.3", "hospoda u cajzlu4", "www.pajzl.cz","4" ],
+           [ "1234567894", "49.4", "17.4", "hospoda u dajzlu5", "www.pajzl.cz","5" ],
+           [ "1234567895", "49.5", "17.5", "hospoda u eajzlu6", "www.pajzl.cz","6" ],
+           [ "1234567896", "49.6", "17.6", "hospoda u gajzlu7", "www.pajzl.cz","7" ],
+           [ "1234567897", "49.7", "17.7", "hospoda u hajzlu8", "www.pajzl.cz","8" ],
+           [ "1234567898", "49.8", "17.8", "hospoda u wwwwww8", "www.pajzl.cz","8" ],
+           [ "1234567899", "49.9", "17.9", "hospoda u xxxxxx8", "www.pajzl.cz","0" ],
+           [ "1234567900", "50.0", "18.0", "hospoda u yyyyyy8", "www.pajzl.cz","8" ],
     );
 
   $json = encode_json \@AoA;
@@ -142,13 +149,38 @@ sub checkin
 
   my ($user, $place) = @_;
 
-  my $user = &get_user_id($user);
+  my $user_id = &get_user_id($user);
 
   my $time = time;
-  $query = "insert into checkins values (NULL, $user, $time, $place)";
+  $query = "insert into checkins values (NULL, $user_id, $time, $place)";
   print $user.$place.$query;
   $query_handle = $dbh->prepare($query) or print "konec>";
   $query_handle->execute();
+  print $DBI::errstr;
+
+}
+
+################################################################################
+sub history
+################################################################################
+{
+
+  my ($user, $place) = @_;
+
+  my $user_id = &get_user_id($user);
+
+  my $time = time;
+  $query = "select * from checkins where user=$user_id";
+  print $user_id.$place.$query;
+
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  foreach my $row (@$res) {
+    my ($id, $user, $date, $place) = @$row;
+    print "($id, $user, $date, $place)<br>\n";
+  }
+
   print $DBI::errstr;
 
 }
