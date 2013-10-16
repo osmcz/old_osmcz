@@ -223,13 +223,13 @@ sub history
               checkins,users 
             where 
               users.name='$user' and checkins.user=users.id";
-print $query;
+
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
   &thead();
 
-#  print "<tbody>\n";
+  print "<tbody>\n";
   foreach my $row (@$res) {
     my ($id, $user, $date, $place) = @$row;
     my @row_data = @$row;
