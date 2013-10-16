@@ -178,7 +178,14 @@ sub history
 
   foreach my $row (@$res) {
     my ($id, $user, $date, $place) = @$row;
+    my @row_data = @$row;
+    print "<tr>\n";
     print "($id, $user, $date, $place)<br>\n";
+    foreach (@row_data) {
+     print "<td>".$_."</td>";
+    }
+    print "</tr>\n";
+
   }
 
   print $DBI::errstr;
