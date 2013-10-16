@@ -129,16 +129,11 @@ sub get_user_id
 {
   my ($user) = @_;
   $query = "select id from users where users.name='$user'";
-  print $query;
   $query_handle = $dbh->prepare($query) or print "konec>".$DBI::errstr;;
   $query_handle->execute() or die $DBI::errstr;
   while(@data = $query_handle->fetchrow_array()) {
-   print $data[0];
-   $id = $data[0];
+    $id = $data[0];
   }
-  
-  print "<hr>";
-  print "k";
   return $id;
 }
 
@@ -161,34 +156,95 @@ sub checkin
 }
 
 ################################################################################
+sub parse_template
+################################################################################
+{
+  my ($filename) = @_;
+  my $datadir = "http://openstreetmap.cz/t/";
+  open($h, "<", $filename) or die;
+  while (<$h>) {
+    s/\[DATADIR\]/$datadir/g;
+    print;
+  }
+  print $tmpl;
+}
+
+################################################################################
+sub table_header
+################################################################################
+{
+  parse_template("/var/www/mapy/t/table_header.tmpl");
+}
+
+################################################################################
+sub table_footer
+################################################################################
+{
+  parse_template("/var/www/mapy/t/table_footer.tmpl");
+}
+
+################################################################################
+sub thead()
+################################################################################
+{
+
+  my $sth = $dbh->prepare( "PRAGMA table_info(checkins)" );
+  $sth->execute();
+
+  print "<thead>
+         <tr>";
+
+  my @row;
+  while (@row = $sth->fetchrow_array()) {
+    print "<th>".$row[1]."</th>\n";
+  }
+
+  print "</tr>";
+  print "</thead>";
+
+}
+
+################################################################################
 sub history
 ################################################################################
 {
 
   my ($user, $place) = @_;
 
-  my $user_id = &get_user_id($user);
+#  my $user_id = &get_user_id($user);
+
+  &table_header();
 
   my $time = time;
-  $query = "select * from checkins where user=$user_id";
-  print $user_id.$place.$query;
 
+  $query = "select 
+              checkins.id,users.name,checkins.date,checkins.place 
+            from 
+              checkins,users 
+            where 
+              users.name='$user' and checkins.user=users.id";
+print $query;
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
+  &thead();
+
+#  print "<tbody>\n";
   foreach my $row (@$res) {
     my ($id, $user, $date, $place) = @$row;
     my @row_data = @$row;
-    print "<tr>\n";
-    print "($id, $user, $date, $place)<br>\n";
+    print "<tr class='odd'>\n";
     foreach (@row_data) {
      print "<td>".$_."</td>";
     }
     print "</tr>\n";
-
   }
+  print "</tbody>\n";
+
+  &table_footer();
 
   print $DBI::errstr;
+  print $user_id.$place.$query;
 
 }
 
