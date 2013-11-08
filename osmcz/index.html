@@ -135,9 +135,9 @@ ddtabmenu.definemenu("ddtabs", 0)
 <div style="width:100%; height: 35em; overflow: hidden">
 <div id="ddtabs" class="chromemenu">
 <ul>
+<li><a href="#" rel="cm2"><img src="img/kctred.png"></a></li>
 <li><a href="#" rel="cm0"><img src="img/lupa.png"></a></li>
 <li><a href="#" rel="cm1"><img src="img/car.png"></a></li>
-<li><a href="#" rel="cm2"><img src="img/kctred.png"></a></li>
 <li><a href="#" rel="cm3">POI</a></li>
 </ul>
 </div>
@@ -177,16 +177,30 @@ ddtabmenu.definemenu("ddtabs", 0)
 
 <div id="cm2" class="tabcontent">
 <h4>Turistika</h4>
+<h5>Naše Rozcestníky</h5>
 <ul>
 <li><a href="javascript:show_guideposts(1)">Zobrazit rozcestníky</a>
 <li><a href="javascript:upbox_on()">Vložit obrázek rozcestníku</a>
 <li><img widgt="32px" height="32px" src="img/android_robot.png"> <a href=android.html>Android aplikace pro nahravani rozcestniku</a>
-<li>
+</ul>
+
 <h5>Rozcestníky z Wikimedia Commons</h5>
+
+<style>
+select{
+  width: 200px;
+  xtext-align:right;
+}
+option
+{
+  width: 200px;
+  xtext-align:right;
+}
+</style>
+
 <form name="catsel">
-<label>Vyber kategorii</label>
- <select name="commons_category" style="width:100px;">
-  <option selected="yes">Hiking_and_footpath_fingerposts_in_the_Czech_Republic</option>
+ <select name="commons_category">
+  <option selected="yes">Vyber oblast</option>
   <option value="Hiking_and_footpath_fingerposts_in_Central_Bohemian_Region"      >S - Hiking in Central Bohemian Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Bene%C5%A1ov_District"        >'-- Benešov District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Beroun_District"              >'-- Beroun District</option>
@@ -201,14 +215,17 @@ ddtabmenu.definemenu("ddtabs", 0)
   <option value="Hiking_and_footpath_fingerposts_in_Rakovn%C3%ADk_District"       >'-- Rakovník_District</option>
   <option value="Hiking_and_footpath_fingerposts_of_Svazek_měst_a_obcí_Rakovnicka">..'-- Svazek měst a obcí Rakovnicka</option>
   <option value="Vycházkové_okruhy_kolem_hradu_Křivoklátu_(guideposts)"           >....'-- Vycházkové okruhy kolem hradu Křivoklátu</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Zlín_Region"                  >Z - Hiking in Zlín Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Uherské_Hradiště_District"    >'-- Uherské Hradiště District</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Hradec_Králové_Rion"          >H - Hiking in Hradec Králové Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Hradec_Kr%C3%A1lov%C3%A9_District">'-- Hradec Králové District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Ji%C4%8D%C3%ADn_District"     >'-- Jičín District</option>
   <option value="Hiking_and_footpath_fingerposts_in_N%C3%A1chod_District"         >'--  Náchod District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Rychnov_nad_Kn%C4%9B%C5%BEnou_District">'-- Rychnov nad Kněžnou District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Trutnov_District"             >'-- Trutnov District</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Karlovy_Vary_Region"          >K - Hiking in Karlovy Vary Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Cheb_District"                >'-- Cheb District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Karlovy_Vary_District"        >'-- Karlovy Vary District</option>
@@ -218,15 +235,27 @@ ddtabmenu.definemenu("ddtabs", 0)
   <option value="Hiking_and_footpath_fingerposts_in_Liberec_District"             >'-- Liberec District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Semily_District"              >'-- Semily District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Česká_Lípa_District"          >'-- Ceská Lípa District</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Moravian-Silesian_Region"     >T - Hiking in Moravian-Silesian Region</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Olomouc_Region"               >M + Hiking in Olomouc Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Přerov_District"              >'-- Přerov</option>
   <option value="Hiking_and_footpath_fingerposts_in_Jeseník_District"             >'-- Jeseník</option>
   <option value="Hiking_and_footpath_fingerposts_in_%C5%A0umperk_District"        >'-- Šumperk District</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Pardubice_Region"             >E - Hiking in Pardubice Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Plzeň_Region"                 >P - Hiking in Plzeň Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Prague"                       >A - Hiking in Prague</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_South_Bohemian_Region"        >C - Hiking in South Bohemian Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Jindřichův_Hradec_District"   >'-- Jindřichův Hradec District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Prachatice_District"          >'-- Prachatice District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Písek_District"               >'-- Písek District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Strakonice_District"          >'-- Strakonice District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Tábor_District"               >'-- Tábor District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_České_Budějovice_District"    >'-- České Budějovice District</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Český_Krumlov_District"       >'-- Český Krumlov District</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_South_Moravian_Region"        >B - Hiking in South Moravian Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Vysočina_Region"              >J - Hiking in Vysočina Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Ústí_nad_Labem_Region"        >U - Hiking in Ústí nad Labem Region</option>
@@ -240,10 +269,10 @@ ddtabmenu.definemenu("ddtabs", 0)
  </select>
 </form>
 <a href="javascript:request_commons(document.catsel.commons_category.value)">Zobraz kliknutím zde</a>
-</li>
-</ul>
+
+<h5>Ostatní</h5>
 <ul>
-<li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a></li>
+<li><a href="javascript:loader_on();new_data();">Zobraz turistické stezky ve výřezu</a>
 <li><a href="fs.html">Fullscreen mapa</a>
 </ul>
 </div>
