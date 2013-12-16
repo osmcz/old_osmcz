@@ -176,11 +176,11 @@ function process_file()
           printdebug("exifme error $error_message");
         }
       } else {
+        printdebug("Soubor '$file' nema exif");
         if (file_exists("img/guidepost/$file")) {
-          $error_message = "file $file already exists, please rename your copy";
+          $error_message = "file already exists ($file), please rename your copy";
           $result = 0;
-        }
-        if (!copy ("uploads/$file","img/guidepost/$file")) {
+        } else if (!copy ("uploads/$file","img/guidepost/$file")) {
           $error_message = "failed to copy $file to destination ... ";
           $result = 0;
         } else {
@@ -191,6 +191,7 @@ function process_file()
           }
         }
       }
+      printdebug("error message:".$error_message);
     } else {
       $error_message = "Chyba pri otevirani souboru, mozna je prilis velky";
       $result = 0;
