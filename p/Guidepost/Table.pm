@@ -127,7 +127,7 @@ sub table_get
   &connect_db();
 
   my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
-  print $query;
+#  print $query;
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
@@ -139,7 +139,9 @@ sub table_get
 
 }
 
+################################################################################
 sub play_badge()
+################################################################################
 {
 print '<a href="https://play.google.com/store/apps/details?id=org.walley.guidepost">
   <img alt="Android app on Google Play"
