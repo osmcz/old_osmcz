@@ -165,6 +165,7 @@ function process_file()
     if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
       printdebug("Soubor '$file' byl uspesne nahran na server do $target_path<hr>");
       if (!$lat && !$lon) {
+        printdebug("soubor byl poslan se souradnicemi 0,0 -> exifme");
         $command = "/var/www/mapy/exifme.pl $target_path $author img/guidepost/";
         $out = system ($command, $errlvl);
         printdebug("command:output(exit code) - $command:$out($errlvl)");
@@ -176,7 +177,7 @@ function process_file()
           printdebug("exifme error $error_message");
         }
       } else {
-        printdebug("Soubor '$file' nema exif");
+        printdebug("soubor byl poslan se souradnicemi ve formulari");
         if (file_exists("img/guidepost/$file")) {
           $error_message = "file already exists ($file), please rename your copy";
           $result = 0;
