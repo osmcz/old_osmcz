@@ -80,6 +80,8 @@ sub handler
     print &get_gp_count();
   } elsif ($uri =~ "/table/get") {
     &table_get($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "/table/leaderboard") {
+    &leaderboard();
   }
 
 #    print Dumper(\%ENV);
@@ -116,15 +118,13 @@ sub handler
 sub table_get
 ################################################################################
 {
-
   my ($pf, $pt) = @_;
 
+  my $from_gp = looks_like_number($pf) ? $pf : 0;
+  my $to_gp = looks_like_number($pt) ? $pt : 0;
+  print "<h1>from ($pf $pt) ($from_gp) ($to_gp)</h1><hr>";
 
-    my $from_gp = looks_like_number($pf) ? $pf : 0;
-    my $to_gp = looks_like_number($pt) ? $pt : 0;
-    print "<h1>from ($pf $pt) ($from_gp) ($to_gp)</h1><hr>";
-
-    &connect_db();
+  &connect_db();
 
   my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
   print $query;
@@ -136,6 +136,42 @@ sub table_get
     &gp_line($id, $lat, $lon, $url, $name, $attribution);
     print "</p>\n";
   }
+
+}
+
+sub play_badge()
+{
+print '<a href="https://play.google.com/store/apps/details?id=org.walley.guidepost">
+  <img alt="Android app on Google Play"
+       src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
+</a>';
+
+}
+
+################################################################################
+sub leaderboard
+################################################################################
+{
+
+  &page_header();
+  print "<h1>Leaderboard</h1>";
+
+  my $query = "select attribution, count (*) as num from guidepost group by attribution order by num desc";
+  my $pos = 1;
+
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  &play_badge();
+
+  print "<table>\n";
+  print "<tr><th>position</th><th>name</th><th>count</th></tr>";
+  foreach my $row (@$res) {
+    my ($name, $count) = @$row;
+    print "<tr><td>" . $pos++. "</td><td>$name</td><td>$count</td></tr>";
+  }
+  print "</table>\n";
+  &page_footer();
 
 }
 
@@ -185,6 +221,31 @@ sub get_gp_count
   my $rv = $sth->execute() or die $DBI::errstr;
   my @row = $sth->fetchrow_array();
   return $row[0];
+}
+
+################################################################################
+sub page_header()
+################################################################################
+{
+print '
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>load demo</title>
+</head>
+<body>
+';
+}
+
+################################################################################
+sub page_footer()
+################################################################################
+{
+print '
+</body>
+</html>
+';
 }
 
 1;
