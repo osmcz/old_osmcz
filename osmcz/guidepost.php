@@ -161,6 +161,17 @@ function process_file()
     $result = 0;
   }
 
+  if ($author == "android") {
+    $error_message = "zmente jmeno";
+    $result = 0;
+  }
+
+  $file_parts = pathinfo($_FILES['uploadedfile']['tmp_name']);
+  if ($file_parts['extension']!="jpg" || $file_parts['extension']!="JPG") {
+    $error_message = "spatny soubor, pouzijte jpeg";
+    $result = 0;
+  }
+
   if ($result) {
     if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
       printdebug("Soubor '$file' byl uspesne nahran na server do $target_path<hr>");
