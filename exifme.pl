@@ -84,5 +84,5 @@ exit 0;
 sub debuglog
 {
   $x = join("-",@_);
-  system ("/usr/bin/logger -t guidepost '$x'");
+  system ("/usr/bin/logger -t guidepostexifme '$x'");
 }
