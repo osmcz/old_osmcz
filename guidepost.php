@@ -120,6 +120,7 @@ function process_file()
   $filename = $_FILES['uploadedfile']['name'];
   $error_message = "";
 
+
   printdebug("name: $filename");
   printdebug("type:".$_FILES['uploadedfile']['type']);
   printdebug("size:".$_FILES['uploadedfile']['size']);
@@ -166,6 +167,18 @@ function process_file()
     $result = 0;
   }
 
+#sanitize filename
+
+  if (strpos($filename, ';') !== FALSE) {
+    $error_message = "spatny soubor strednik";
+    $result = 0;
+  }
+
+  if (strpos($filename, '&') !== FALSE) {
+    $error_message = "spatny soubor divnaosmicka";
+    $result = 0;
+  }
+
   $file_parts = pathinfo($_FILES['uploadedfile']['tmp_name']);
   if ($file_parts['extension']!="jpg" || $file_parts['extension']!="JPG") {
     $error_message = "spatny soubor, pouzijte jpeg";
@@ -208,6 +221,8 @@ function process_file()
       $error_message = "Chyba pri otevirani souboru, mozna je prilis velky";
       $result = 0;
     }
+  } else {
+      printdebug("Upload refused");
   }
 
   if ($result == 0 and $error_message == "") {
