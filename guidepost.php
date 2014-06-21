@@ -122,10 +122,10 @@ function process_file()
 
 
   printdebug("name: $filename");
-  printdebug("type:".$_FILES['uploadedfile']['type']);
-  printdebug("size:".$_FILES['uploadedfile']['size']);
-  printdebug("tmp:".$_FILES['uploadedfile']['tmp_name']);
-  printdebug("error".$_FILES['uploadedfile']['error']);
+  printdebug("type: ".$_FILES['uploadedfile']['type']);
+  printdebug("size: ".$_FILES['uploadedfile']['size']);
+  printdebug("tmp: ".$_FILES['uploadedfile']['tmp_name']);
+  printdebug("error: ".$_FILES['uploadedfile']['error']);
 
 
   $lat = $_POST['lat'];
@@ -149,7 +149,7 @@ function process_file()
   }
 
   if (file_exists($_FILES['uploadedfile']['tmp_name'])) {
-    printdebug("soubor byl uspesne uploadnut\n");
+    printdebug("soubor byl uspesne uploadnut do tmp\n");
     $result = 1;
   } else {
     printdebug("cannot upload file\n");
@@ -222,7 +222,7 @@ function process_file()
       $result = 0;
     }
   } else {
-      printdebug("Upload refused");
+      printdebug("Upload refused: ".$error_message);
   }
 
   if ($result == 0 and $error_message == "") {
