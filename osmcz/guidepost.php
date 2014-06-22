@@ -11,6 +11,13 @@ function printdebug($x)
   //let it print when debugging
   //return;
 //  print $x."<br>";
+  $x = str_replace('%', '(percent)',    $x);
+  $x = str_replace(';', '(semicolon)',  $x);
+  $x = str_replace('*', '(asterisk)',   $x);
+  $x = str_replace('/', '(slash)',      $x);
+  $x = str_replace("\\", '(backslash)', $x);
+  $x = str_replace('~', '(tilda)',      $x);
+
   system ("/usr/bin/logger -t guidepost '$x'");
 }
 
@@ -117,9 +124,10 @@ function process_file()
 
   $result = 0;
 
+  printdebug("    START");
+
   $filename = $_FILES['uploadedfile']['name'];
   $error_message = "";
-
 
   printdebug("name: $filename");
   printdebug("type: ".$_FILES['uploadedfile']['type']);
@@ -127,19 +135,23 @@ function process_file()
   printdebug("tmp: ".$_FILES['uploadedfile']['tmp_name']);
   printdebug("error: ".$_FILES['uploadedfile']['error']);
 
-
   $lat = $_POST['lat'];
   $lon = $_POST['lon'];
   $author = $_POST['author'];
 
-  printdebug("lat:lon:author - $lat:$lon:$author");
+  printdebug("before lat:lon:author - $lat:$lon:$author");
+
+  $author = preg_replace('/[^-a-zA-Z0-9_.]/', '', $author);
+  $lat = preg_replace('/[^0-9.]/', '', $lat);
+  $lon = preg_replace('/[^0-9.]/', '', $lon);
+
+  printdebug("after lat:lon:author - $lat:$lon:$author");
 
   $file = basename($filename);
-  $target_path = "uploads/";
-  $target_path = $target_path . $file;
+  $target_path = "uploads/" . $file;
   $final_path = "img/guidepost/" . $file;
 
-  printdebug("target:$target_path");
+  printdebug("target: $target_path");
 
   $error_message = "OK";
 
@@ -162,7 +174,7 @@ function process_file()
     $result = 0;
   }
 
-  if ($author == "android") {
+  if ($author === "android" or $author === "autor") {
     $error_message = "zmente jmeno";
     $result = 0;
   }
@@ -179,18 +191,24 @@ function process_file()
     $result = 0;
   }
 
-  $file_parts = pathinfo($_FILES['uploadedfile']['tmp_name']);
-  if ($file_parts['extension']!="jpg" || $file_parts['extension']!="JPG") {
-    $error_message = "spatny soubor, pouzijte jpeg";
+  $file_parts = pathinfo($filename);
+  $ext = $file_parts['extension'];
+  if ($ext !== "jpg" && $ext !== "JPG") {
+    $error_message = "spatny soubor, pouzijte jpeg " . $file_parts['extension'];
+    $result = 0;
+  }
+
+  if (file_exists("img/guidepost/$file")) {
+    $error_message = "file already exists ($file), please rename your copy";
     $result = 0;
   }
 
   if ($result) {
     if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-      printdebug("Soubor '$file' byl uspesne nahran na server do $target_path<hr>");
+      printdebug("File '$file' has been moved from tmp to $target_path");
       if (!$lat && !$lon) {
         printdebug("soubor byl poslan se souradnicemi 0,0 -> exifme");
-        $command = "/var/www/mapy/exifme.pl $target_path $author img/guidepost/";
+        $command = "/var/www/mapy/exifme.pl '$target_path' '$author' img/guidepost/";
         $out = system ($command, $errlvl);
         printdebug("command:output(exit code) - $command:$out($errlvl)");
         if (!$errlvl) {
@@ -202,10 +220,7 @@ function process_file()
         }
       } else {
         printdebug("soubor byl poslan se souradnicemi ve formulari");
-        if (file_exists("img/guidepost/$file")) {
-          $error_message = "file already exists ($file), please rename your copy";
-          $result = 0;
-        } else if (!copy ("uploads/$file","img/guidepost/$file")) {
+        if (!copy ("uploads/$file","img/guidepost/$file")) {
           $error_message = "failed to copy $file to destination ... ";
           $result = 0;
         } else {
