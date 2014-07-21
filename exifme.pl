@@ -11,16 +11,17 @@ use File::Copy;
 
 $debug = 0;
 
- &debuglog("exifme", "start");
+&debuglog("exifme", "start");
 
 if (scalar @ARGV == 0) {die("not enough parameters, died");}
 
 $i = $ARGV[0];
 $author = $ARGV[1];
 $new_location = $ARGV[2];
-@output = `jhead $i`;
+@output = `jhead '$i'`;
 
-print @output;
+#print @output;
+
 &debuglog("params:",$i,$author,$new_location);
 
 @exiflat = grep(/^GPS Latitude/, @output);
@@ -52,10 +53,12 @@ if (-e $new_location.basename($i)) {
   $filename = $r.basename($i);
 }
 
-$res = move("uploads/".basename($i),$url);
+$move_from = "uploads/".basename($i);
+$move_to = $url;
+$res = move($move_from, $move_to);
 
 if (!$res) {
-  &debuglog("moving failed","uploads/".basename($i),$url);
+  &debuglog("moving failed",$move_from, $move_to);
   die;
 }
 
