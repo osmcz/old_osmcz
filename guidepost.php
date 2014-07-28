@@ -43,8 +43,7 @@ function page_header()
   print "  <title>openstreetmap.cz image upload</title>\n";
   print "  <script src='OpenLayers.2.8.0.js'></script>\n";
   print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
-  print "  <link href='upload.css' rel='stylesheet' type='text/css'/>";
-  print "  </head>\n";
+  print "  <link href='upload.css' rel='stylesheet' type='text/css'/>\n";
 }
 
 
@@ -70,10 +69,40 @@ function show_upload_dialog()
   print "{\n";
   print "  document.getElementById('upbox').style.display = 'none' ;\n";
   print "}\n";
+  print "
+
+  function exif_present()
+  {
+     document.getElementById('lat').value = 0;
+     document.getElementById('lat').readOnly = true;
+     document.getElementById('lon').value = 0;
+     document.getElementById('lon').readOnly = true;
+  }
+
+  function no_exif()
+  {
+     document.getElementById('lat').readOnly = false;
+     document.getElementById('lon').readOnly = false;
+  }
+
+  function exif_checkbox_action()
+  {
+    if (document.getElementById('exif_checkbox').checked) {
+      exif_present();
+    } else {
+      no_exif();
+    }
+  }
+
+
+  ";
+
   print"</script>\n";
 
   print "  </head>
   <body onload='upload_init()'>\n";
+
+$title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 0,0";
 
   print "
 <div id='map' class='smallmap'></div>
@@ -81,10 +110,11 @@ function show_upload_dialog()
   <input type='hidden' name='action' value='file' />
   <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
   <fieldset>
-    <input type='text' name='author' value='autor' size='9'>
-    <input name='uploadedfile' type='file' size='20'/>
-    <input type='text' name='lat' value='0' size='10'>
-    <input type='text' name='lon' value='0' size='10'>
+    <label>autor</label><input type='text' name='author' value='autor' size='9'>
+    <input name='uploadedfile' type='file' size='20'/><br>
+    <label>lat</label><input type='text' id='lat' name='lat' value='0' size='10' title='".$title_help."'>
+    <label>lon</label><input type='text' id='lon' name='lon' value='0' size='10' title='".$title_help."'>
+    <label>exif </label><input type=checkbox id='exif_checkbox' onchange='exif_checkbox_action()'>
   </fieldset>
   <fieldset>
     <input type='reset' name='reset' value='Reset' />
@@ -93,7 +123,7 @@ function show_upload_dialog()
 </form>\n";
   print "<p id='upload_process'>Uploading...</p>\n";
   //set widht and height to display debug output
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100;height:100;border:0px solid #fff;'></iframe>\n";
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:0px solid #fff;'></iframe>\n";
 }
 
 ################################################################################
