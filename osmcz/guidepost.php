@@ -154,7 +154,7 @@ function process_file()
 
   $result = 0;
 
-  printdebug("    START");
+  printdebug("    START!");
 
   $filename = $_FILES['uploadedfile']['name'];
   $error_message = "";
