@@ -2,6 +2,7 @@ var lon = 5;
 var lat = 40;
 var zoom = 5;
 var upload_map, select;
+var form_file;
 
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   defaultHandlerOptions: {
@@ -76,6 +77,8 @@ function upload_init()
   upload_map.addControl(click);
   click.activate();
 
+  auto_rename_handler();
+
 }
 
 /******************************************************************************/
@@ -143,4 +146,33 @@ function stop_upload(success, message, filename)
     }
   }
   return true;
+}
+
+
+/******************************************************************************/
+function auto_rename_event()
+/******************************************************************************/
+{
+  var i;
+  var files = form_file.files;
+  var len = files.length;
+
+  for (i = 0; i < len; i++) {
+//    alert('Type: ' + files[i].type);
+//    alert('Size: ' + files[i].size + ' bytes');
+    if (files[i].name == "image.jpg") {
+      $timestamp = new Date().getTime();
+      $rnd = Math.floor((Math.random() * 100));
+      files[i].name = "iphone" + $timestamp + $rnd + "image.jpg";
+      alert('Filename: ' + files[i].name);
+    }
+  }
+}
+
+/******************************************************************************/
+function auto_rename_handler()
+/******************************************************************************/
+{
+  form_file = document.getElementById('guidepostfile');
+  form_file.addEventListener('change', auto_rename_event, false);
 }

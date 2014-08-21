@@ -94,7 +94,6 @@ function show_upload_dialog()
     }
   }
 
-
   ";
 
   print"</script>\n";
@@ -111,7 +110,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
   <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
   <fieldset>
     <label>autor</label><input type='text' name='author' value='autor' size='9'>
-    <input name='uploadedfile' type='file' size='20'/><br>
+    <input name='uploadedfile' type='file' id='guidepostfile'  size='20'/><br>
     <label>lat</label><input type='text' id='lat' name='lat' value='0' size='10' title='".$title_help."'>
     <label>lon</label><input type='text' id='lon' name='lon' value='0' size='10' title='".$title_help."'>
     <label>exif </label><input type=checkbox id='exif_checkbox' onchange='exif_checkbox_action()'>
