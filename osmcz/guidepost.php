@@ -125,6 +125,101 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
   print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:0px solid #fff;'></iframe>\n";
 }
 
+
+################################################################################ 
+function show_iphone_upload_dialog()
+################################################################################ 
+{
+
+  $PHP_SELF = $_SERVER['PHP_SELF'];
+
+  print"<script>\n";
+  print "function upbox_off()\n";
+  print "{\n";
+  print "  document.getElementById('upbox').style.display = 'none' ;\n";
+  print "}\n";
+  print "
+
+  function exif_present()
+  {
+     document.getElementById('lat').value = 0;
+     document.getElementById('lat').readOnly = true;
+     document.getElementById('lon').value = 0;
+     document.getElementById('lon').readOnly = true;
+  }
+
+  function no_exif()
+  {
+     document.getElementById('lat').readOnly = false;
+     document.getElementById('lon').readOnly = false;
+  }
+
+  function exif_checkbox_action()
+  {
+    if (document.getElementById('exif_checkbox').checked) {
+      exif_present();
+    } else {
+      no_exif();
+    }
+  }
+
+  function send_data() 
+  {
+    var boundary = this.generateBoundary();
+    var xhr = new XMLHttpRequest;
+
+    xhr.open('POST', this.form.action, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            alert(xhr.responseText);
+        }
+    };
+
+    var contentType = 'multipart/form-data; boundary=' + boundary;
+    xhr.setRequestHeader('Content-Type', contentType);
+
+    for (var header in this.headers) {
+        xhr.setRequestHeader(header, headers[header]);
+    }
+
+    // here's our data variable that we talked about earlier
+    var data = this.buildMessage(this.elements, boundary);
+
+    // finally send the request as binary data
+        xhr.sendAsBinary(data);
+  }
+
+  ";
+
+  print"</script>\n";
+
+  print "  </head>
+  <body onload='upload_init()'>\n";
+
+$title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 0,0";
+
+  print "
+<div id='map' class='smallmap'></div>
+<form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
+  <input type='hidden' name='action' value='file' />
+  <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
+  <fieldset>
+    <label>autor</label><input type='text' name='author' value='autor' size='9'>
+    <input name='uploadedfile' type='file' id='guidepostfile'  size='20'/><br>
+    <label>lat</label><input type='text' id='lat' name='lat' value='0' size='10' title='".$title_help."'>
+    <label>lon</label><input type='text' id='lon' name='lon' value='0' size='10' title='".$title_help."'>
+    <label>exif </label><input type=checkbox id='exif_checkbox' onchange='exif_checkbox_action()'>
+  </fieldset>
+  <fieldset>
+    <input type='reset' name='reset' value='Reset' />
+    <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
+  </fieldset>
+</form>\n";
+  print "<p id='upload_process'>Uploading...</p>\n";
+  //set widht and height to display debug output
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:0px solid #fff;'></iframe>\n";
+}
+
 ################################################################################
 function insert_to_db($lat, $lon, $url ,$file, $author)
 ################################################################################

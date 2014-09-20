@@ -161,10 +161,11 @@ function auto_rename_event()
 //    alert('Type: ' + files[i].type);
 //    alert('Size: ' + files[i].size + ' bytes');
     if (files[i].name == "image.jpg") {
-      $timestamp = new Date().getTime();
-      $rnd = Math.floor((Math.random() * 100));
-      files[i].name = "iphone" + $timestamp + $rnd + "image.jpg";
-      alert('Filename: ' + files[i].name);
+      var timestamp = new Date().getTime();
+      var rnd = Math.floor((Math.random() * 100));
+      new_name = "iphone" + timestamp + rnd + "image.jpg";
+//      files[i].name = 
+      alert('Filename: ' + new_name);
     }
   }
 }
