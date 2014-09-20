@@ -234,7 +234,7 @@ print '
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>load demo</title>
+  <title>openstreetmap.cz guidepost editor</title>
 </head>
 <body>
 ';

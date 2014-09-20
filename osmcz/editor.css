@@ -38,7 +38,7 @@ div.gp_line {
 }
 
 div.gp_line:hover {
-  background-color:red;
+  background-color:grey;
 }
 
 .location {
