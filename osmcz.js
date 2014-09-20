@@ -23,6 +23,16 @@ var debug = false;
 var newWindow;
 var debug_window_content;
 
+function loader_on()
+{
+  document.getElementById("loader").style.display = 'block' ;
+}
+
+function loader_off()
+{
+  document.getElementById("loader").style.display = 'none' ;
+}
+
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   defaultHandlerOptions: {
     'single': true,
@@ -759,6 +769,8 @@ function parse_data(req)
 
     addMarker(markers, pos, popupClass, html_content, true, true);
   }
+
+  loader_off();
 }
 
 function commons_on(url)

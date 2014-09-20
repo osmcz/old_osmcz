@@ -39,8 +39,8 @@ div.mainx {
 div.smallmap {
   position: absolute;
   width: 97%;
-  height:90%;
-  border: 0px solid #ddd;
+  height:100%;
+  border: 1px solid #ddd;
 }
 
 div.handle {
