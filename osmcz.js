@@ -513,8 +513,14 @@ function handler(request)
 
   a = JSON.decode(request.responseText);
 
-  debug_alert("input" + request.responseText);
-  debug_alert("result of JSON.decode:" + a);
+  if (!a) {
+    debug_alert("a is null");
+    loader_off();
+    alert("Nic nenalezeno");
+  }
+
+  debug_alert("responsetext:" + request.responseText);
+  debug_alert("result of JSON.decode(responsetext):" + a);
 
   for(i = 0; i < a.length; i++) {
     b = a[i];
@@ -531,10 +537,15 @@ function handler(request)
     addMarker(markers, pos, popupClass, html_content, true, true);
   }
   status = request.status;
+
+  loader_off();
 }
 
 function show_guideposts(x)
 {
+
+  loader_on();
+
   var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
   debug_alert("show_guidepost():"+kokot+" "+kokot.toBBOX());
   var request = OpenLayers.Request.GET({
