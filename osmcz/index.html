@@ -108,8 +108,9 @@ ddtabmenu.definemenu("ddtabs", 0)
 
 <BODY onload="init_page()" onunload="get_center()">
 
+
 <div id='loader' class='centered'>
-<p>loading<br><img src="img/loader.gif" alt="-"></p>
+<p>Pracuji...<br><img src="img/loader.gif" alt="-"></p>
 </div>
 
 <div id="upbox" class="uploadbox">
@@ -128,6 +129,7 @@ ddtabmenu.definemenu("ddtabs", 0)
 <li><a href="#" rel="cm0"><img src="img/lupa.png"></a></li>
 <li><a href="#" rel="cm1"><img src="img/car.png"></a></li>
 <li><a href="#" rel="cm3">POI</a></li>
+<li><a href="#" rel="cm4"><img src="img/share.png"></a></li>
 </ul>
 </div>
 
@@ -168,15 +170,15 @@ ddtabmenu.definemenu("ddtabs", 0)
 <h4>Turistika</h4>
 <h5>Naše Rozcestníky</h5>
 <ul>
-<li><a href="javascript:show_guideposts(1)">Zobrazit rozcestníky</a>
-<li><a href="javascript:upbox_on()">Vložit obrázek rozcestníku</a>
-<li><img widgt="32px" height="32px" src="img/android_robot.png"> <a href=android.html>Android aplikace pro nahravani rozcestniku</a>
+<li><span title="Zobrazí rozcestníky, které se fyzicky nachází v aktuálně vybraném výřezu mapy. Zároveň se vytvoří nová vrstva (+ vlevo nahoře na mapě)."><img src="img/icon-eye.png"> <a href="javascript:show_guideposts(1)">Ukaž rozcestníky na mapě</a></span>
+<li><img width="32px" height="32px" src="img/icon-add-location.png"> <a href="javascript:upbox_on()">Vložit obrázek rozcestníku</a>
+<li><img width="32px" height="32px" src="img/android_robot.png"> <a href="android.html">Android</a><a href="https://play.google.com/store/apps/details?id=org.walley.guidepost"> aplikace pro nahrávání rozcestníků</a>
+<li><a href="http://openstreetmap.cz/table/leaderboard">Leaderboard</a>
+<li><a href="http://openstreetmap.cz/editor.html">Editor</a>
 </ul>
 
 <h5>Rozcestníky z Wikimedia Commons</h5>
 
-<p onmouseover="javascript:loader_on();">a</p>
-<p onmouseover="javascript:loader_off();">b</p>
 
 <style>
 select{
@@ -298,6 +300,34 @@ option
  </ul>
 </div>
 
+<div id="cm4" class="tabcontent">
+
+<a href="about.html">[O Projektu]</a><br>
+<a href="odkazy.html">[Odkazy]</a><br>
+
+<!--buttons-->
+G+ page: <a href="https://plus.google.com/101537650520682759804?prsrc=3" style="text-decoration:none;"><img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/></a>
+<br>
+G+ community: <a href="https://plus.google.com/u/0/b/101537650520682759804/communities/111981115616957848548">here</a>
+<br>
+<g:plusone size="medium" href="http://openstreetmap.cz"></g:plusone>
+
+<br>
+<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fopenstreetmap.cz&amp;width&amp;layout=button_count&amp;action=recommend&amp;show_faces=true&amp;share=true&amp;height=21&amp;appId=134976729912304" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+<br>
+
+<a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="https://flattr.com/profile/walley"></a>
+
+<br>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="GZYJ36AMVVDV4">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+</div>
+
 </DIV><!--tabcontainer-->
 </div>
 
@@ -328,10 +358,6 @@ option
  </div>
 
  <div id="map" class="smallmap"></div>
-<br>bla
- <div class="gpslink">
-  <p><a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma / Map for your GPS navigation device <img src="img/external_link.png" border="0"></a></p>
- </div>
 
 </div>
 
@@ -365,22 +391,7 @@ google_ad_height = 90;
 </div>
 
 <div class="bottomright">
-<a href="about.html">[O Projektu]</a><br>
-<a href="odkazy.html">[Odkazy]</a><br>
-
-<!--buttons-->
-<g:plusone size="medium" href="http://openstreetmap.cz"></g:plusone>
-<a href="https://plus.google.com/101537650520682759804?prsrc=3" style="text-decoration:none;"><img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/></a>
-<div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#appId=134976729912304&amp;xfbml=1"></script><fb:like href="https://www.facebook.com/pages/openstreetmapcz/141059862622270" send="false" layout="button_count" width="40" show_faces="false" font=""></fb:like>
-<a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="https://flattr.com/profile/walley"></a>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="GZYJ36AMVVDV4">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-<!--/buttons-->
-<!--bottomright-->
+  <p><a href="http://garmin.openstreetmap.cz">Mapa pro vaši navigaci zdarma / Free map for your GPS navigation device <img src="img/external_link.png" border="0"></a></p>
 </div>
 
 </body>
