@@ -208,7 +208,7 @@ sub gp_line()
   print "</p>\n";
   print "<span class='staticmap'>\n";
 
-  $static_map = "http://www.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=14&size=200,200&type=map&imagetype=png&pois=";
+  $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=14&size=200,200&type=map&imagetype=png&pois=";
 #  print "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
   print "<img src='".$static_map."'/>";
   print "</span>\n";
