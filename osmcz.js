@@ -340,7 +340,7 @@ function init()
 */
   var layer_kctcz = new OpenLayers.Layer.TMS(
     "Turisticke stezky",
-    "http://openstreetmap.cz/kct_tiles/",
+    "http://map.openstreetmap.cz/kct_tiles/",
     {
       isBaseLayer:false,
       layername: 'kctcz',
@@ -453,8 +453,8 @@ function hide_poi(category)
 function addMarker(to_layer, ll, popupClass, popupContentHTML, closeBox, overflow) 
 {
   var icon_size = new OpenLayers.Size(48, 48);
-  var marker_icon = new OpenLayers.Icon('http://openstreetmap.cz/img/guidepost_nice.png', icon_size);
-  var icon_url = 'http://openstreetmap.cz/img/guidepost.png';
+  var marker_icon = new OpenLayers.Icon('http://map.openstreetmap.cz/img/guidepost_nice.png', icon_size);
+  var icon_url = 'http://map.openstreetmap.cz/img/guidepost.png';
   var data = {
     iconURL: icon_url,
     iconSize: icon_size
@@ -516,7 +516,7 @@ function handler(request)
   if (!a) {
     debug_alert("a is null");
     loader_off();
-    alert("Nic nenalezeno");
+    alert("rozcestniky: Nic nenalezeno");
   }
 
   debug_alert("responsetext:" + request.responseText);
@@ -549,7 +549,7 @@ function show_guideposts(x)
   var kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
   debug_alert("show_guidepost():"+kokot+" "+kokot.toBBOX());
   var request = OpenLayers.Request.GET({
-    url: "http://openstreetmap.cz/guidepost.php",
+    url: "http://api.openstreetmap.cz/guidepost.php",
     params: {bbox: kokot.toBBOX()},
     callback: handler
   });
@@ -726,7 +726,7 @@ function on_search(request)
   for(i = 0; i < a.length; i++) {
     search_result += "<li>";
     search_result += "<span onclick='javascript:set_center("+a[i].lon+", "+a[i].lat+")'> <font color='blue'>&gt;&gt;</font> </span>";
-    search_result += "<a href='http://openstreetmap.cz/?zoom=12&lat="+a[i].lat+"&lon="+a[i].lon+"&layers=B0000FTTFTTT'>"+a[i].display_name+"</a>";
+    search_result += "<a href='http://map.openstreetmap.cz/?zoom=12&lat="+a[i].lat+"&lon="+a[i].lon+"&layers=B0000FTTFTTT'>"+a[i].display_name+"</a>";
   }
   search_result += "</ol></p>";
 

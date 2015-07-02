@@ -202,7 +202,7 @@ sub gp_line()
   print "</ul>\n";
   print "</span>\n";
 
-  $full_uri = "http://openstreetmap.cz/".$url;
+  $full_uri = "http://api.openstreetmap.cz/".$url;
   print "<p class='image'>\n";
   print "<a href='$full_uri'><img src='$full_uri' height='150px'><br>$name</a>";
   print "</p>\n";
