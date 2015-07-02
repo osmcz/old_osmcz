@@ -60,10 +60,10 @@ function load_page(page)
   var from = page * page_length;
   var to = from + page_length;
 
-  uri = "http://openstreetmap.cz/table/get/" + from + "/" + to;
+  uri = "http://api.openstreetmap.cz/table/get/" + from + "/" + to;
 //  alert(uri);
 
-  $("#new-nav").load("http://openstreetmap.cz/table/get/" + from + "/" + to, response);
+  $("#new-nav").load("http://api.openstreetmap.cz/table/get/" + from + "/" + to, response);
   $("#currpage").html("page:"+page);
 }
 
@@ -130,7 +130,7 @@ function paginator()
 
 <script>
   gp_count = $.ajax({
-    url: "http://openstreetmap.cz/table/count",
+    url: "http://api.openstreetmap.cz/table/count",
     async: false
   }).responseText;
   //alert(gp_count);
@@ -138,11 +138,11 @@ function paginator()
   load_page(1);
 </script>
 
-<span><a href="http://openstreetmap.cz"><img src="http://openstreetmap.cz/img/guidepost_nice.png"></a></span>
+<span><a href="http://map.openstreetmap.cz"><img src="http://map.openstreetmap.cz/img/guidepost_nice.png"></a></span>
 <h1>Guidepost editor</h1>
 
 <p>
-<a href="http://openstreetmap.cz">See them on the Map</a>
+<a href="http://map.openstreetmap.cz">See them on the Map</a>
 </p>
 
 <div id="demo_pag1"></div>
