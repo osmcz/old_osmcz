@@ -117,7 +117,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
   </fieldset>
   <fieldset>
     <input type='reset' name='reset' value='Reset' />
-    <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
+    <input type='submit' name='submitBtn' class='sbtn' value='Nahrát soubor' />
   </fieldset>
 </form>\n";
   print "<p id='upload_process'>Uploading...</p>\n";
