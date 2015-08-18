@@ -28,7 +28,8 @@ allowedHosts = [
 "open.mapquestapi.com",
 "routes.cloudmade.com",
 "api.openstreetmap.cz",
-"map.openstreetmap.cz"
+"map.openstreetmap.cz",
+"old.openstreetmap.cz"
 ]
 
 method = os.environ["REQUEST_METHOD"]
