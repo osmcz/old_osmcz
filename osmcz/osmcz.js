@@ -19,7 +19,7 @@
 var map, gml;
 var navmarkers;
 
-var debug = false;
+var debug = true;
 var newWindow;
 var debug_window_content;
 
@@ -749,13 +749,17 @@ function parse_data(req)
 {
   var markers = new OpenLayers.Layer.Markers("Wikimedia Commons");
   map.addLayer(markers);
-  
+
   var expr = /<img.*src="(.*?)".*?>/;
   var exprc = /<center>(.*?)<.center>/;
 
+debug_alert("wikimedia parse_data ...");
   g =  new OpenLayers.Format.KML({extractStyles: true});
   html = ""
   features = g.read(req.responseText);
+
+  debug_alert("result:(" + features + ")");
+
   for(var feat in features) {
     var lat = features[feat].geometry.y;
     var lon = features[feat].geometry.x;
@@ -786,5 +790,6 @@ function parse_data(req)
 
 function commons_on(url)
 {
+  debug_alert("commons_on url:" + url);
   OpenLayers.loadURL(url, "", null, parse_data);
 }
