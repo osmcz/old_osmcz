@@ -40,7 +40,7 @@ foreach (@l2) {chop();}
 
 $lat = $l1[1] + $l1[2] / 60 + $l1[3] / 3600;
 $lon = $l2[1] + $l2[2] / 60 + $l2[3] / 3600;
-&debuglog( "vysledek: $lat $lon");
+&debuglog( "coordinates result: $lat $lon");
 
 my $filename;
 if (-e $new_location.basename($i)) {
