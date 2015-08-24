@@ -745,7 +745,7 @@ type: "motorway_junction"
   set_center(a[0].lon, a[0].lat);
 }
 
-function parse_data(req) 
+function parse_data(req)
 {
   var markers = new OpenLayers.Layer.Markers("Wikimedia Commons");
   map.addLayer(markers);
@@ -753,12 +753,13 @@ function parse_data(req)
   var expr = /<img.*src="(.*?)".*?>/;
   var exprc = /<center>(.*?)<.center>/;
 
-debug_alert("wikimedia parse_data ...");
+  debug_alert("wikimedia parse_data ...");
+  debug_alert("result:(" + req.responseText + ")");
+
   g =  new OpenLayers.Format.KML({extractStyles: true});
   html = ""
   features = g.read(req.responseText);
 
-  debug_alert("result:(" + features + ")");
 
   for(var feat in features) {
     var lat = features[feat].geometry.y;
@@ -791,5 +792,10 @@ debug_alert("wikimedia parse_data ...");
 function commons_on(url)
 {
   debug_alert("commons_on url:" + url);
-  OpenLayers.loadURL(url, "", null, parse_data);
+//  OpenLayers.loadURL(url, "", null, parse_data);
+  var request = OpenLayers.Request.GET({
+    url: url,
+    callback: parse_data
+  });
+
 }
