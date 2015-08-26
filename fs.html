@@ -32,16 +32,35 @@ body {
 }
 </style>
 
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 
-    <script src="OpenLayers.js"></script>
-    <script src="OpenStreetMap.js"></script>
-    <script type="text/javascript" src="http://openstreetmap.cz/osmcz.js"></script>
-    <script type="text/javascript" src="json.js"></script>
+<script>
+var map;
+var ajaxRequest;
+var plotlist;
+var plotlayers=[];
+
+function initmap() {
+// set up the map
+map = new L.Map('map');
+
+// create the tile layer with correct attribution
+var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+var osm = new L.TileLayer(osmUrl, {minZoom: 4, maxZoom: 12, attribution: osmAttrib});
+
+// start the map in South-East England
+map.setView(new L.LatLng(49.5, 17), 7);
+map.addLayer(osm);
+}
+
 </script>
 
 </HEAD>
 
-<BODY onload="init()">
+<BODY onload="initmap()">
+
 <div id="map"></div>
 
 <div id="text">
@@ -69,7 +88,6 @@ pageTracker._trackPageview();
 </script>
 </div>
 </div>
-
 
 </BODY>
 </HTML>

@@ -63,6 +63,13 @@ function request_commons(category)
   commons_on('http://tools.wmflabs.org/kmlexport?project=Commons&article=Category:'+category);
 }
 
+function request_commons_all()
+{
+  category = "Hiking_and_footpath_fingerposts_in_the_Czech_Republic_by_region";
+  loader_on();
+  commons_on('http://tools.wmflabs.org/kmlexport?l=0&project=Commons&article=Category:'+category);
+}
+
 function init_page()
 {
   if ( getInternetExplorerVersion() > -1 ) {
@@ -178,7 +185,10 @@ ddtabmenu.definemenu("ddtabs", 0)
 </ul>
 
 <h5>Rozcestníky z Wikimedia Commons</h5>
+<ul>
+<li><a href="javascript:request_commons_all()">Zobraz všechny rozcestníky z Commons</a>
 
+<li>Zobraz vybraný region
 
 <style>
 select{
@@ -193,7 +203,7 @@ option
 </style>
 
 <form name="catsel">
- <select name="commons_category">
+ <select name="commons_category" onchange="request_commons(document.catsel.commons_category.value)">
   <option selected="yes">Vyber oblast</option>
   <option value="Hiking_and_footpath_fingerposts_in_Central_Bohemian_Region"      >S - Central Bohemian Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Bene%C5%A1ov_District"        >'-- Benešov District</option>
@@ -224,6 +234,7 @@ option
   <option value="Hiking_and_footpath_fingerposts_in_Cheb_District"                >'-- Cheb District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Karlovy_Vary_District"        >'-- Karlovy Vary District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Sokolov_District"             >'-- Sokolov District</option>
+
   <option value="Hiking_and_footpath_fingerposts_in_Liberec_Region"               >L - Liberec Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Jablonec_nad_Nisou_District"  >'-- Jablonec nad Nisou District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Liberec_District"             >'-- Liberec District</option>
@@ -231,6 +242,10 @@ option
   <option value="Hiking_and_footpath_fingerposts_in_Česká_Lípa_District"          >'-- Ceská Lípa District</option>
 
   <option value="Hiking_and_footpath_fingerposts_in_Moravian-Silesian_Region"     >T - Moravian-Silesian Region</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Brunt%C3%A1l_District"         >'--  Bruntál</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Fr%C3%BDdek-M%C3%ADstek_District">'-- Frýdek-Místek</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Nov%C3%BD_Ji%C4%8D%C3%ADn_District">'-- Nový Jičín</option>
+  <option value="Hiking_and_footpath_fingerposts_in_Karvin%C3%A1_District"        >'-- Karviná</option>
 
   <option value="Hiking_and_footpath_fingerposts_in_Olomouc_Region"               >M - Olomouc Region</option>
   <option value="Hiking_and_footpath_fingerposts_in_Jeseník_District"             >'-- Jeseník</option>
@@ -275,6 +290,7 @@ option
   <option value="Hiking_and_footpath_fingerposts_in_Litoměřice_District"          >'-- Litoměřice District</option>
   <option value="Hiking_and_footpath_fingerposts_in_Teplice_District"             >'-- Teplice District</option>
 
+  <option>Czech_hiking_and_footpath_signs_in_Silesian_Beskids</option>
   <option>Way_of_Saint_James_in_the_Czech_Republic</option>
   <option>Cycling_route_signs_in_the_Czech_Republic</option>
   <option>Czech_hiking_and_footpath_signs_in_Krkonoše</option>
@@ -282,9 +298,10 @@ option
   <option>Hiking_guideposts_of_ČSTV</option>
   <option>Cycling fingerposts with stripe signs in the Czech Republic</option>
   <option>European long-distance paths direction labels in the Czech Republic</option>
+  <option>Hiking_and_footpath_fingerposts_in_the_Czech_Republic_by_region</option>
  </select>
 </form>
-<a href="javascript:request_commons(document.catsel.commons_category.value)">Zobraz kliknutím zde</a>
+</ul>
 
 <h5>Ostatní</h5>
 <ul>

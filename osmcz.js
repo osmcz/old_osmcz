@@ -19,7 +19,7 @@
 var map, gml;
 var navmarkers;
 
-var debug = true;
+var debug = false;
 var newWindow;
 var debug_window_content;
 
