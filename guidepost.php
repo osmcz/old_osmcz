@@ -17,6 +17,9 @@ function printdebug($x)
   $x = str_replace('/', '(slash)',      $x);
   $x = str_replace("\\", '(backslash)', $x);
   $x = str_replace('~', '(tilda)',      $x);
+  $x = str_replace('>', '(GT)',         $x);
+  $x = str_replace('<', '(LT)',         $x);
+  $x = str_replace('?', '(question)',   $x);
 
   system ("/usr/bin/logger -t guidepost '$x'");
 }
@@ -434,7 +437,7 @@ switch ($action) {
       printdebug("no bbox");
       die("No bbox provided\n");
     } else {
-      printdebug("bbox: " + $bbox);
+      printdebug("bbox: " . $bbox);
     }
 
     list($minlon, $minlat, $maxlon, $maxlat) = preg_split('/,/', $bbox, 4);
@@ -445,7 +448,7 @@ switch ($action) {
       $i = 0;
       $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
 
-      printdebug("query " + $query);
+      printdebug("query " . $query);
 
       $results = $db->query($query);
       while ($row = $results->fetchArray()) {
