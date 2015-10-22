@@ -116,6 +116,15 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
     <label>exif </label><input type=checkbox id='exif_checkbox' onchange='exif_checkbox_action()'>
   </fieldset>
   <fieldset>
+    <label>Ref</label><input type='text' name='reg' value='' size='6'>
+<br>
+    <input type='radio' name='gp_type' value='gp' checked>Rozcestník
+    <input type='radio' name='gp_type' value='map'>Mapa
+    <input type='radio' name='gp_type' value='pano'>Panorama
+    <input type='radio' name='gp_type' value='info'>Informační tabule
+
+  </fieldset>
+  <fieldset>
     <input type='reset' name='reset' value='Reset' />
     <input type='submit' name='submitBtn' class='sbtn' value='Nahrát soubor' />
   </fieldset>
@@ -248,7 +257,7 @@ function process_file()
 
   $result = 0;
 
-  printdebug("    START!");
+  printdebug("!!! START !!!");
 
   $filename = $_FILES['uploadedfile']['name'];
   $error_message = "";
@@ -265,7 +274,7 @@ function process_file()
 
   printdebug("before lat:lon:author - $lat:$lon:$author");
 
-  $author = preg_replace('/[^-a-zA-Z0-9_.]/', '', $author);
+  $author = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíé.]/', '', $author);
   $lat = preg_replace('/[^0-9.]/', '', $lat);
   $lon = preg_replace('/[^0-9.]/', '', $lon);
 
@@ -376,6 +385,8 @@ function process_file()
     parent.stop_upload(".$result.",'".$error_message."', '".$filename."');
   </script>\n";
   }
+
+  printdebug("!!! END !!!");
   return $result;
 }
 
