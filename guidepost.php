@@ -308,7 +308,7 @@ function process_file()
   }
 
   if ($author === "android" or $author === "autor") {
-    $error_message = "zmente jmeno";
+    $error_message = "zmente vase jmeno";
     $result = 0;
   }
 
