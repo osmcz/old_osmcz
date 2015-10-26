@@ -233,7 +233,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 }
 
 ################################################################################
-function insert_to_db($lat, $lon, $url ,$file, $author)
+function insert_to_db($lat, $lon, $url ,$file, $author, $ref)
 ################################################################################
 {
   global $global_error_message;
@@ -242,12 +242,13 @@ function insert_to_db($lat, $lon, $url ,$file, $author)
     $global_error_message = (file_exists('guidepost')) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
     return 0;
   }
-  $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author')";
+  $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author', '$ref')";
   $query = $database->exec($q);
   if (!$query) {
     $global_error_message = "Error: $query_error"; 
     return 0;
   }
+  printdebug("insert_to_db(): insert successful");
   return 1;
 }
 
@@ -274,12 +275,18 @@ function process_file()
   $lat = $_POST['lat'];
   $lon = $_POST['lon'];
   $author = $_POST['author'];
+  if (isset($_POST['ref'])) {
+    $ref = $_POST['ref'];
+  } else {
+    $ref = "none";
+  }
 
   printdebug("before lat:lon:author - $lat:$lon:$author");
 
-  $author = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíé.]/', '', $author);
+  $author = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíé .]/', '', $author);
   $lat = preg_replace('/[^0-9.]/', '', $lat);
   $lon = preg_replace('/[^0-9.]/', '', $lon);
+  $ref = preg_replace('/[^a-zA-Z0-9.]/', '', $ref);
 
   printdebug("after lat:lon:author - $lat:$lon:$author");
 
@@ -344,7 +351,7 @@ function process_file()
       printdebug("File '$file' has been moved from tmp to $target_path");
       if (!$lat && !$lon) {
         printdebug("soubor byl poslan se souradnicemi 0,0 -> exifme");
-        $command = "/var/www/mapy/exifme.pl '$target_path' '$author' img/guidepost/";
+        $command = "/var/www/mapy/exifme.pl '$target_path' '$author' img/guidepost/ '$ref'";
         $out = system ($command, $errlvl);
         printdebug("command:output(exit code) - $command:$out($errlvl)");
         if (!$errlvl) {
@@ -360,7 +367,7 @@ function process_file()
           $error_message = "failed to copy $file to destination ... ";
           $result = 0;
         } else {
-          $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author);
+          $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author, $ref);
           if (!$ret_db) {
             $error_message = "failed to insert to db" . $global_error_message;
             $result = 0;

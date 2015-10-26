@@ -18,6 +18,7 @@ if (scalar @ARGV == 0) {die("not enough parameters, died");}
 $i = $ARGV[0];
 $author = $ARGV[1];
 $new_location = $ARGV[2];
+$ref = $ARGV[3];
 @output = `jhead '$i'`;
 
 #print @output;
@@ -69,7 +70,7 @@ if (!$dbh) {
   die;
 }
 
-$q = "insert into guidepost values (NULL, $lat, $lon, '".$url."','".$filename."', '$author');\n";
+$q = "insert into guidepost values (NULL, $lat, $lon, '".$url."','".$filename."', '$author', '$ref');\n";
 &debuglog($q);
 
 $res = $dbh->do($q);
