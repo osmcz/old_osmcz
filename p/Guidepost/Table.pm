@@ -60,7 +60,7 @@ sub connect_db
 }
 
 ################################################################################
-sub handler 
+sub handler
 ################################################################################
 {
   my $r = shift;
@@ -72,6 +72,10 @@ sub handler
   my $query_string = $r->args;
   @uri_components = split("/", $uri);
 
+  foreach $text (@uri_components) {
+    $text =~ s/[^A-Za-z0-9 ]//g;
+  }
+
   if ($uri =~ "table\/all") {
     print "<h1>all</h1>\n";
   } elsif ($uri =~ /goodbye/) {
@@ -82,6 +86,8 @@ sub handler
     &table_get($uri_components[3], $uri_components[4]);
   } elsif ($uri =~ "/table/leaderboard") {
     &leaderboard();
+  } elsif ($uri =~ "/table/ref") {
+    &show_by_ref($uri_components[3]);
   }
 
 #    print Dumper(\%ENV);
@@ -115,6 +121,27 @@ sub handler
 }
 
 ################################################################################
+sub show_by_ref
+################################################################################
+{
+  my ($ref) = @_;
+
+  print "ref $ref";
+
+  &connect_db();
+  my $query = "select * from guidepost where ref='$ref'";
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  foreach my $row (@$res) {
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
+    print "\n";
+  }
+
+}
+
+################################################################################
 sub table_get
 ################################################################################
 {
@@ -132,8 +159,8 @@ sub table_get
   print $DBI::errstr;
 
   foreach my $row (@$res) {
-    my ($id, $lat, $lon, $url, $name, $attribution) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution);
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
     print "</p>\n";
   }
 
@@ -181,7 +208,7 @@ sub leaderboard
 sub gp_line()
 ################################################################################
 {
-  my ($id, $lat, $lon, $url, $name, $attribution) = @_;
+  my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @_;
 
   print "<hr>\n";
   print "<div class='gp_line'>\n";
@@ -189,6 +216,7 @@ sub gp_line()
   print "<h2>$id</h2>";
   print "latitude: $lat<br>";
   print "longtitude: $lon<br>";
+  print "ref: <a href='/table/ref/$ref'>$ref</a><br>";
   print "by $attribution<br>";
   print "</p>\n";
 
