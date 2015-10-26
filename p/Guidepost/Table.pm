@@ -16,6 +16,11 @@ use DBI;
 use Data::Dumper;
 use Scalar::Util qw(looks_like_number);
 
+use Geo::JSON;
+use Geo::JSON::Point;
+use Geo::JSON::Feature;
+use Geo::JSON::FeatureCollection;
+
 my $dbh;
 
 sub connection_info
@@ -47,6 +52,32 @@ sub rrr
     print "<hr>\n";
  }
 
+sub say_goodbye
+{
+  my $r = shift;
+  print $r->args;
+
+  &parse_query_string($r);
+
+  foreach (sort keys %currargs) {
+    print "$_ : $currargs{$_}\n";
+  }
+}
+
+################################################################################
+sub parse_query_string
+################################################################################
+{
+  my $r = shift;
+  %currargs = map { split("=",$_) } split(/&/, $r->args);
+  #sanitize
+
+  foreach (sort keys %currargs) {
+    $currargs{$_} =~ s/[^A-Za-z0-9 ]//g;
+  }
+
+}
+
 ################################################################################
 sub connect_db
 ################################################################################
@@ -60,12 +91,61 @@ sub connect_db
 }
 
 ################################################################################
+sub output_geojson
+################################################################################
+{
+
+  my $pt;
+  my $ft;
+  my @feature_objects;
+
+#  &connect_db();
+
+  my $query = "select * from guidepost";
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  foreach my $row (@$res) {
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
+
+  my $fixed_lat = looks_like_number($lat) ? $lat : 0;
+  my $fixed_lon = looks_like_number($lon) ? $lon : 0;
+
+    $pt = Geo::JSON::Point->new({
+      coordinates => [$fixed_lon, $fixed_lat],
+    properties => ["prop0", "value0"],
+    });
+
+    my %properties = (
+      'ref' => $ref,
+      'name' => $attribution,
+      'id' => $id,
+    );
+
+    $ft = Geo::JSON::Feature->new({
+      geometry   => $pt,
+      properties => \%properties,
+    });
+
+    push @feature_objects, $ft;
+  }
+
+
+my $fcol = Geo::JSON::FeatureCollection->new({
+     features => \@feature_objects,
+});
+
+print $fcol->to_json."\n";
+}
+
+################################################################################
 sub handler
 ################################################################################
 {
   my $r = shift;
   $r->content_type('text/html');
   my $uri = $r->uri;      # what does the URI (URL) look like ?
+  &parse_query_string($r);
 
   &connect_db();
 
@@ -77,9 +157,17 @@ sub handler
   }
 
   if ($uri =~ "table\/all") {
-    print "<h1>all</h1>\n";
+
+    if (!exists $currargs{output}) {
+      print "<h1>all</h1>\n";
+    } elsif ($currargs{output} eq "geojson") {
+      &output_geojson();
+    } else {
+      print "Dont know hot to do this yet\n";
+    }
+
   } elsif ($uri =~ /goodbye/) {
-    say_goodbye($r);
+    &say_goodbye($r);
   } elsif ($uri =~ "/table/count") {
     print &get_gp_count();
   } elsif ($uri =~ "/table/get") {
@@ -88,6 +176,8 @@ sub handler
     &leaderboard();
   } elsif ($uri =~ "/table/ref") {
     &show_by_ref($uri_components[3]);
+  } elsif ($uri =~ "/table/name") {
+    &show_by_name($uri_components[3]);
   }
 
 #    print Dumper(\%ENV);
@@ -128,8 +218,19 @@ sub show_by_ref
 
   print "ref $ref";
 
-  &connect_db();
-  my $query = "select * from guidepost where ref='$ref'";
+
+}
+
+################################################################################
+sub show_by_name
+################################################################################
+{
+  my ($name) = @_;
+
+  print "name $name";
+
+#  &connect_db();
+  my $query = "select * from guidepost where attribution='$name'";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
@@ -151,7 +252,7 @@ sub table_get
   my $to_gp = looks_like_number($pt) ? $pt : 0;
   print "<h1>from ($pf $pt) ($from_gp) ($to_gp)</h1><hr>";
 
-  &connect_db();
+#  &connect_db();
 
   my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
 #  print $query;
