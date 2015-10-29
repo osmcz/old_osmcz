@@ -22,6 +22,12 @@ use Geo::JSON::Feature;
 use Geo::JSON::FeatureCollection;
 
 my $dbh;
+my $BBOX = 0;
+my $minlon;
+my $minlat;
+my $maxlon;
+my $maxlat;
+
 
 sub connection_info
 {
@@ -70,12 +76,15 @@ sub parse_query_string
 {
   my $r = shift;
   %currargs = map { split("=",$_) } split(/&/, $r->args);
+
   #sanitize
-
   foreach (sort keys %currargs) {
-    $currargs{$_} =~ s/[^A-Za-z0-9 ]//g;
+    if (lc $_ eq "bbox" ) {
+      $currargs{$_} =~ s/[^A-Za-z0-9,-]//g;
+    } else {
+      $currargs{$_} =~ s/[^A-Za-z0-9 ]//g;
+    }
   }
-
 }
 
 ################################################################################
@@ -91,9 +100,163 @@ sub connect_db
 }
 
 ################################################################################
+sub parse_bbox
+################################################################################
+{
+  my $b = shift;
+#BBox=-20,-40,60,40
+
+  print $b;
+
+  @bbox = split(",", $b);
+  $minlon = $bbox[0];
+  $minlat = $bbox[1];
+  $maxlon = $bbox[2];
+  $maxlat = $bbox[3];
+  $BBOX = 1;
+}
+
+################################################################################
+sub handler
+################################################################################
+{
+  my $r = shift;
+  $r->content_type('text/html');
+  my $uri = $r->uri;      # what does the URI (URL) look like ?
+  &parse_query_string($r);
+
+  if (exists $currargs{bbox}) {
+    &parse_bbox($currargs{bbox});
+  }
+
+  if (!exists $currargs{output}) {
+    $OUTPUT_FORMAT = "html";
+  } elsif ($currargs{output} eq "geojson") {
+    $OUTPUT_FORMAT = "geojson";
+  } elsif ($currargs{output} eq "kml") {
+    $OUTPUT_FORMAT = "kml";
+  } else {
+    $OUTPUT_FORMAT = "html";
+  }
+
+  &connect_db();
+
+  my $query_string = $r->args;
+  @uri_components = split("/", $uri);
+
+  foreach $text (@uri_components) {
+    $text =~ s/[^A-Za-z0-9 ]//g;
+  }
+
+  if ($uri =~ "table\/all") {
+    my $query = "select * from guidepost";
+    if ($BBOX) {
+      $query .= " where ".&add_bbox();
+    }
+    &output_data($query);
+  } elsif ($uri =~ /goodbye/) {
+    &say_goodbye($r);
+  } elsif ($uri =~ "/table/count") {
+    print &get_gp_count();
+  } elsif ($uri =~ "/table/get") {
+    &table_get($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "/table/leaderboard") {
+    &leaderboard();
+  } elsif ($uri =~ "/table/ref") {
+    &show_by_ref($uri_components[3]);
+  } elsif ($uri =~ "/table/name") {
+    &show_by_name($uri_components[3]);
+  }
+
+#    print Dumper(\%ENV);
+#    connection_info($r->connection);
+
+#    $r->status = 200;       # All's ok, so set a "200 OK" status
+#    $r->send_http_header;   # Now send the http headers.
+
+   $dbh->disconnect;
+   return Apache2::Const::OK;
+}
+
+################################################################################
+sub add_bbox
+################################################################################
+{
+  if ($BBOX) {
+    return "lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
+  }
+}
+
+################################################################################
+sub show_by_ref
+################################################################################
+{
+  my $ref = shift;
+
+  my $query = "select * from guidepost where ref='$ref'";
+
+  if ($BBOX) {
+    $query .= " and ".&add_bbox();
+  }
+
+  &output_data($query);
+}
+
+################################################################################
+sub show_by_name
+################################################################################
+{
+  my $name = shift;
+
+  my $query = "select * from guidepost where attribution='$name'";
+
+  if ($BBOX) {
+    $query .= " and ".&add_bbox();
+  }
+  &output_data($query);
+}
+
+################################################################################
+sub output_data
+################################################################################
+{
+  my ($query) = @_;
+
+  if ($OUTPUT_FORMAT eq "html") {
+    output_html($query);
+  } elsif ($OUTPUT_FORMAT eq "geojson") {
+    output_geojson($query);
+  } elsif ($OUTPUT_FORMAT eq "kml") {
+    output_kml($query);
+  }
+}
+
+################################################################################
+sub output_html
+################################################################################
+{
+  my ($query) = @_;
+
+  print "query $query";
+
+#  &connect_db();
+#  my $query = "select * from guidepost where attribution='$name'";
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  foreach my $row (@$res) {
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
+    print "\n";
+  }
+}
+
+################################################################################
 sub output_geojson
 ################################################################################
 {
+
+  my ($query) = @_;
 
   my $pt;
   my $ft;
@@ -101,7 +264,7 @@ sub output_geojson
 
 #  &connect_db();
 
-  my $query = "select * from guidepost";
+#  my $query = "select * from guidepost";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
@@ -138,109 +301,6 @@ my $fcol = Geo::JSON::FeatureCollection->new({
 print $fcol->to_json."\n";
 }
 
-################################################################################
-sub handler
-################################################################################
-{
-  my $r = shift;
-  $r->content_type('text/html');
-  my $uri = $r->uri;      # what does the URI (URL) look like ?
-  &parse_query_string($r);
-
-  &connect_db();
-
-  my $query_string = $r->args;
-  @uri_components = split("/", $uri);
-
-  foreach $text (@uri_components) {
-    $text =~ s/[^A-Za-z0-9 ]//g;
-  }
-
-  if ($uri =~ "table\/all") {
-
-    if (!exists $currargs{output}) {
-      print "<h1>all</h1>\n";
-    } elsif ($currargs{output} eq "geojson") {
-      &output_geojson();
-    } else {
-      print "Dont know hot to do this yet\n";
-    }
-
-  } elsif ($uri =~ /goodbye/) {
-    &say_goodbye($r);
-  } elsif ($uri =~ "/table/count") {
-    print &get_gp_count();
-  } elsif ($uri =~ "/table/get") {
-    &table_get($uri_components[3], $uri_components[4]);
-  } elsif ($uri =~ "/table/leaderboard") {
-    &leaderboard();
-  } elsif ($uri =~ "/table/ref") {
-    &show_by_ref($uri_components[3]);
-  } elsif ($uri =~ "/table/name") {
-    &show_by_name($uri_components[3]);
-  }
-
-#    print Dumper(\%ENV);
-#    connection_info($r->connection);
-
-#    $r->status = 200;       # All's ok, so set a "200 OK" status
-#    $r->send_http_header;   # Now send the http headers.
-
-#my $dbfile = '/var/www/mapy/guidepost';
-#$dbh = DBI->connect( "dbi:SQLite:$dbfile" );
-#if (!$dbh) {
-#  &debuglog("db failed","Cannot connect: ".$DBI::errstr);
-#  die;
-#}
-#print '
-#<div id="map" style="width:200px;height:200px;"></div>
-#<script type="text/javascript">
-#var map; 
-#function showMap(){ 
-#map = new OpenLayers.Map("map"); var mapnik = new OpenLayers.Layer.OSM(); map.addLayer(mapnik); map.setCenter(new OpenLayers.LonLat('.$lon.",".$lat.').transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")), 16); 
-#map.addLayer(new OpenLayers.Layer.Markers()); 
-#var marker = new OpenLayers.Marker(map.getCenter()); 
-#map.layers[map.layers.length-1].addMarker(marker); 
-#} 
-#showMap();
-#</script>
-#';
-
-   $dbh->disconnect;
-   return Apache2::Const::OK;
-}
-
-################################################################################
-sub show_by_ref
-################################################################################
-{
-  my ($ref) = @_;
-
-  print "ref $ref";
-
-
-}
-
-################################################################################
-sub show_by_name
-################################################################################
-{
-  my ($name) = @_;
-
-  print "name $name";
-
-#  &connect_db();
-  my $query = "select * from guidepost where attribution='$name'";
-  $res = $dbh->selectall_arrayref($query);
-  print $DBI::errstr;
-
-  foreach my $row (@$res) {
-    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
-    print "\n";
-  }
-
-}
 
 ################################################################################
 sub table_get
@@ -318,7 +378,7 @@ sub gp_line()
   print "latitude: $lat<br>";
   print "longtitude: $lon<br>";
   print "ref: <a href='/table/ref/$ref'>$ref</a><br>";
-  print "by $attribution<br>";
+  print "by <a href='/table/name/$attribution'>$attribution</a><br>";
   print "</p>\n";
 
   print "<span class='maplinks'>\n";
