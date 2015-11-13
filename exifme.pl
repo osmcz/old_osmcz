@@ -23,7 +23,7 @@ $ref = $ARGV[3];
 
 #print @output;
 
-&debuglog("params:",$i,$author,$new_location);
+&debuglog("params:",$i,$author,$new_location,$ref);
 
 @exiflat = grep(/^GPS Latitude/, @output);
 @exiflon = grep(/^GPS Longitude/, @output);
