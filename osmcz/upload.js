@@ -53,6 +53,8 @@ function upload_init()
     {
       type: 'png', getURL: upload_getTileURL,
       displayOutsideMaxExtent: true,
+      maxZoomLevel: 19,
+      numZoomLevels: 19,
       attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
     }
   );
@@ -64,7 +66,8 @@ function upload_init()
       isBaseLayer:false,
       layername: 'kctcz',
       opacity:0.6,
-      type: 'png', 
+      maxZoomLevel: 16,
+      type: 'png',
       getURL: upload_getTileURL,
       displayOutsideMaxExtent: true,
       attribution: '<a href="http://www.openstreetmap.cz/">OSM CZ</a>'

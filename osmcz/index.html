@@ -9,6 +9,13 @@
   <script type="text/javascript" src="OpenStreetMap.js"></script>
   <script type="text/javascript" src="osmcz.js"></script>
   <script type="text/javascript" src="json.js"></script>
+
+  <!--<script type="text/javascript" src="jquery-1.2.2.pack.js"></script>-->
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
   <link href='index.css' rel='stylesheet' type='text/css'>
   <link href="https://plus.google.com/101537650520682759804" rel="publisher" />
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -76,11 +83,23 @@ function init_page()
     //window.location = "http://map.openstreetmap.cz/map.html"
   }
   init();
+
+  $("#dialog").dialog({ 
+    autoOpen: false,
+    height: 600,
+    width: 600
+  });
+  $("#dialog").dialog({
+    resizeStop: function( event, ui ) {}
+  });
+  $("#opendialog").click(function() {
+    $("#dialog").dialog("open");
+  });
+
 }
 
 </script>
 
-<script type="text/javascript" src="jquery-1.2.2.pack.js"></script>
 <script type="text/javascript" src="animatedcollapse.js">
 /***********************************************
 * Animated Collapsible DIV v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
@@ -115,6 +134,9 @@ ddtabmenu.definemenu("ddtabs", 0)
 
 <BODY onload="init_page()" onunload="get_center()">
 
+<div id="dialog" title="Vlož rozcestník">
+<iframe src="guidepost.php?action=show_dialog" width="100%" height="95%">upload iframe</iframe>
+</div>
 
 <div id='loader' class='centered'>
 <p>Pracuji...<br><img src="img/loader.gif" alt="-"></p>
@@ -178,13 +200,15 @@ ddtabmenu.definemenu("ddtabs", 0)
 <h5>Naše Rozcestníky</h5>
 <ul>
 <li><span title="Zobrazí rozcestníky, které se fyzicky nachází v aktuálně vybraném výřezu mapy. Zároveň se vytvoří nová vrstva (+ vlevo nahoře na mapě)."><img src="img/icon-eye.png"> <a href="javascript:show_guideposts(1)">Ukaž rozcestníky na mapě</a></span>
-<li><img width="32px" height="32px" src="img/icon-add-location.png"> <a href="javascript:upbox_on()">Vložit obrázek rozcestníku</a>
+<!--<li><img width="32px" height="32px" src="img/icon-add-location.png"> <a href="javascript:upbox_on()">Vložit obrázek rozcestníku</a>-->
+<li><img width="32px" height="32px" src="img/icon-add-location.png"> <a href="#" id="opendialog">Vložit obrázek rozcestníku</a>
 <li><img width="32px" height="32px" src="img/android_robot.png"> <a href="android.html">Android</a><a href="https://play.google.com/store/apps/details?id=org.walley.guidepost"> aplikace pro nahrávání rozcestníků</a>
 <li><a href="http://api.openstreetmap.cz/table/leaderboard">Leaderboard</a>
 <li><a href="http://api.openstreetmap.cz/editor.html">Editor</a>
 </ul>
 
 <h5>Rozcestníky z Wikimedia Commons</h5>
+
 <ul>
 <li><a href="javascript:request_commons_all()">Zobraz všechny rozcestníky z Commons</a>
 

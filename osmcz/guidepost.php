@@ -107,7 +107,7 @@ function show_upload_dialog()
 $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 0,0";
 
   print "
-<div id='map' class='smallmap'></div>
+<div id='map' class='mapmap'></div>
 <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
   <input type='hidden' name='action' value='file' />
   <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
@@ -119,7 +119,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
     <label>exif </label><input type=checkbox id='exif_checkbox' onchange='exif_checkbox_action()'>
   </fieldset>
   <fieldset>
-    <label>Ref</label><input type='text' name='reg' value='' size='6'>
+    <label>Ref</label><input type='text' name='ref' value='' size='6'>
 <br>
     <input type='radio' name='gp_type' value='gp' checked>Rozcestník
     <input type='radio' name='gp_type' value='map'>Mapa
@@ -134,7 +134,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 </form>\n";
   print "<p id='upload_process'>Uploading...</p>\n";
   //set widht and height to display debug output
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:0px solid #fff;'></iframe>\n";
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:40px;border:1px solid #fff;'></iframe>\n";
 }
 
 
@@ -211,7 +211,8 @@ function show_iphone_upload_dialog()
 $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 0,0";
 
   print "
-<div id='map' class='smallmap'></div>
+    <div id='map' class='smallmap'></div>
+
 <form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
   <input type='hidden' name='action' value='file' />
   <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
@@ -281,6 +282,7 @@ function process_file()
     $ref = "none";
   }
 
+  printdebug("ref: ".$ref);
   printdebug("before lat:lon:author - $lat:$lon:$author");
 
   $author = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíé .]/', '', $author);
@@ -453,6 +455,7 @@ switch ($action) {
 
     if ($db) {
       $i = 0;
+      $result = array();
       $query = "select * from guidepost where lat < $maxlat and lat > $minlat and lon < $maxlon and lon > $minlon";
 
       printdebug("query " . $query);
