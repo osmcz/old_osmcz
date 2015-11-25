@@ -14,7 +14,7 @@
  
 .rows-per-page1 {
   display: inline-block !important;
-  background: url("images/page.png") no-repeat left center !important;
+  background: url("img/page.png") no-repeat left center !important;
   padding: 0px 0px 0px 20px !important;
   margin: 3px 10px 3px 10px !important;
   width: 30px;
@@ -24,7 +24,7 @@
  
 .goto-page1 {
   display: inline-block !important;
-  background: url("images/bullet_go.png") no-repeat left center !important;
+  background: url("img/bullet_go.png") no-repeat left center !important;
   padding: 0px 0px 0px 20px !important;
   margin: 3px 10px 3px 10px !important;
   width: 30px;
