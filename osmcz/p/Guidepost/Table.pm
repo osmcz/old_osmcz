@@ -4,7 +4,16 @@ use Apache2::Reload;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::URI ();
+
 use APR::URI ();
+use APR::Brigade ();
+use APR::Bucket ();
+use Apache2::Filter ();
+
+#use Apache2::Const -compile => qw(MODE_READBYTES);
+#use APR::Const    -compile => qw(SUCCESS BLOCK_READ);
+
+use constant IOBUFSIZE => 8192;
 use Apache2::Connection ();
 use Apache2::RequestRec ();
 
@@ -20,6 +29,8 @@ use Geo::JSON;
 use Geo::JSON::Point;
 use Geo::JSON::Feature;
 use Geo::JSON::FeatureCollection;
+
+use Sys::Syslog;                        # all except setlogsock()
 
 my $dbh;
 my $BBOX = 0;
@@ -75,6 +86,7 @@ sub parse_query_string
 ################################################################################
 {
   my $r = shift;
+
   %currargs = map { split("=",$_) } split(/&/, $r->args);
 
   #sanitize
@@ -84,6 +96,27 @@ sub parse_query_string
     } else {
       $currargs{$_} =~ s/[^A-Za-z0-9 ]//g;
     }
+  }
+}
+
+################################################################################
+sub parse_post_data
+################################################################################
+{
+  my $r = shift;
+
+  $raw_data = &read_post($r);
+
+  %post_data = map { split("=",$_) } split(/&/, $raw_data);
+
+  #sanitize
+  foreach (sort keys %post_data) {
+    if (lc $_ eq "bbox" ) {
+      $post_data{$_} =~ s/[^A-Za-z0-9,-]//g;
+    } else {
+      $post_data{$_} =~ s/[^A-Za-z0-9 ]//g;
+    }
+    syslog('info', "post " . $_ . "=" . $post_data{$_});
   }
 }
 
@@ -121,9 +154,23 @@ sub handler
 ################################################################################
 {
   my $r = shift;
+  openlog('guidepostapi', 'cons,pid', 'user');
+
+  syslog('info', 'start method:'. $r->method());
+
   $r->content_type('text/html');
   my $uri = $r->uri;      # what does the URI (URL) look like ?
   &parse_query_string($r);
+  &parse_post_data($r);
+
+#  my %post_data  = $r->content;
+
+#  $r->read($content, $r->headers_in('Content-length'));
+#  my (@pairs) = split(/[&;]/, $content);
+#  foreach my $pair (@pairs) {
+#    my ($parameter, $value) = split('=', $pair, 2);
+#    syslog('info', "$parameter has value $value<br>\n");
+#  }
 
   if (exists $currargs{bbox}) {
     &parse_bbox($currargs{bbox});
@@ -141,7 +188,9 @@ sub handler
 
   &connect_db();
 
-  my $query_string = $r->args;
+#  my $query_string = $r->args;
+#  my @param_names = $req->param;
+
   @uri_components = split("/", $uri);
 
   foreach $text (@uri_components) {
@@ -166,9 +215,11 @@ sub handler
     &show_by_ref($uri_components[3]);
   } elsif ($uri =~ "/table/name") {
     &show_by_name($uri_components[3]);
+  } elsif ($uri =~ "/table/setbyid") {
+    &set_by_id($r);
   }
 
-#    print Dumper(\%ENV);
+Dumper(\%ENV);
 #    connection_info($r->connection);
 
 #    $r->status = 200;       # All's ok, so set a "200 OK" status
@@ -366,6 +417,25 @@ sub leaderboard
 }
 
 ################################################################################
+sub init_inplace_edit()
+################################################################################
+{
+  my $url = "http://api.openstreetmap.cz/table/setbyid";
+
+  print "<script>\n";
+  print "  \$('.edit').editable('" . $url. "', {\n";
+  print "     indicator : 'Saving...',\n";
+  print "     cancel    : 'Cancel',\n";
+  print "     submit    : 'OK',\n";
+  print "     event     : 'mouseover',\n";
+  print "     width     : 100,\n";
+  print "     tooltip   : 'Click to edit...'\n";
+  print "  });\n";
+  print "console.log('ready!');";
+  print "</script>\n";
+}
+
+################################################################################
 sub gp_line()
 ################################################################################
 {
@@ -377,13 +447,23 @@ sub gp_line()
   print "<h2>$id</h2>";
   print "latitude: $lat<br>";
   print "longtitude: $lon<br>";
-  print "ref: <a href='/table/ref/$ref'>$ref</a><br>";
+
+  if ($ref eq "") {
+    $ref = "none";
+  }
+
+
+  print "<a title='Click to show only this ref' href='/table/ref/$ref'>ref</a>:";
+  print "<div style='xfloat:right' class='edit' id='editref_$id'>$ref</div>";
+
+  print "<br>";
+
   print "by <a href='/table/name/$attribution'>$attribution</a><br>";
   print "</p>\n";
 
   print "<span class='maplinks'>\n";
-  print "<ul>";
-  print "<li><a href='http://maps.yahoo.com/#mvt=m&lat=$lat&lon=$lon&mag=6&q1=$lat,$lon'>Yahoo</a>";
+  print "<ul>\n";
+#  print "<li><a href='http://maps.yahoo.com/#mvt=m&lat=$lat&lon=$lon&mag=6&q1=$lat,$lon'>Yahoo</a>";
   print "<li><a href='http://www.openstreetmap.org/?mlat=$lat&mlon=$lon&zoom=16#map=16/$lat/$lon'>OSM</a>";
   print "<li><a href='https://maps.google.com/maps?ll=$lat,$lon&q=loc:$lat,$lon&hl=en&t=m&z=16'>Google</a>";
   print "<li><a href='http://www.bing.com/maps/?v=2&cp=$lat~$lon&style=r&lvl=16'>Bing</a>";
@@ -402,6 +482,9 @@ sub gp_line()
   print "<img src='".$static_map."'/>";
   print "</span>\n";
   print "</div>\n";
+
+  &init_inplace_edit();
+
   print "<hr>\n";
 
 }
@@ -440,6 +523,41 @@ print '
 </body>
 </html>
 ';
+}
+
+################################################################################
+sub set_by_id()
+################################################################################
+{
+  my @p = shift;
+  foreach $i (@p) {
+    syslog('info', "set_by_id(" . $i .")");
+  }
+
+  @bbox = split("-", $b);
+}
+
+sub read_post()
+{
+  my $r = shift;
+  my $bb = APR::Brigade->new($r->pool, $r->connection->bucket_alloc);
+  my $data = '';
+  my $seen_eos = 0;
+  do {
+    $r->input_filters->get_brigade($bb, Apache2::Const::MODE_READBYTES, APR::Const::BLOCK_READ, IOBUFSIZE);
+    for (my $b = $bb->first; $b; $b = $bb->next($b)) {
+      if ($b->is_eos) {
+          $seen_eos++;
+        last;
+      }
+      if ($b->read(my $buf)) {
+        $data .= $buf;
+      }
+      $b->remove; # optimization to reuse memory
+    }
+  } while (!$seen_eos);
+  $bb->destroy;
+  return $data;
 }
 
 1;
