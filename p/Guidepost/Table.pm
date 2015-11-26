@@ -224,6 +224,9 @@ sub handler
     &show_by_name($uri_components[3]);
   } elsif ($uri =~ "/table/setbyid") {
     &set_by_id($post_data{id}, $post_data{value});
+  } elsif ($uri =~ "isedited") {
+  } elsif ($uri =~ "/table/review") {
+    &review_form();
   }
 
 #Dumper(\%ENV);
@@ -593,6 +596,21 @@ sub read_post()
   } while (!$seen_eos);
   $bb->destroy;
   return $data;
+}
+
+################################################################################
+sub review_form
+################################################################################
+{
+  my $query = "select * from changes";
+  $res = $dbh->selectall_arrayref($query);
+  print $DBI::errstr;
+
+  foreach my $row (@$res) {
+    my ($id, $col, $value) = @$row;
+    print "$id, $col, $value <br>";
+  }
+
 }
 
 1;
