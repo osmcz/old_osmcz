@@ -226,7 +226,7 @@ sub handler
     &set_by_id($post_data{id}, $post_data{value});
   } elsif ($uri =~ "isedited") {
     #/isedited/ref/id
-    &show_by_name($uri_components[3], $uri_components[4]);
+    &is_edited($uri_components[3], $uri_components[4]);
   } elsif ($uri =~ "/table/review") {
     &review_form();
   }
@@ -624,9 +624,9 @@ sub is_edited
   @out = $dbh->selectrow_array($query);
   print $DBI::errstr;
   if ($out[0] > 0) {
-    print "zero";
+    print $out[0]."edited";
   } else {
-    print "edit";
+    print "zero";
   }
 
 }
