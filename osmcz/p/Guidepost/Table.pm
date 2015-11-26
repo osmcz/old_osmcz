@@ -225,6 +225,8 @@ sub handler
   } elsif ($uri =~ "/table/setbyid") {
     &set_by_id($post_data{id}, $post_data{value});
   } elsif ($uri =~ "isedited") {
+    #/isedited/ref/id
+    &show_by_name($uri_components[3], $uri_components[4]);
   } elsif ($uri =~ "/table/review") {
     &review_form();
   }
@@ -609,6 +611,22 @@ sub review_form
   foreach my $row (@$res) {
     my ($id, $col, $value) = @$row;
     print "$id, $col, $value <br>";
+  }
+
+}
+
+################################################################################
+sub is_edited
+################################################################################
+{
+  my ($what, $id) = @_;
+  my $query = "select count() from changes where id=$id and col='$what'";
+  @out = $dbh->selectrow_array($query);
+  print $DBI::errstr;
+  if ($out[0] > 0) {
+    print "zero";
+  } else {
+    print "edit";
   }
 
 }
