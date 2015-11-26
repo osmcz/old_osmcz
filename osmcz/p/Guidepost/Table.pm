@@ -31,6 +31,7 @@ use Geo::JSON::Feature;
 use Geo::JSON::FeatureCollection;
 
 use Sys::Syslog;                        # all except setlogsock()
+use HTML::Entities;
 
 my $dbh;
 my $BBOX = 0;
@@ -40,7 +41,9 @@ my $maxlon;
 my $maxlat;
 
 
+################################################################################
 sub connection_info
+################################################################################
 {
   my ($c) = @_;
   print $c->id();
@@ -53,7 +56,9 @@ sub connection_info
   print $c->remote_ip();
 }
 
+################################################################################
 sub rrr
+################################################################################
 {
    $parsed_uri = $r->parsed_uri();
 
@@ -69,7 +74,9 @@ sub rrr
     print "<hr>\n";
  }
 
+################################################################################
 sub say_goodbye
+################################################################################
 {
   my $r = shift;
   print $r->args;
@@ -105,18 +112,18 @@ sub parse_post_data
 {
   my $r = shift;
 
-  $raw_data = &read_post($r);
+  $raw_data = decode_entities(&read_post($r));
 
   %post_data = map { split("=",$_) } split(/&/, $raw_data);
 
   #sanitize
   foreach (sort keys %post_data) {
-    if (lc $_ eq "bbox" ) {
-      $post_data{$_} =~ s/[^A-Za-z0-9,-]//g;
+    if (lc $_ eq "id" ) {
+      $post_data{$_} =~ s/[^A-Za-z0-9_]//g;
     } else {
       $post_data{$_} =~ s/[^A-Za-z0-9 ]//g;
     }
-    syslog('info', "post " . $_ . "=" . $post_data{$_});
+    syslog('info', "postdata " . $_ . "=" . $post_data{$_});
   }
 }
 
@@ -127,7 +134,7 @@ sub connect_db
   my $dbfile = '/var/www/mapy/guidepost';
   $dbh = DBI->connect( "dbi:SQLite:$dbfile" );
   if (!$dbh) {
-    &debuglog("db failed","Cannot connect: ".$DBI::errstr);
+#    &debuglog("db failed","Cannot connect: ".$DBI::errstr);
     die;
   }
 }
@@ -216,10 +223,10 @@ sub handler
   } elsif ($uri =~ "/table/name") {
     &show_by_name($uri_components[3]);
   } elsif ($uri =~ "/table/setbyid") {
-    &set_by_id($r);
+    &set_by_id($post_data{id}, $post_data{value});
   }
 
-Dumper(\%ENV);
+#Dumper(\%ENV);
 #    connection_info($r->connection);
 
 #    $r->status = 200;       # All's ok, so set a "200 OK" status
@@ -321,13 +328,12 @@ sub output_geojson
 
   foreach my $row (@$res) {
     my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
-
-  my $fixed_lat = looks_like_number($lat) ? $lat : 0;
-  my $fixed_lon = looks_like_number($lon) ? $lon : 0;
+    my $fixed_lat = looks_like_number($lat) ? $lat : 0;
+    my $fixed_lon = looks_like_number($lon) ? $lon : 0;
 
     $pt = Geo::JSON::Point->new({
       coordinates => [$fixed_lon, $fixed_lat],
-    properties => ["prop0", "value0"],
+      properties => ["prop0", "value0"],
     });
 
     my %properties = (
@@ -345,11 +351,11 @@ sub output_geojson
   }
 
 
-my $fcol = Geo::JSON::FeatureCollection->new({
+  my $fcol = Geo::JSON::FeatureCollection->new({
      features => \@feature_objects,
-});
+  });
 
-print $fcol->to_json."\n";
+  print $fcol->to_json."\n";
 }
 
 
@@ -435,6 +441,24 @@ sub init_inplace_edit()
   print "</script>\n";
 }
 
+sub show_table_row()
+{
+
+  my ($p1, $p2) = @_;
+
+print "
+  <div class='Row'>
+    <div class='Cell'>
+      <p>$p1</p>
+    </div>
+    <div class='Cell'>
+       <p>$p2</p>
+    </div>
+  </div>
+";
+
+}
+
 ################################################################################
 sub gp_line()
 ################################################################################
@@ -444,21 +468,25 @@ sub gp_line()
   print "<hr>\n";
   print "<div class='gp_line'>\n";
   print "<p class='location'>\n";
-  print "<h2>$id</h2>";
-  print "latitude: $lat<br>";
-  print "longtitude: $lon<br>";
+  print "<h2 style='float:left;'>$id</h2>";
+
+  print "<div class='Table'>";
+
+  &show_table_row("latitude", $lat);
+  &show_table_row("longtitude", $lon);
 
   if ($ref eq "") {
     $ref = "none";
   }
 
+  &show_table_row(
+    "<a title='Click to show only this ref' href='/table/ref/$ref'>ref</a>:",
+    "<div class='edit' id='ref_$id'>$ref</div>"
+  );
 
-  print "<a title='Click to show only this ref' href='/table/ref/$ref'>ref</a>:";
-  print "<div style='xfloat:right' class='edit' id='editref_$id'>$ref</div>";
+  &show_table_row("by", "<a href='/table/name/$attribution'>$attribution</a>");
 
-  print "<br>";
-
-  print "by <a href='/table/name/$attribution'>$attribution</a><br>";
+  print "</div>";
   print "</p>\n";
 
   print "<span class='maplinks'>\n";
@@ -468,6 +496,7 @@ sub gp_line()
   print "<li><a href='https://maps.google.com/maps?ll=$lat,$lon&q=loc:$lat,$lon&hl=en&t=m&z=16'>Google</a>";
   print "<li><a href='http://www.bing.com/maps/?v=2&cp=$lat~$lon&style=r&lvl=16'>Bing</a>";
   print "<li><a href='http://www.mapy.cz/?st=search&fr=loc:".$lat."N ".$lon."E'>Mapy.cz</a>";
+  print "<li><a href='http://mapy.idnes.cz/#pos=".$lat."P".$lon."P13'>idnes.cz</a>";
   print "</ul>\n";
   print "</span>\n";
 
@@ -529,15 +558,21 @@ print '
 sub set_by_id()
 ################################################################################
 {
-  my @p = shift;
-  foreach $i (@p) {
-    syslog('info', "set_by_id(" . $i .")");
-  }
-
-  @bbox = split("-", $b);
+  my ($id, $val) = @_;
+  syslog('info', "$id, $val");
+  my @data = split("_", $id);
+  $db_id = $data[1];
+  $db_col = $data[0];
+  $val =~ s/[^A-Za-z0-9óěščřžýáíéůúĚŘČŽÁÉŠŇŤÁÍÝÓťľ]//g;
+  $query = "insert into changes (id, col, value) values ($db_id, '$db_col', '$val')";
+  syslog('info', $query);
+  my $sth = $dbh->prepare($query);
+  my $rv = $sth->execute() or die $DBI::errstr;
 }
 
+################################################################################
 sub read_post()
+################################################################################
 {
   my $r = shift;
   my $bb = APR::Brigade->new($r->pool, $r->connection->bucket_alloc);
