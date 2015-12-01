@@ -227,6 +227,8 @@ sub handler
   } elsif ($uri =~ "isedited") {
     #/isedited/ref/id
     &is_edited($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "/table/approve") {
+  } elsif ($uri =~ "/table/reject") {
   } elsif ($uri =~ "/table/review") {
     &review_form();
   }
@@ -446,22 +448,66 @@ sub init_inplace_edit()
   print "</script>\n";
 }
 
+################################################################################
 sub show_table_row()
+################################################################################
 {
 
-  my ($p1, $p2) = @_;
+  my ($p1, $p2, $id, $col) = @_;
 
-print "
+  my $out = "<!-- table row -->";
+  $out .= "
   <div class='Row'>
     <div class='Cell'>
-      <p>$p1</p>
+      <span>$p1</span>
     </div>
     <div class='Cell'>
-       <p>$p2</p>
+       <span>$p2</span>
+    </div>
+    <div class='Cell'>
+      <div id='edited" . $col . $id . "'>checking ...</div>
     </div>
   </div>
-";
+  ";
+  return $out;
+}
 
+
+################################################################################
+sub maplinks()
+################################################################################
+{
+  my $out = "<!-- maplinks -->";
+  $out .=  "<span class='maplinks'>\n";
+  $out .=  "<ul>\n";
+#  $out .=  "<li><a href='http://maps.yahoo.com/#mvt=m&lat=$lat&lon=$lon&mag=6&q1=$lat,$lon'>Yahoo</a>";
+  $out .=  "<li><a href='http://www.openstreetmap.org/?mlat=$lat&mlon=$lon&zoom=16#map=16/$lat/$lon'>OSM</a>";
+  $out .=  "<li><a href='https://maps.google.com/maps?ll=$lat,$lon&q=loc:$lat,$lon&hl=en&t=m&z=16'>Google</a>";
+  $out .=  "<li><a href='http://www.bing.com/maps/?v=2&cp=$lat~$lon&style=r&lvl=16'>Bing</a>";
+  $out .=  "<li><a href='http://www.mapy.cz/?st=search&fr=loc:".$lat."N ".$lon."E'>Mapy.cz</a>";
+  $out .=  "<li><a href='http://mapy.idnes.cz/#pos=".$lat."P".$lon."P13'>idnes.cz</a>";
+  $out .=  "</ul>\n";
+  $out .=  "</span>\n";
+  
+  return $out;
+}
+
+
+################################################################################
+sub static_map()
+################################################################################
+{
+  my ($lat, $lon) = @_;
+  my $out = "<!-- static map -->";
+  
+  $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=15&size=200,200&type=map&imagetype=png&pois=";
+#  $out .=  "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
+
+  $out .=  "<span class='staticmap'>\n";
+  $out .=  "<img src='".$static_map."'/>";
+  $out .=  "</span>\n";
+
+  return $out;
 }
 
 ################################################################################
@@ -470,52 +516,58 @@ sub gp_line()
 {
   my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @_;
 
+  my $out = "<!-- GP LINE -->";
+
   print "<hr>\n";
   print "<div class='gp_line'>\n";
   print "<p class='location'>\n";
   print "<h2 style='float:left;'>$id</h2>";
 
-  print "<div class='Table'>";
-
-  &show_table_row("latitude", $lat);
-  &show_table_row("longtitude", $lon);
-
   if ($ref eq "") {
     $ref = "none";
   }
 
-  &show_table_row(
+  print "<div class='Table'>";
+
+  $out .= &show_table_row("latitude", $lat, $id, "lat");
+  $out .= &show_table_row("longtitude", $lon, $id, "lon");
+  $out .= &show_table_row(
     "<a title='Click to show only this ref' href='/table/ref/$ref'>ref</a>:",
-    "<div class='edit' id='ref_$id'>$ref</div>"
+    "<div class='edit' id='ref_$id'>$ref</div>",
+    $id, "ref"
+  );
+  $out .= &show_table_row(
+   "<a href='/table/name/$attribution'>by</a>",
+   "<div class='edit' id='attribution_$id'>$attribution</div>",
+   $id, "attribution"
   );
 
-  &show_table_row("by", "<a href='/table/name/$attribution'>$attribution</a>");
+  $out .= "</div>";
+  $out .= "</p>\n";
 
-  print "</div>";
-  print "</p>\n";
+  @attrs= ("lat", "lon", "ref", "attribution");
 
-  print "<span class='maplinks'>\n";
-  print "<ul>\n";
-#  print "<li><a href='http://maps.yahoo.com/#mvt=m&lat=$lat&lon=$lon&mag=6&q1=$lat,$lon'>Yahoo</a>";
-  print "<li><a href='http://www.openstreetmap.org/?mlat=$lat&mlon=$lon&zoom=16#map=16/$lat/$lon'>OSM</a>";
-  print "<li><a href='https://maps.google.com/maps?ll=$lat,$lon&q=loc:$lat,$lon&hl=en&t=m&z=16'>Google</a>";
-  print "<li><a href='http://www.bing.com/maps/?v=2&cp=$lat~$lon&style=r&lvl=16'>Bing</a>";
-  print "<li><a href='http://www.mapy.cz/?st=search&fr=loc:".$lat."N ".$lon."E'>Mapy.cz</a>";
-  print "<li><a href='http://mapy.idnes.cz/#pos=".$lat."P".$lon."P13'>idnes.cz</a>";
-  print "</ul>\n";
-  print "</span>\n";
+  $out .= "<script>";
+  foreach $col (@attrs) {
+    $out .= "    \$('#edited" . $col . $id . "').load('http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "');";
+  }
+  $out .= "  </script>";
+
+
+  $out .= &maplinks();
 
   $full_uri = "http://api.openstreetmap.cz/".$url;
-  print "<p class='image'>\n";
-  print "<a href='$full_uri'><img src='$full_uri' height='150px'><br>$name</a>";
-  print "</p>\n";
-  print "<span class='staticmap'>\n";
+  $out .= "<p class='image'>\n";
+  $out .= "<a href='$full_uri'><img src='$full_uri' height='150px'><br>$name</a>";
+  $out .= "</p>\n";
 
-  $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=14&size=200,200&type=map&imagetype=png&pois=";
-#  print "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
-  print "<img src='".$static_map."'/>";
-  print "</span>\n";
-  print "</div>\n";
+  $out .= &static_map($lat, $lon);
+
+  $out .= "</div>\n";
+
+  syslog('info', $out);
+
+  print $out;
 
   &init_inplace_edit();
 
@@ -538,13 +590,22 @@ sub get_gp_count
 sub page_header()
 ################################################################################
 {
+@scripts = shift;
 print '
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>openstreetmap.cz guidepost editor</title>
-</head>
+';
+
+  foreach $i (@scripts) {
+    print "  <script type='text/javascript' src='";
+    print $i;
+    print "'></script>\n";
+  }
+
+print '</head>
 <body>
 ';
 }
@@ -600,19 +661,64 @@ sub read_post()
   return $data;
 }
 
+
+################################################################################
+sub review_entry
+################################################################################
+{
+  my ($id, $col, $value) = @_;
+
+  print "<div>";
+  print "$id, $col, $value <br>";
+  print "<form>";
+  print "<button onclick='javascript:reject(".$id.")' > reject </button>";
+  print "<button onclick='javascript:approve(".$id.")'> approve </button>";
+  print "</form>";
+  print "</div>";
+}
+
 ################################################################################
 sub review_form
 ################################################################################
 {
+
   my $query = "select * from changes";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
+  &page_header(("http://code.jquery.com/jquery-2.1.4.min.js"));
+
+print "<script>";
+print "
+function approve(id)
+{
+alert('a'+id);
+\$.get( 'ajax/test.html', function(data) {
+  alert( 'Load was performed.'+data );
+})
+  .done(function() {
+    alert( 'second success' );
+  })
+  .fail(function() {
+    alert( 'error' );
+  })
+  .always(function() {
+    alert( 'finished' );
+  });
+}
+
+function reject(id)
+{
+alert('r'+id);
+}
+
+";
+print "</script>";
+
   foreach my $row (@$res) {
     my ($id, $col, $value) = @$row;
-    print "$id, $col, $value <br>";
+    &review_entry($id, $col, $value);
   }
-
 }
 
 ################################################################################
@@ -628,7 +734,6 @@ sub is_edited
   } else {
     print "zero";
   }
-
 }
 
 1;
