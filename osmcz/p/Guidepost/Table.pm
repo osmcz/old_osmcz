@@ -228,7 +228,9 @@ sub handler
     #/isedited/ref/id
     &is_edited($uri_components[3], $uri_components[4]);
   } elsif ($uri =~ "/table/approve") {
+    print "OK";
   } elsif ($uri =~ "/table/reject") {
+    print "OK";
   } elsif ($uri =~ "/table/review") {
     &review_form();
   }
@@ -590,7 +592,7 @@ sub get_gp_count
 sub page_header()
 ################################################################################
 {
-@scripts = shift;
+@scripts = @_;
 print '
 <!doctype html>
 <html lang="en">
@@ -666,15 +668,20 @@ sub read_post()
 sub review_entry
 ################################################################################
 {
-  my ($id, $col, $value) = @_;
+  my ($req_id, $id, $col, $value, $img) = @_;
 
   print "<div>";
-  print "$id, $col, $value <br>";
-  print "<form>";
+  print "object id:$id  column: $col  value: $value <br>";
+  print "<img id='wheelzoom$req_id' src='http://api.openstreetmap.cz/img/guidepost/$img' width='555' height='320' alt='mapic'>";
   print "<button onclick='javascript:reject(".$id.")' > reject </button>";
   print "<button onclick='javascript:approve(".$id.")'> approve </button>";
-  print "</form>";
+
+#  print "<script>";
+#  print "wheelzoom(document.querySelector('img.wheelzoom'));";
+#  print "wheelzoom(document.querySelectorAll('img'));";
+#  print "</script>\n";
   print "</div>";
+  print "<hr>\n";
 }
 
 ################################################################################
@@ -682,20 +689,21 @@ sub review_form
 ################################################################################
 {
 
-  my $query = "select * from changes";
+  my $query = "select guidepost.name, changes.id, changes.col, changes.value from changes, guidepost where changes.id=guidepost.id";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
-
-  &page_header(("http://code.jquery.com/jquery-2.1.4.min.js"));
+#http://code.jquery.com/jquery-1.11.3.min.js
+#http://code.jquery.com/jquery-2.1.4.min.js
+  &page_header(("http://code.jquery.com/jquery-1.11.3.min.js", "http://api.openstreetmap.cz/wheelzoom.js"));
 
 print "<script>";
 print "
 function approve(id)
 {
-alert('a'+id);
-\$.get( 'ajax/test.html', function(data) {
-  alert( 'Load was performed.'+data );
-})
+  alert('a'+id);
+  \$.ajax( 'table/approve', function(data) {
+    alert( 'Load was performed.'+data );
+  })
   .done(function() {
     alert( 'second success' );
   })
@@ -710,15 +718,35 @@ alert('a'+id);
 function reject(id)
 {
 alert('r'+id);
+  \$.ajax( 'http://api.openstreetmap.cz/table/reject', function(data) {
+    alert( 'Load was performed.'+data );
+  })
+  .done(function() {
+    alert( 'second success' );
+  })
+  .fail(function() {
+    alert( 'error' );
+  })
+  .always(function() {
+    alert( 'finished' );
+  });
 }
 
 ";
 print "</script>";
 
+my $req_id = 0;
   foreach my $row (@$res) {
-    my ($id, $col, $value) = @$row;
-    &review_entry($id, $col, $value);
+    my ($img, $id, $col, $value) = @$row;
+    &review_entry($req_id++, $id, $col, $value, $img);
   }
+
+  print "<script>";
+#  print "wheelzoom(document.querySelector('img.wheelzoom'));";
+  print "wheelzoom(document.querySelectorAll('img'));";
+  print "</script>\n";
+
+  &page_footer();
 }
 
 ################################################################################
