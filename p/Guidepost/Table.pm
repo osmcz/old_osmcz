@@ -231,6 +231,7 @@ sub handler
     print "OK";
   } elsif ($uri =~ "/table/reject") {
     print "OK";
+    &reject_edit($uri_components[3]);
   } elsif ($uri =~ "/table/review") {
     &review_form();
   }
@@ -718,7 +719,7 @@ function approve(id)
 function reject(id)
 {
 alert('r'+id);
-  \$.ajax( 'http://api.openstreetmap.cz/table/reject', function(data) {
+  \$.ajax( 'http://api.openstreetmap.cz/table/reject/' + id, function(data) {
     alert( 'Load was performed.'+data );
   })
   .done(function() {
@@ -762,6 +763,19 @@ sub is_edited
   } else {
     print "zero";
   }
+}
+
+################################################################################
+sub reject_edit
+################################################################################
+{
+  my ($id) = @_;
+  my $query = "delete from changes where id=$id";
+
+  syslog('info', "removing change id: " . $id);
+
+  $rv  = $dbh->do($query) or return $dbh->errstr;
+  return "OK $id removed";
 }
 
 1;
