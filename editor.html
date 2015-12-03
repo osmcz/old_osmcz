@@ -130,14 +130,6 @@ function paginator()
   });
 //  $("#result").html('Current page : ' + $("#demo_pag1").jui_pagination('getOption', 'currentPage'));
 
-  $('.edit').editable('http://www.example.com/save.php', {
-     indicator : 'Saving...',
-     cancel    : 'Cancel',
-     submit    : 'OK',
-     event     : "mouseover",
-     tooltip   : 'Click to edit...'
-  });
-
   });
 }
 </script>
@@ -145,11 +137,6 @@ function paginator()
 </head>
 
 <body>
-<div id="test">nic</div>
-<hr>
-<script>
-$("#test").load('http://api.openstreetmap.cz/table/isedited/ref/10');
-</script>
 
 <script>
   gp_count = $.ajax({

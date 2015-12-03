@@ -633,7 +633,7 @@ sub set_by_id()
   $db_id = $data[1];
   $db_col = $data[0];
   $val =~ s/[^A-Za-z0-9óěščřžýáíéůúĚŘČŽÁÉŠŇŤÁÍÝÓťľ]//g;
-  $query = "insert into changes (id, col, value) values ($db_id, '$db_col', '$val')";
+  $query = "insert into changes (gp_id, col, value) values ($db_id, '$db_col', '$val')";
   syslog('info', $query);
   my $sth = $dbh->prepare($query);
   my $rv = $sth->execute() or die $DBI::errstr;
@@ -669,20 +669,37 @@ sub read_post()
 sub review_entry
 ################################################################################
 {
-  my ($req_id, $id, $col, $value, $img) = @_;
+  my ($req_id, $id, $gp_id, $col, $value, $img) = @_;
 
-  print "<div>";
-  print "object id:$id  column: $col  value: $value <br>";
-  print "<img id='wheelzoom$req_id' src='http://api.openstreetmap.cz/img/guidepost/$img' width='555' height='320' alt='mapic'>";
+  $original = &get_gp_column_value($gp_id, $col);
+
+  print "<div id='reviewdiv$req_id'>";
+  print "<table>";
+  print "<tr>";
+  print "<td>change id:$id";
+  print "<td>guidepost id:$gp_id";
+  print "<td>column: $col";
+  print "<td>original value: $original";
+  print "<td>value: $value";
+  print "</tr>";
+  print "<table>";
+
+  print "<img id='wheelzoom$req_id' src='http://api.openstreetmap.cz/img/guidepost/$img' width='320' height='200' alt='mapic'>";
   print "<button onclick='javascript:reject(".$id.")' > reject </button>";
   print "<button onclick='javascript:approve(".$id.")'> approve </button>";
 
-#  print "<script>";
-#  print "wheelzoom(document.querySelector('img.wheelzoom'));";
-#  print "wheelzoom(document.querySelectorAll('img'));";
-#  print "</script>\n";
   print "</div>";
   print "<hr>\n";
+}
+
+################################################################################
+sub get_gp_column_value
+################################################################################
+{
+  ($id, $column) = @_;
+  $query = "select $column from guidepost where id=$id";
+  @res = $dbh->selectrow_array($query) or return "db error error";
+  return $res[0];
 }
 
 ################################################################################
@@ -690,56 +707,53 @@ sub review_form
 ################################################################################
 {
 
-  my $query = "select guidepost.name, changes.id, changes.col, changes.value from changes, guidepost where changes.id=guidepost.id";
+  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value from changes, guidepost where changes.gp_id=guidepost.id";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 #http://code.jquery.com/jquery-1.11.3.min.js
 #http://code.jquery.com/jquery-2.1.4.min.js
   &page_header(("http://code.jquery.com/jquery-1.11.3.min.js", "http://api.openstreetmap.cz/wheelzoom.js"));
 
-print "<script>";
-print "
+  print "<script>";
+  print "
 function approve(id)
 {
-  alert('a'+id);
-  \$.ajax( 'table/approve', function(data) {
-    alert( 'Load was performed.'+data );
+  \$.ajax( 'http://api.openstreetmap.cz/table/approve/' + id, function(data) {
+    alert( 'Load was performed.' + data );
   })
   .done(function() {
-    alert( 'second success' );
   })
   .fail(function() {
     alert( 'error' );
   })
   .always(function() {
-    alert( 'finished' );
   });
 }
 
 function reject(id)
 {
-alert('r'+id);
   \$.ajax( 'http://api.openstreetmap.cz/table/reject/' + id, function(data) {
     alert( 'Load was performed.'+data );
   })
   .done(function() {
-    alert( 'second success' );
   })
   .fail(function() {
     alert( 'error' );
   })
   .always(function() {
-    alert( 'finished' );
   });
 }
 
 ";
-print "</script>";
 
-my $req_id = 0;
+  print "</script>";
+
+  print "<h1>Review</h1>\n";
+
+  my $req_id = 0;
   foreach my $row (@$res) {
-    my ($img, $id, $col, $value) = @$row;
-    &review_entry($req_id++, $id, $col, $value, $img);
+    my ($img, $id, $gp_id, $col, $value) = @$row;
+    &review_entry($req_id++, $id, $gp_id, $col, $value, $img);
   }
 
   print "<script>";
@@ -755,13 +769,13 @@ sub is_edited
 ################################################################################
 {
   my ($what, $id) = @_;
-  my $query = "select count() from changes where id=$id and col='$what'";
+  my $query = "select count() from changes where gp_id=$id and col='$what'";
   @out = $dbh->selectrow_array($query);
   print $DBI::errstr;
   if ($out[0] > 0) {
-    print $out[0]."edited";
+    print " edited " . $out[0] . "x";
   } else {
-    print "zero";
+    print "";
   }
 }
 
@@ -784,9 +798,20 @@ sub approve_edit
 {
   my ($id) = @_;
 
-  my $query = "delete from changes where id=$id";
+  syslog('info', "accepting change id: " . $id);
+
+  my $query = "select * from changes where id=$id";
+  syslog('info', "0 " . $query);
+  @res = $dbh->selectrow_array($query) or return $DBI::errstr;
+  ($xid, $gp_id, $col, $value) = @res;
+
+  my $query = "update guidepost set $col='$value' where id=$gp_id";
+  syslog('info', "1 " . $query);
+  $rv  = $dbh->do($query) or return $dbh->errstr;
 
   my $query = "delete from changes where id=$id";
+  syslog('info', "2 " . $query);
+  $rv  = $dbh->do($query) or return $dbh->errstr;
 
   return "OK $id changed";
 }
