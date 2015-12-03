@@ -228,9 +228,8 @@ sub handler
     #/isedited/ref/id
     &is_edited($uri_components[3], $uri_components[4]);
   } elsif ($uri =~ "/table/approve") {
-    print "OK";
+    &approve_edit($uri_components[3]);
   } elsif ($uri =~ "/table/reject") {
-    print "OK";
     &reject_edit($uri_components[3]);
   } elsif ($uri =~ "/table/review") {
     &review_form();
@@ -480,6 +479,7 @@ sub show_table_row()
 sub maplinks()
 ################################################################################
 {
+  my ($lat, $lon) = @_;
   my $out = "<!-- maplinks -->";
   $out .=  "<span class='maplinks'>\n";
   $out .=  "<ul>\n";
@@ -557,7 +557,7 @@ sub gp_line()
   $out .= "  </script>";
 
 
-  $out .= &maplinks();
+  $out .= &maplinks($lat, $lon);
 
   $full_uri = "http://api.openstreetmap.cz/".$url;
   $out .= "<p class='image'>\n";
@@ -776,6 +776,19 @@ sub reject_edit
 
   $rv  = $dbh->do($query) or return $dbh->errstr;
   return "OK $id removed";
+}
+
+################################################################################
+sub approve_edit
+################################################################################
+{
+  my ($id) = @_;
+
+  my $query = "delete from changes where id=$id";
+
+  my $query = "delete from changes where id=$id";
+
+  return "OK $id changed";
 }
 
 1;
