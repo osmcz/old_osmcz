@@ -170,15 +170,6 @@ sub handler
   &parse_query_string($r);
   &parse_post_data($r);
 
-#  my %post_data  = $r->content;
-
-#  $r->read($content, $r->headers_in('Content-length'));
-#  my (@pairs) = split(/[&;]/, $content);
-#  foreach my $pair (@pairs) {
-#    my ($parameter, $value) = split('=', $pair, 2);
-#    syslog('info', "$parameter has value $value<br>\n");
-#  }
-
   if (exists $currargs{bbox}) {
     &parse_bbox($currargs{bbox});
   }
@@ -194,9 +185,6 @@ sub handler
   }
 
   &connect_db();
-
-#  my $query_string = $r->args;
-#  my @param_names = $req->param;
 
   @uri_components = split("/", $uri);
 
@@ -304,10 +292,8 @@ sub output_html
 {
   my ($query) = @_;
 
-  print "query $query";
+  &page_header();
 
-#  &connect_db();
-#  my $query = "select * from guidepost where attribution='$name'";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
@@ -316,6 +302,8 @@ sub output_html
     &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
     print "\n";
   }
+
+  &page_footer();
 }
 
 ################################################################################
@@ -378,10 +366,7 @@ sub table_get
   my $to_gp = looks_like_number($pt) ? $pt : 0;
   print "<h1>from ($pf $pt) ($from_gp) ($to_gp)</h1><hr>";
 
-#  &connect_db();
-
   my $query = "select * from guidepost LIMIT " . ($to_gp - $from_gp) . " OFFSET $from_gp";
-#  print $query;
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 
@@ -446,7 +431,6 @@ sub init_inplace_edit()
   print "     width     : 100,\n";
   print "     tooltip   : 'Click to edit...'\n";
   print "  });\n";
-  print "console.log('ready!');";
   print "</script>\n";
 }
 
@@ -540,8 +524,13 @@ sub gp_line()
     $id, "ref"
   );
   $out .= &show_table_row(
-   "<a href='/table/name/$attribution'>by</a>",
+   "<a title='Click to show only this name' href='/table/name/$attribution'>by</a>:",
    "<div class='edit' id='attribution_$id'>$attribution</div>",
+   $id, "attribution"
+  );
+  $out .= &show_table_row(
+   "<a title='Click to show only this note' href='/table/tbd'>Note:</a>:",
+   "<div class='edit' id='attribution_$id'>TBD</div>",
    $id, "attribution"
   );
 
@@ -599,6 +588,7 @@ print '
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="http://api.openstreetmap.cz/editor.css"/>
   <title>openstreetmap.cz guidepost editor</title>
 ';
 
@@ -682,11 +672,12 @@ sub review_entry
   print "<td>original value: $original";
   print "<td>value: $value";
   print "</tr>";
-  print "<table>";
+  print "</table>\n";
 
   print "<img id='wheelzoom$req_id' src='http://api.openstreetmap.cz/img/guidepost/$img' width='320' height='200' alt='mapic'>";
-  print "<button onclick='javascript:reject(".$id.")' > reject </button>";
-  print "<button onclick='javascript:approve(".$id.")'> approve </button>";
+  print "<button onclick='javascript:reject(".$id."," . $req_id . ")' > reject </button>";
+  print "<button onclick='javascript:approve(".$id."," . $req_id . ")'> approve </button>";
+  print "\n";
 
   print "</div>";
   print "<hr>\n";
@@ -716,12 +707,13 @@ sub review_form
 
   print "<script>";
   print "
-function approve(id)
+function approve(id,divid)
 {
   \$.ajax( 'http://api.openstreetmap.cz/table/approve/' + id, function(data) {
     alert( 'Load was performed.' + data );
   })
   .done(function() {
+  \$('#reviewdiv'+divid).css('background-color', 'lightgreen');
   })
   .fail(function() {
     alert( 'error' );
@@ -730,7 +722,7 @@ function approve(id)
   });
 }
 
-function reject(id)
+function reject(id,divid)
 {
   \$.ajax( 'http://api.openstreetmap.cz/table/reject/' + id, function(data) {
     alert( 'Load was performed.'+data );
@@ -748,7 +740,7 @@ function reject(id)
 
   print "</script>";
 
-  print "<h1>Review</h1>\n";
+  print "\n<h1>Review</h1>\n";
 
   my $req_id = 0;
   foreach my $row (@$res) {
