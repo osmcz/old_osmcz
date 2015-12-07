@@ -88,6 +88,15 @@ sub say_goodbye
   }
 }
 
+sub smartdecode
+{
+  use URI::Escape qw( uri_unescape );
+  use utf8;
+  my $x = my $y = uri_unescape($_[0]);
+  return $x if utf8::decode($x);
+  return $y;
+}
+
 ################################################################################
 sub parse_query_string
 ################################################################################
@@ -103,6 +112,7 @@ sub parse_query_string
     } else {
       $currargs{$_} =~ s/[^A-Za-z0-9 ]//g;
     }
+    syslog('info', "getdata " . $_ . "=" . $currargs{$_});
   }
 }
 
@@ -118,8 +128,18 @@ sub parse_post_data
 
   #sanitize
   foreach (sort keys %post_data) {
+    syslog('info', "postdata before " . $_ . "=" . $post_data{$_});
+    $post_data{$_} = &smartdecode($post_data{$_});
+    $post_data{$_} =~ s/\+/ /g;
+    $post_data{$_} =~ s/\%2F/\//g;
+    $post_data{$_} =~ s/\%2C/,/g;
+    syslog('info', "postdata after decode " . $_ . "=" . $post_data{$_});
+
     if (lc $_ eq "id" ) {
-      $post_data{$_} =~ s/[^A-Za-z0-9_]//g;
+      $post_data{$_} =~ s/[^A-Za-z0-9_\/]//g;
+    } elsif (lc $_ eq "value" ) {
+      syslog('info',"value");
+      $post_data{$_} =~ s/[^A-Za-z0-9_ \p{IsLatin}\/,]//g;
     } else {
       $post_data{$_} =~ s/[^A-Za-z0-9 ]//g;
     }
@@ -292,7 +312,11 @@ sub output_html
 {
   my ($query) = @_;
 
-  &page_header();
+  &page_header((
+    "http://code.jquery.com/jquery-1.11.3.min.js", 
+    "http://www.appelsiini.net/download/jquery.jeditable.mini.js",
+    "http://api.openstreetmap.cz/wheelzoom.js"
+    ));
 
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
@@ -302,6 +326,8 @@ sub output_html
     &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
     print "\n";
   }
+
+  print "<script>wheelzoom(document.querySelectorAll('img'));</script>";
 
   &page_footer();
 }
@@ -376,6 +402,8 @@ sub table_get
     print "</p>\n";
   }
 
+  print "<script>wheelzoom(document.querySelectorAll('img'));</script>";
+
 }
 
 ################################################################################
@@ -427,7 +455,7 @@ sub init_inplace_edit()
   print "     indicator : 'Saving...',\n";
   print "     cancel    : 'Cancel',\n";
   print "     submit    : 'OK',\n";
-  print "     event     : 'mouseover',\n";
+  print "     event     : 'click',\n";
   print "     width     : 100,\n";
   print "     tooltip   : 'Click to edit...'\n";
   print "  });\n";
@@ -491,7 +519,7 @@ sub static_map()
 #  $out .=  "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
 
   $out .=  "<span class='staticmap'>\n";
-  $out .=  "<img src='".$static_map."'/>";
+  $out .=  "<img class='zoom' src='".$static_map."'/>";
   $out .=  "</span>\n";
 
   return $out;
@@ -530,7 +558,7 @@ sub gp_line()
   );
   $out .= &show_table_row(
    "<a title='Click to show only this note' href='/table/tbd'>Note:</a>:",
-   "<div class='edit' id='attribution_$id'>TBD</div>",
+   "<div class='edit' id='tbd_$id'>TBD</div>",
    $id, "attribution"
   );
 
@@ -544,7 +572,6 @@ sub gp_line()
     $out .= "    \$('#edited" . $col . $id . "').load('http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "');";
   }
   $out .= "  </script>";
-
 
   $out .= &maplinks($lat, $lon);
 
@@ -622,7 +649,7 @@ sub set_by_id()
   my @data = split("_", $id);
   $db_id = $data[1];
   $db_col = $data[0];
-  $val =~ s/[^A-Za-z0-9óěščřžýáíéůúĚŘČŽÁÉŠŇŤÁÍÝÓťľ]//g;
+#  $val =~ s/[^A-Za-z0-9óěščřžýáíéůúĚŘČŽÁÉŠŇŤÁÍÝÓťľ]//g;
   $query = "insert into changes (gp_id, col, value) values ($db_id, '$db_col', '$val')";
   syslog('info', $query);
   my $sth = $dbh->prepare($query);
@@ -728,6 +755,7 @@ function reject(id,divid)
     alert( 'Load was performed.'+data );
   })
   .done(function() {
+  \$('#reviewdiv'+divid).css('background-color', 'red');
   })
   .fail(function() {
     alert( 'error' );
