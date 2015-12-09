@@ -97,6 +97,8 @@ sub handler
     &show_by_id($uri_components[3]);
   } elsif ($uri =~ "/table/name") {
     &show_by_name($uri_components[3]);
+  } elsif ($uri =~ "/table/note") {
+    &show_by($uri_components[3],"note");
   } elsif ($uri =~ "/table/setbyid") {
     &set_by_id($post_data{id}, $post_data{value});
   } elsif ($uri =~ "isedited") {
@@ -286,6 +288,21 @@ sub show_by_id
   my $id = shift;
 
   my $query = "select * from guidepost where id='$id'";
+
+  if ($BBOX) {
+    $query .= " and ".&add_bbox();
+  }
+
+  &output_data($query);
+}
+
+################################################################################
+sub show_by
+################################################################################
+{
+  my ($val, $what) = @_;
+
+  my $query = "select * from guidepost where $what='$val'";
 
   if ($BBOX) {
     $query .= " and ".&add_bbox();
@@ -544,6 +561,18 @@ sub static_map()
 }
 
 ################################################################################
+sub t()
+################################################################################
+{
+  my ($s, $lang) = @_;
+
+  if ($s eq "Click to show items containing") {return "Zobraz položky obsahující"};
+  if ($s eq "note") {return "Poznámka"};
+
+  return $s;
+}
+
+################################################################################
 sub gp_line()
 ################################################################################
 {
@@ -565,31 +594,31 @@ sub gp_line()
   $out .= &show_table_row("latitude", $lat, $id, "lat");
   $out .= &show_table_row("longtitude", $lon, $id, "lon");
   $out .= &show_table_row(
-    "<a title='Click to show only this ref' href='/table/ref/$ref'>ref</a>:",
+    "<a title='" . &t("Click to show items containing") . " ref' href='/table/ref/$ref'>" . &t("ref") . "</a>:",
     "<div class='edit' id='ref_$id'>$ref</div>",
     $id, "ref"
   );
   $out .= &show_table_row(
-   "<a title='Click to show only this name' href='/table/name/$attribution'>by</a>:",
+   "<a title='" . &t("Click to show items containing") . " name' href='/table/name/$attribution'>" . &t("by") . "</a>:",
    "<div class='edit' id='attribution_$id'>$attribution</div>",
    $id, "attribution"
   );
   $out .= &show_table_row(
-   "<a title='Click to show only this note' href='/table/tbd'>Note:</a>:",
-   "<div class='edit' id='tbd_$id'>TBD</div>",
-   $id, "attribution"
+   "<a title='" . &t("Click to show items containing") . " note' href='/table/tbd'>" . &t("note") . "</a>:",
+   "<div class='edit' id='note_$id'>$note</div>",
+   $id, "note"
   );
 
   $out .= "</div>";
   $out .= "</p>\n";
 
-  @attrs= ("lat", "lon", "ref", "attribution");
+  @attrs= ("lat", "lon", "ref", "attribution", "note");
 
   $out .= "<script>";
   foreach $col (@attrs) {
 #    $out .= "    \$('#edited" . $col . $id . "').load('http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "');";
 
-$out .= "
+    $out .= "
   \$.ajax({
     url: 'http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "',
     timeout:3000
@@ -601,8 +630,7 @@ $out .= "
     \$('#edited" . $col . $id . "').text('error');
   })
   .always(function(data) {
-  });
-"
+  });"
   }
   $out .= "  </script>";
 

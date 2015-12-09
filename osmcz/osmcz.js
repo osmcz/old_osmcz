@@ -531,7 +531,12 @@ function handler(request)
     var pos    = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
 
     popupClass = AutoSizeFramedCloudMaxSize;
-    html_content = "guidepost by "+b.attribution+"<br>"
+    html_content = "guidepost";
+    html_content += " by ";
+    html_content += "<a href='http://api.openstreetmap.cz/table/name/" + b.id + "'>" + b.attribution + "</a>";
+    html_content += " ";
+    html_content += "<a href='http://api.openstreetmap.cz/table/id/" + b.id + "'>edit</a>";
+    html_content += "<br>"
     html_content += "<a href='"+b.url+"'>"+b.name+"</a><br>"
     html_content += " <img src='"+b.url+"' width='180' alt='guidepost'>" 
     addMarker(markers, pos, popupClass, html_content, true, true);
