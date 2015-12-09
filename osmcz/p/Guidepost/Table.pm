@@ -42,6 +42,85 @@ my $maxlat;
 
 
 ################################################################################
+sub handler
+################################################################################
+{
+  my $r = shift;
+  openlog('guidepostapi', 'cons,pid', 'user');
+
+  syslog('info', 'start method:'. $r->method());
+
+  $r->content_type('text/html');
+  my $uri = $r->uri;      # what does the URI (URL) look like ?
+  &parse_query_string($r);
+  &parse_post_data($r);
+
+  if (exists $currargs{bbox}) {
+    &parse_bbox($currargs{bbox});
+  }
+
+  if (!exists $currargs{output}) {
+    $OUTPUT_FORMAT = "html";
+  } elsif ($currargs{output} eq "geojson") {
+    $OUTPUT_FORMAT = "geojson";
+  } elsif ($currargs{output} eq "kml") {
+    $OUTPUT_FORMAT = "kml";
+  } else {
+    $OUTPUT_FORMAT = "html";
+  }
+
+  &connect_db();
+
+  @uri_components = split("/", $uri);
+
+  foreach $text (@uri_components) {
+    $text =~ s/[^A-Za-z0-9 ]//g;
+  }
+
+  if ($uri =~ "table\/all") {
+    my $query = "select * from guidepost";
+    if ($BBOX) {
+      $query .= " where ".&add_bbox();
+    }
+    &output_data($query);
+  } elsif ($uri =~ /goodbye/) {
+    &say_goodbye($r);
+  } elsif ($uri =~ "/table/count") {
+    print &get_gp_count();
+  } elsif ($uri =~ "/table/get") {
+    &table_get($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "/table/leaderboard") {
+    &leaderboard();
+  } elsif ($uri =~ "/table/ref") {
+    &show_by_ref($uri_components[3]);
+  } elsif ($uri =~ "/table/id") {
+    &show_by_id($uri_components[3]);
+  } elsif ($uri =~ "/table/name") {
+    &show_by_name($uri_components[3]);
+  } elsif ($uri =~ "/table/setbyid") {
+    &set_by_id($post_data{id}, $post_data{value});
+  } elsif ($uri =~ "isedited") {
+    #/isedited/ref/id
+    &is_edited($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "/table/approve") {
+    &approve_edit($uri_components[3]);
+  } elsif ($uri =~ "/table/reject") {
+    &reject_edit($uri_components[3]);
+  } elsif ($uri =~ "/table/review") {
+    &review_form();
+  }
+
+#Dumper(\%ENV);
+#    connection_info($r->connection);
+
+#    $r->status = 200;       # All's ok, so set a "200 OK" status
+#    $r->send_http_header;   # Now send the http headers.
+
+   $dbh->disconnect;
+   return Apache2::Const::OK;
+}
+
+################################################################################
 sub connection_info
 ################################################################################
 {
@@ -177,83 +256,6 @@ sub parse_bbox
 }
 
 ################################################################################
-sub handler
-################################################################################
-{
-  my $r = shift;
-  openlog('guidepostapi', 'cons,pid', 'user');
-
-  syslog('info', 'start method:'. $r->method());
-
-  $r->content_type('text/html');
-  my $uri = $r->uri;      # what does the URI (URL) look like ?
-  &parse_query_string($r);
-  &parse_post_data($r);
-
-  if (exists $currargs{bbox}) {
-    &parse_bbox($currargs{bbox});
-  }
-
-  if (!exists $currargs{output}) {
-    $OUTPUT_FORMAT = "html";
-  } elsif ($currargs{output} eq "geojson") {
-    $OUTPUT_FORMAT = "geojson";
-  } elsif ($currargs{output} eq "kml") {
-    $OUTPUT_FORMAT = "kml";
-  } else {
-    $OUTPUT_FORMAT = "html";
-  }
-
-  &connect_db();
-
-  @uri_components = split("/", $uri);
-
-  foreach $text (@uri_components) {
-    $text =~ s/[^A-Za-z0-9 ]//g;
-  }
-
-  if ($uri =~ "table\/all") {
-    my $query = "select * from guidepost";
-    if ($BBOX) {
-      $query .= " where ".&add_bbox();
-    }
-    &output_data($query);
-  } elsif ($uri =~ /goodbye/) {
-    &say_goodbye($r);
-  } elsif ($uri =~ "/table/count") {
-    print &get_gp_count();
-  } elsif ($uri =~ "/table/get") {
-    &table_get($uri_components[3], $uri_components[4]);
-  } elsif ($uri =~ "/table/leaderboard") {
-    &leaderboard();
-  } elsif ($uri =~ "/table/ref") {
-    &show_by_ref($uri_components[3]);
-  } elsif ($uri =~ "/table/name") {
-    &show_by_name($uri_components[3]);
-  } elsif ($uri =~ "/table/setbyid") {
-    &set_by_id($post_data{id}, $post_data{value});
-  } elsif ($uri =~ "isedited") {
-    #/isedited/ref/id
-    &is_edited($uri_components[3], $uri_components[4]);
-  } elsif ($uri =~ "/table/approve") {
-    &approve_edit($uri_components[3]);
-  } elsif ($uri =~ "/table/reject") {
-    &reject_edit($uri_components[3]);
-  } elsif ($uri =~ "/table/review") {
-    &review_form();
-  }
-
-#Dumper(\%ENV);
-#    connection_info($r->connection);
-
-#    $r->status = 200;       # All's ok, so set a "200 OK" status
-#    $r->send_http_header;   # Now send the http headers.
-
-   $dbh->disconnect;
-   return Apache2::Const::OK;
-}
-
-################################################################################
 sub add_bbox
 ################################################################################
 {
@@ -269,6 +271,21 @@ sub show_by_ref
   my $ref = shift;
 
   my $query = "select * from guidepost where ref='$ref'";
+
+  if ($BBOX) {
+    $query .= " and ".&add_bbox();
+  }
+
+  &output_data($query);
+}
+
+################################################################################
+sub show_by_id
+################################################################################
+{
+  my $id = shift;
+
+  my $query = "select * from guidepost where id='$id'";
 
   if ($BBOX) {
     $query .= " and ".&add_bbox();
@@ -457,6 +474,7 @@ sub init_inplace_edit()
   print "     submit    : 'OK',\n";
   print "     event     : 'click',\n";
   print "     width     : 100,\n";
+  print "     select    : true,\n";
   print "     tooltip   : 'Click to edit...'\n";
   print "  });\n";
   print "</script>\n";
@@ -569,7 +587,22 @@ sub gp_line()
 
   $out .= "<script>";
   foreach $col (@attrs) {
-    $out .= "    \$('#edited" . $col . $id . "').load('http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "');";
+#    $out .= "    \$('#edited" . $col . $id . "').load('http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "');";
+
+$out .= "
+  \$.ajax({
+    url: 'http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "',
+    timeout:3000
+  })
+  .done(function(data) {
+    \$('#edited" . $col . $id . "').text(data);
+  })
+  .fail(function() {
+    \$('#edited" . $col . $id . "').text('error');
+  })
+  .always(function(data) {
+  });
+"
   }
   $out .= "  </script>";
 
@@ -725,7 +758,7 @@ sub review_form
 ################################################################################
 {
 
-  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value from changes, guidepost where changes.gp_id=guidepost.id";
+  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value from changes, guidepost where changes.gp_id=guidepost.id limit 50";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 #http://code.jquery.com/jquery-1.11.3.min.js
