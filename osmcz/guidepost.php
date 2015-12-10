@@ -45,6 +45,8 @@ function page_header()
   print "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n";
   print "  <title>openstreetmap.cz image upload</title>\n";
   print "  <script src='OpenLayers.2.8.0.js'></script>\n";
+  print "  <script src='jquery-1.11.3.min.js'></script>\n";
+  print "  <script src='jquery-ui.min.js'></script>\n";
   print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
   print "  <link href='upload.css' rel='stylesheet' type='text/css'/>\n";
 }
@@ -120,6 +122,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
   </fieldset>
   <fieldset>
     <label>Ref</label><input type='text' name='ref' value='' size='6'>
+    <label>Poznámka</label><input type='text' name='note' value='' size='50'>
 <br>
     <input type='radio' name='gp_type' value='gp' checked>Rozcestník
     <input type='radio' name='gp_type' value='map'>Mapa
@@ -134,7 +137,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 </form>\n";
   print "<p id='upload_process'>Uploading...</p>\n";
   //set widht and height to display debug output
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:40px;border:1px solid #fff;'></iframe>\n";
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:20px;border:3px solid #aaaaaa;'></iframe>\n";
 }
 
 
@@ -230,7 +233,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 </form>\n";
   print "<p id='upload_process'>Uploading...</p>\n";
   //set widht and height to display debug output
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:0px solid #fff;'></iframe>\n";
+  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:10px solid #fff;'></iframe>\n";
 }
 
 ################################################################################

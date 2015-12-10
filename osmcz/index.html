@@ -10,11 +10,9 @@
   <script type="text/javascript" src="osmcz.js"></script>
   <script type="text/javascript" src="json.js"></script>
 
-  <!--<script type="text/javascript" src="jquery-1.2.2.pack.js"></script>-->
-
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="jquery-1.11.3.min.js"></script>
+  <script src="jquery-ui.min.js"></script>
 
   <link href='index.css' rel='stylesheet' type='text/css'>
   <link href="https://plus.google.com/101537650520682759804" rel="publisher" />
@@ -35,6 +33,8 @@
 </script>
 
 <script type="text/javascript">
+
+/*
 function upbox_on()
 {
   document.getElementById("upbox").style.display = 'block' ;
@@ -44,6 +44,7 @@ function upbox_off()
 {
   document.getElementById("upbox").style.display = 'none' ;
 }
+*/
 
 function div_on(div_id)
 {
@@ -134,18 +135,20 @@ ddtabmenu.definemenu("ddtabs", 0)
 
 <BODY onload="init_page()" onunload="get_center()">
 
-<div id="dialog" title="Vlož rozcestník">
-<iframe src="guidepost.php?action=show_dialog" width="100%" height="95%">upload iframe</iframe>
-</div>
+<div id="dialog" title="Vlož rozcestník" style="display:none;"><iframe src="guidepost.php?action=show_dialog" width="100%" height="95%">upload iframe</iframe></div>
 
 <div id='loader' class='centered'>
-<p>Pracuji...<br><img src="img/loader.gif" alt="-"></p>
+<br>
+<p> Pracuji... <br><img src="img/loader.gif" alt="-"></p>
+<br>
 </div>
 
+<!--
 <div id="upbox" class="uploadbox">
 <img src='img/close.png' align=right alt='x' onclick='javascript:upbox_off()'>
 <iframe src="guidepost.php?action=show_dialog" width="90%" height="99%">iframe</iframe>
 </div>
+-->
 
 <!--########class=right######################################################-->
 
