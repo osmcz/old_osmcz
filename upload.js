@@ -126,28 +126,19 @@ function start_upload()
   return true;
 }
 
+
+
 /******************************************************************************/
 function stop_upload(success, message, filename)
 /******************************************************************************/
 {
-  var result = ''; 
-  var response = '';
-  var out_line = '';
 
   if (success != 1) {
     alert("error: " + message);
   }
 
   document.getElementById('upload_process').style.visibility = 'hidden';
-  var http = getHTTPObject();
-  http.open('GET', 'http://localhost/~walley/php/index.php?action=upload&name='+filename, true);
-  http.send(null)
-  http.onreadystatechange = function()
-  {
-    if (http.readyState == 4) {
-      response = http.responseText;
-    }
-  }
+
   return true;
 }
 
