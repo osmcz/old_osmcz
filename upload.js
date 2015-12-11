@@ -138,6 +138,10 @@ function stop_upload(success, message, filename)
   }
 
   document.getElementById('upload_process').style.visibility = 'hidden';
+  author = document.getElementById('author').value;
+
+  document.getElementById("coord").reset();
+  document.getElementById('author').value = author;
 
   return true;
 }
@@ -170,4 +174,33 @@ function auto_rename_handler()
 {
   form_file = document.getElementById('guidepostfile');
   form_file.addEventListener('change', auto_rename_event, false);
+}
+
+
+function exif_present()
+{
+   document.getElementById('lat').value = 0;
+   document.getElementById('lat').readOnly = true;
+   document.getElementById('lon').value = 0;
+   document.getElementById('lon').readOnly = true;
+}
+
+function no_exif()
+{
+   document.getElementById('lat').readOnly = false;
+   document.getElementById('lon').readOnly = false;
+}
+
+function exif_checkbox_action()
+{
+  if (document.getElementById('exif_checkbox').checked) {
+    exif_present();
+  } else {
+    no_exif();
+  }
+}
+
+function upbox_off()
+{
+  document.getElementById('upbox').style.display = 'none' ;
 }

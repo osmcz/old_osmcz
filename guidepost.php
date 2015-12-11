@@ -49,6 +49,7 @@ function page_header()
   print "  <script src='jquery-ui.min.js'></script>\n";
   print "  <script language='javascript' type='text/javascript' src='upload.js'></script>\n";
   print "  <link href='upload.css' rel='stylesheet' type='text/css'/>\n";
+  
 }
 
 
@@ -69,40 +70,6 @@ function show_upload_dialog()
 
   $PHP_SELF = $_SERVER['PHP_SELF'];
 
-  print"<script>\n";
-  print "function upbox_off()\n";
-  print "{\n";
-  print "  document.getElementById('upbox').style.display = 'none' ;\n";
-  print "}\n";
-  print "
-
-  function exif_present()
-  {
-     document.getElementById('lat').value = 0;
-     document.getElementById('lat').readOnly = true;
-     document.getElementById('lon').value = 0;
-     document.getElementById('lon').readOnly = true;
-  }
-
-  function no_exif()
-  {
-     document.getElementById('lat').readOnly = false;
-     document.getElementById('lon').readOnly = false;
-  }
-
-  function exif_checkbox_action()
-  {
-    if (document.getElementById('exif_checkbox').checked) {
-      exif_present();
-    } else {
-      no_exif();
-    }
-  }
-
-  ";
-
-  print"</script>\n";
-
   print "  </head>
   <body onload='upload_init()'>\n";
 
@@ -110,12 +77,13 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 
   print "
 <div id='map' class='mapmap'></div>
-<form name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
+<div id='form' class='form'>
+<form id='coord' name='coord' action='".$PHP_SELF."' method='post' enctype='multipart/form-data' target='upload_target' onsubmit='start_upload();'>
   <input type='hidden' name='action' value='file' />
   <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
   <fieldset>
-    <label>autor</label><input type='text' name='author' value='autor' size='9'>
-    <input name='uploadedfile' type='file' id='guidepostfile'  size='20'/><br>
+    <label>autor</label><input type='text' id='author' name='author' value='autor' size='9'>
+    <input name='uploadedfile' type='file' id='guidepostfile' size='20'/><br>
     <label>lat</label><input type='text' id='lat' name='lat' value='0' size='10' title='".$title_help."'>
     <label>lon</label><input type='text' id='lon' name='lon' value='0' size='10' title='".$title_help."'>
     <label>exif </label><input type=checkbox id='exif_checkbox' onchange='exif_checkbox_action()'>
@@ -131,13 +99,18 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 
   </fieldset>
   <fieldset>
-    <input type='reset' name='reset' value='Reset' />
     <input type='submit' name='submitBtn' class='sbtn' value='Nahrát soubor' />
   </fieldset>
-</form>\n";
-  print "<p id='upload_process'>Uploading...</p>\n";
-  //set widht and height to display debug output
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:20px;border:3px solid #aaaaaa;'></iframe>\n";
+</form>
+</div>
+
+<table><tr> 
+  <td><div id='upload_div'><p style='border:3px solid #aaaaaa;' id='upload_process'>Uploading...</p></div></td>
+  <td><iframe id='upload_target' name='upload_target' src='#' style='width:200px;height:30px;border:3px solid #aaaaaa;'></iframe></td>
+</tr></table>
+
+\n";
+
 }
 
 
@@ -220,7 +193,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
   <input type='hidden' name='action' value='file' />
   <input type='hidden' name='MAX_FILE_SIZE' value='5000000' />
   <fieldset>
-    <label>autor</label><input type='text' name='author' value='autor' size='9'>
+    <label>autor</label><input type='text' id='author' name='author' value='autor' size='9'>
     <input name='uploadedfile' type='file' id='guidepostfile'  size='20'/><br>
     <label>lat</label><input type='text' id='lat' name='lat' value='0' size='10' title='".$title_help."'>
     <label>lon</label><input type='text' id='lon' name='lon' value='0' size='10' title='".$title_help."'>
@@ -230,10 +203,15 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
     <input type='reset' name='reset' value='Reset' />
     <input type='submit' name='submitBtn' class='sbtn' value='Nahrat soubor' />
   </fieldset>
-</form>\n";
-  print "<p id='upload_process'>Uploading...</p>\n";
+</form>
+
+<table><tr>
+  <td><p style='border:10px solid #fff;'> id='upload_process'>Uploading...</p></td>
+  <td><iframe id='upload_target' name='upload_target' src='#' style='width:200px;height:100px;border:10px solid #aaaaaa;'></iframe></td>
+</tr></table>
+\n";
   //set widht and height to display debug output
-  print "<iframe id='upload_target' name='upload_target' src='#' style='width:100px;height:100px;border:10px solid #fff;'></iframe>\n";
+
 }
 
 ################################################################################
@@ -395,8 +373,15 @@ function process_file()
   if (get_param("source") == "mobile") {
     print "$result-$error_message";
   } else {
+    print "  </head>\n";
+    print "  <body>\n";
     print "
+  <div id='x'></div>
   <script language='javascript' type='text/javascript'>
+    \$('#x').text('*** OK ***');
+    \$('#x').hide();
+    \$('#x').show('highlight',{color: 'lightgreen'},'2000');
+
     parent.stop_upload(".$result.",'".$error_message."', '".$filename."');
   </script>\n";
   }
