@@ -33,6 +33,8 @@ use Geo::JSON::FeatureCollection;
 use Sys::Syslog;                        # all except setlogsock()
 use HTML::Entities;
 
+use File::Copy;
+
 my $dbh;
 my $BBOX = 0;
 my $minlon;
@@ -48,7 +50,7 @@ sub handler
   my $r = shift;
   openlog('guidepostapi', 'cons,pid', 'user');
 
-  syslog('info', 'start method:'. $r->method());
+#  syslog('info', 'start method:'. $r->method());
 
   $r->content_type('text/html');
   my $uri = $r->uri;      # what does the URI (URL) look like ?
@@ -110,6 +112,8 @@ sub handler
     &reject_edit($uri_components[3]);
   } elsif ($uri =~ "/table/review") {
     &review_form();
+  } elsif ($uri =~ "/table/delete") {
+    &delete_id($uri_components[3]);
   }
 
 #Dumper(\%ENV);
@@ -549,7 +553,7 @@ sub static_map()
 {
   my ($lat, $lon) = @_;
   my $out = "<!-- static map -->";
-  
+
   $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=15&size=200,200&type=map&imagetype=png&pois=";
 #  $out .=  "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
 
@@ -895,6 +899,35 @@ sub approve_edit
   $rv  = $dbh->do($query) or return $dbh->errstr;
 
   return "OK $id changed";
+}
+
+################################################################################
+sub delete_id
+################################################################################
+{
+  my ($id) = @_;
+
+  syslog('info', "deleting id: " . $id);
+
+  my $query = "select * from guidepost where id=$id";
+#  $res = $dbh->selectall_hashref($query, { Slice => {} });
+  $res = $dbh->selectall_hashref($query, 'id');
+
+  my $original_file = "/home/walley/www/mapy/img/guidepost/" . $res->{$id}->{name};
+  my $new_file = "/home/walley/www/mapy/img/guidepost/deleted/" . $res->{$id}->{name};
+
+
+#delete from db
+  $query = "delete from guidepost where id=$id";
+
+#move picture to backup directory
+# somewhere in the code ...
+  syslog('info', "Moving $original_file to $new_file");
+
+# the perl move file function
+  if (!move($original_file, $new_file)) {
+    syslog('info', "Move failed($original_file,$new_file): $!");
+  }
 }
 
 1;
