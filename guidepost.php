@@ -20,6 +20,7 @@ function printdebug($x)
   $x = str_replace('>', '(GT)',         $x);
   $x = str_replace('<', '(LT)',         $x);
   $x = str_replace('?', '(question)',   $x);
+  $x = str_replace('-', '(minus)',      $x);
 
   system ("/usr/bin/logger -t guidepost '$x'");
 }
@@ -215,7 +216,7 @@ $title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 
 }
 
 ################################################################################
-function insert_to_db($lat, $lon, $url ,$file, $author, $ref)
+function insert_to_db($lat, $lon, $url ,$file, $author, $ref, $note)
 ################################################################################
 {
   global $global_error_message;
@@ -224,7 +225,7 @@ function insert_to_db($lat, $lon, $url ,$file, $author, $ref)
     $global_error_message = (file_exists('guidepost')) ? "Impossible to open, check permissions" : "Impossible to create, check permissions";
     return 0;
   }
-  $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author', '$ref')";
+  $q = "insert into guidepost values (NULL, '$lat', '$lon', '$url', '$file', '$author', '$ref', '$note')";
   $query = $database->exec($q);
   if (!$query) {
     $global_error_message = "Error: $query_error"; 
@@ -263,10 +264,14 @@ function process_file()
     $ref = "none";
   }
 
+  $note = $_POST['note'];
+
   printdebug("ref: ".$ref);
+  printdebug("note: ".$note);
   printdebug("before lat:lon:author - $lat:$lon:$author");
 
-  $author = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíé .]/', '', $author);
+  $author = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíéĚŠČŘŽÁÍÉúůÚľĽ .]/', '', $author);
+  $note = preg_replace('/[^-a-zA-Z0-9_ěščřžýáíéĚŠČŘŽÁÍÉúůÚľĽ .]/', '', $note);
   $lat = preg_replace('/[^0-9.]/', '', $lat);
   $lon = preg_replace('/[^0-9.]/', '', $lon);
   $ref = preg_replace('/[^a-zA-Z0-9.]/', '', $ref);
@@ -334,14 +339,14 @@ function process_file()
       printdebug("File '$file' has been moved from tmp to $target_path");
       if (!$lat && !$lon) {
         printdebug("soubor byl poslan se souradnicemi 0,0 -> exifme");
-        $command = "/var/www/mapy/exifme.pl '$target_path' '$author' img/guidepost/ '$ref'";
+        $command = "/var/www/mapy/exifme.pl '$target_path' '$author' img/guidepost/ '$ref' '$note'";
         $out = system ($command, $errlvl);
         printdebug("command:output(exit code) - $command:$out($errlvl)");
         if (!$errlvl) {
           $result = 1;
         } else {
           $result = 0;
-          $error_message = "nepodarilo se zjistit souradnice z exif" . $out;
+          $error_message = "poslano latlon 0,0 a nepodarilo se zjistit souradnice z exif" . $out;
           printdebug("exifme error $error_message");
         }
       } else {
@@ -350,8 +355,12 @@ function process_file()
           $error_message = "failed to copy $file to destination ... ";
           $result = 0;
         } else {
-          $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author, $ref);
-          if (!$ret_db) {
+          $ret_db = insert_to_db($lat, $lon, $final_path, $file, $author, $ref, $note);
+          if ($ret_db) {
+            if (!unlink ("uploads/$file")) {
+              printdebug("$file cannot be deleted from upload, inserted successfuly");
+            }
+          } else {
             $error_message = "failed to insert to db" . $global_error_message;
             $result = 0;
           }

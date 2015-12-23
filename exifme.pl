@@ -19,6 +19,7 @@ $i = $ARGV[0];
 $author = $ARGV[1];
 $new_location = $ARGV[2];
 $ref = $ARGV[3];
+$note = $ARGV[4];
 @output = `jhead '$i'`;
 
 #print @output;
@@ -70,7 +71,7 @@ if (!$dbh) {
   die;
 }
 
-$q = "insert into guidepost values (NULL, $lat, $lon, '".$url."','".$filename."', '$author', '$ref');\n";
+$q = "insert into guidepost values (NULL, $lat, $lon, '".$url."','".$filename."', '$author', '$ref', '$note');\n";
 &debuglog($q);
 
 $res = $dbh->do($q);

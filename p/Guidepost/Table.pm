@@ -356,8 +356,8 @@ sub output_html
   print $DBI::errstr;
 
   foreach my $row (@$res) {
-    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
     print "\n";
   }
 
@@ -431,8 +431,8 @@ sub table_get
   print $DBI::errstr;
 
   foreach my $row (@$res) {
-    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref);
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @$row;
+    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
     print "</p>\n";
   }
 
@@ -576,7 +576,7 @@ sub t()
 sub gp_line()
 ################################################################################
 {
-  my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @_;
+  my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @_;
 
   my $out = "<!-- GP LINE -->";
 
