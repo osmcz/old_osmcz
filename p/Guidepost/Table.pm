@@ -114,6 +114,8 @@ sub handler
     &review_form();
   } elsif ($uri =~ "/table/delete") {
     &delete_id($uri_components[3]);
+  } elsif ($uri =~ "/table/remove") {
+    &remove($uri_components[3]);
   }
 
 #Dumper(\%ENV);
@@ -508,9 +510,9 @@ sub show_table_row()
 
   my ($p1, $p2, $id, $col) = @_;
 
-  my $out = "<!-- table row -->";
-  $out .= "
-  <div class='Row'>
+  my $out = "<!-- table row -->\n";
+  $out .=
+  "<div class='Row'>
     <div class='Cell'>
       <span>$p1</span>
     </div>
@@ -520,8 +522,8 @@ sub show_table_row()
     <div class='Cell'>
       <div id='edited" . $col . $id . "'>checking ...</div>
     </div>
-  </div>
-  ";
+  </div>\n";
+  $out .= "<!-- end table row -->\n";
   return $out;
 }
 
@@ -532,7 +534,8 @@ sub maplinks()
 {
   my ($lat, $lon) = @_;
   my $out = "<!-- maplinks -->";
-  $out .=  "<span class='maplinks'>\n";
+#  $out .=  "<span class='maplinks'>\n";
+  $out .=  "<span>\n";
   $out .=  "<ul>\n";
 #  $out .=  "<li><a href='http://maps.yahoo.com/#mvt=m&lat=$lat&lon=$lon&mag=6&q1=$lat,$lon'>Yahoo</a>";
   $out .=  "<li><a href='http://www.openstreetmap.org/?mlat=$lat&mlon=$lon&zoom=16#map=16/$lat/$lon'>OSM</a>";
@@ -557,9 +560,10 @@ sub static_map()
   $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=15&size=200,200&type=map&imagetype=png&pois=";
 #  $out .=  "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
 
-  $out .=  "<span class='staticmap'>\n";
+#  $out .=  "<span class='staticmap'>\n";
+#  $out .=  "<span>\n";
   $out .=  "<img class='zoom' src='".$static_map."'/>";
-  $out .=  "</span>\n";
+#  $out .=  "</span>\n";
 
   return $out;
 }
@@ -572,28 +576,56 @@ sub t()
 
   if ($s eq "Click to show items containing") {return "Zobraz položky obsahující"};
   if ($s eq "note") {return "Poznámka"};
+  if ($s eq "remove_picture") {return "Smazat obrázek. Smazána budou pouze metadata, fotka bude skryta."};
 
   return $s;
 }
 
 ################################################################################
-sub gp_line()
+sub id_stuff
+################################################################################
+{
+  ($id) = @_;
+  my $ret = "<!-- is stuff -->";
+  $ret .= "<div class='Table'>\n";
+  $ret .= "<div class='Row'>\n";
+  $ret .= "<div class='Cell'>\n";
+  $ret .= "<h2>$id</h2>\n";
+  $ret .= "</div>\n";
+  $ret .= "</div>\n";
+  $ret .= "<div class='Row'>\n";
+  $ret .= "<div class='Cell'>\n";
+
+  $ret .= "<div id='remove$id'>\n";
+  $ret .= "<span title='" . &t("remove_picture") . "' xonclick='alert(\"x\")'>";
+  $ret .= "delete <img src='http://api.openstreetmap.cz/img/delete.png' width=16 height=16>";
+  $ret .= "</span>\n";
+  $ret .= "</div>";
+
+
+  $ret .= "</div>\n";
+  $ret .= "</div>\n";
+  $ret .= "</div>\n";
+  $ret .= "
+  <script>
+  
+  \$('#remove$id').click(function() {
+    alert('remove$id');
+    \$('#remove$id').text='x';
+  });
+  </script>
+  ";
+  return $ret;
+}
+
+################################################################################
+sub edit_stuff
 ################################################################################
 {
   my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @_;
+my $out = "";
 
-  my $out = "<!-- GP LINE -->";
-
-  print "<hr>\n";
-  print "<div class='gp_line'>\n";
-  print "<p class='location'>\n";
-  print "<h2 style='float:left;'>$id</h2>";
-
-  if ($ref eq "") {
-    $ref = "none";
-  }
-
-  print "<div class='Table'>";
+  $out .= "<div class='Table'>";
 
   $out .= &show_table_row("latitude", $lat, $id, "lat");
   $out .= &show_table_row("longtitude", $lon, $id, "lon");
@@ -608,13 +640,41 @@ sub gp_line()
    $id, "attribution"
   );
   $out .= &show_table_row(
-   "<a title='" . &t("Click to show items containing") . " note' href='/table/tbd'>" . &t("note") . "</a>:",
+   "<a title='" . &t("Click to show items containing") . " note' href='/table/note/$note'>" . &t("note") . "</a>:",
    "<div class='edit' id='note_$id'>$note</div>",
    $id, "note"
   );
 
   $out .= "</div>";
-  $out .= "</p>\n";
+  return $out;
+}
+
+################################################################################
+sub gp_line()
+################################################################################
+{
+  my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @_;
+
+  my $out = "<!-- GP LINE -->";
+  if ($ref eq "") {
+    $ref = "none";
+  }
+
+  $out .= "<hr>\n";
+  $out .= "<div class='gp_line'>\n";
+
+  $out .= "<div class='master_table'>";
+  $out .= "<div class='Row'>";
+
+  #id stuff
+  $out .= "<div class='Cell'>\n";
+  $out .= &id_stuff($id);
+  $out .= "</div>\n";
+
+  #edit stuff
+  $out .= "<div class='Cell cell_middle'>\n";
+  $out .= &edit_stuff($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
+  $out .= "</div>";
 
   @attrs= ("lat", "lon", "ref", "attribution", "note");
 
@@ -638,25 +698,32 @@ sub gp_line()
   }
   $out .= "  </script>";
 
+  $out .= "<div class='Cell cell_middle'>";
   $out .= &maplinks($lat, $lon);
-
-  $full_uri = "http://api.openstreetmap.cz/".$url;
-  $out .= "<p class='image'>\n";
-  $out .= "<a href='$full_uri'><img src='$full_uri' height='150px'><br>$name</a>";
-  $out .= "</p>\n";
-
-  $out .= &static_map($lat, $lon);
-
   $out .= "</div>\n";
 
+  $out .= "<div class='Cell cell_middle'>";
+  $out .= &static_map($lat, $lon);
+  $out .= "</div>\n";
+
+
+  $out .= "<div class='Cell'>";
+  $full_uri = "http://api.openstreetmap.cz/".$url;
+#  $out .= "<p class='image'>\n";
+  $out .= "<a href='$full_uri'><img src='$full_uri' height='150px'><br>$name</a>";
+#  $out .= "</p>\n";
+  $out .= "</div>\n";
+
+  $out .= "</div> <!-- row -->\n";
+
+  $out .= "</div> <!-- table -->\n";
+
+  $out .= "</div> <!-- gp_line -->\n";
   syslog('info', $out);
 
   print $out;
 
   &init_inplace_edit();
-
-  print "<hr>\n";
-
 }
 
 ################################################################################
@@ -751,18 +818,24 @@ sub read_post()
 sub review_entry
 ################################################################################
 {
-  my ($req_id, $id, $gp_id, $col, $value, $img) = @_;
+  my ($req_id, $id, $gp_id, $col, $value, $img, $action) = @_;
 
   $original = &get_gp_column_value($gp_id, $col);
 
   print "<div id='reviewdiv$req_id'>";
   print "<table>";
   print "<tr>";
-  print "<td>change id:$id";
-  print "<td>guidepost id:$gp_id";
-  print "<td>column: $col";
-  print "<td>original value: $original";
-  print "<td>value: $value";
+  if ($action eq "remove") {
+    print "<td>change id:$id";
+    print "<td>guidepost id:$gp_id";
+    print "<td>DELETE";
+  } else {
+    print "<td>change id:$id";
+    print "<td>guidepost id:$gp_id";
+    print "<td>column: $col";
+    print "<td>original value: $original";
+    print "<td>value: $value";
+  }
   print "</tr>";
   print "</table>\n";
 
@@ -790,7 +863,7 @@ sub review_form
 ################################################################################
 {
 
-  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value from changes, guidepost where changes.gp_id=guidepost.id limit 50";
+  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value, changes.action from changes, guidepost where changes.gp_id=guidepost.id limit 50";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 #http://code.jquery.com/jquery-1.11.3.min.js
@@ -837,8 +910,8 @@ function reject(id,divid)
 
   my $req_id = 0;
   foreach my $row (@$res) {
-    my ($img, $id, $gp_id, $col, $value) = @$row;
-    &review_entry($req_id++, $id, $gp_id, $col, $value, $img);
+    my ($img, $id, $gp_id, $col, $value, $action) = @$row;
+    &review_entry($req_id++, $id, $gp_id, $col, $value, $img, $action);
   }
 
   print "<script>";
@@ -928,6 +1001,19 @@ sub delete_id
   if (!move($original_file, $new_file)) {
     syslog('info', "Move failed($original_file,$new_file): $!");
   }
+}
+
+################################################################################
+sub remove
+################################################################################
+{
+  my ($id) = @_;
+  syslog('info', "removing $id");
+  $query = "insert into changes (gp_id, action) values ($id, 'remove')";
+  syslog('info', $query);
+  my $sth = $dbh->prepare($query);
+  my $rv = $sth->execute() or die $DBI::errstr;
+  print $query;
 }
 
 1;
