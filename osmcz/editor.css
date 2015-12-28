@@ -54,6 +54,12 @@ div.gp_line:hover {
 .Table {
     display: table;
 }
+
+.master_table {
+    display: table;
+    width:100%;
+}
+
 .Title {
     display: table-caption;
     text-align: center;
@@ -74,4 +80,8 @@ div.gp_line:hover {
     border-width: thin;
     padding-left: 2px;
     padding-right: 2px;
+}
+
+.cell_middle {
+    vertical-align: middle;
 }
