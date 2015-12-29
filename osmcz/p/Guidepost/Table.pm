@@ -34,6 +34,13 @@ use Sys::Syslog;                        # all except setlogsock()
 use HTML::Entities;
 
 use File::Copy;
+#use Encode::decode_utf8();
+use Encode;
+
+#use utf8;
+#binmode STDIN, ':utf8';
+#binmode STDOUT, ':utf8';
+
 
 my $dbh;
 my $BBOX = 0;
@@ -47,7 +54,7 @@ my $maxlat;
 sub handler
 ################################################################################
 {
-  my $r = shift;
+  $r = shift;
   openlog('guidepostapi', 'cons,pid', 'user');
 
 #  syslog('info', 'start method:'. $r->method());
@@ -76,7 +83,7 @@ sub handler
   @uri_components = split("/", $uri);
 
   foreach $text (@uri_components) {
-    $text =~ s/[^A-Za-z0-9 ]//g;
+    $text =~ s/[^A-Za-z0-9ěščřžýáíéĚŠČŘŽÝÁÍÉůúŮÚ]//g;
   }
 
   if ($uri =~ "table\/all") {
@@ -175,10 +182,11 @@ sub say_goodbye
   }
 }
 
+################################################################################
 sub smartdecode
+################################################################################
 {
   use URI::Escape qw( uri_unescape );
-  use utf8;
   my $x = my $y = uri_unescape($_[0]);
   return $x if utf8::decode($x);
   return $y;
@@ -244,6 +252,8 @@ sub connect_db
 #    &debuglog("db failed","Cannot connect: ".$DBI::errstr);
     die;
   }
+  my $sql = qq{SET NAMES 'utf8';};
+  $dbh->do($sql);
 }
 
 ################################################################################
@@ -253,7 +263,7 @@ sub parse_bbox
   my $b = shift;
 #BBox=-20,-40,60,40
 
-  print $b;
+  #print $b;
 
   @bbox = split(",", $b);
   $minlon = $bbox[0];
@@ -277,14 +287,7 @@ sub show_by_ref
 ################################################################################
 {
   my $ref = shift;
-
-  my $query = "select * from guidepost where ref='$ref'";
-
-  if ($BBOX) {
-    $query .= " and ".&add_bbox();
-  }
-
-  &output_data($query);
+  &show_by($ref,'ref');
 }
 
 ################################################################################
@@ -292,14 +295,7 @@ sub show_by_id
 ################################################################################
 {
   my $id = shift;
-
-  my $query = "select * from guidepost where id='$id'";
-
-  if ($BBOX) {
-    $query .= " and ".&add_bbox();
-  }
-
-  &output_data($query);
+  &show_by($id,'id');
 }
 
 ################################################################################
@@ -307,6 +303,8 @@ sub show_by
 ################################################################################
 {
   my ($val, $what) = @_;
+
+  syslog('info', "show_by($val, $what)");
 
   my $query = "select * from guidepost where $what='$val'";
 
@@ -359,17 +357,24 @@ sub output_html
     ));
 
   $res = $dbh->selectall_arrayref($query);
-  print $DBI::errstr;
+  if (!$res) {
+    syslog("info", "output_html dberror" . $DBI::errstr);
+    $out = "DB error";
+    print $out;
+    return;
+  }
 
   foreach my $row (@$res) {
     my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
-    print "\n";
+    $out .= &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
+    $out .= "\n";
   }
 
-  print "<script>wheelzoom(document.querySelectorAll('img'));</script>";
+  $out .= "<script>wheelzoom(document.querySelectorAll('img'));</script>";
+  $out .= &page_footer();
 
-  &page_footer();
+#  $r->print($out);
+  print $out;
 }
 
 ################################################################################
@@ -438,7 +443,7 @@ sub table_get
 
   foreach my $row (@$res) {
     my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @$row;
-    &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
+    print &gp_line($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
     print "</p>\n";
   }
 
@@ -503,29 +508,6 @@ sub init_inplace_edit()
   print "</script>\n";
 }
 
-################################################################################
-sub show_table_row()
-################################################################################
-{
-
-  my ($p1, $p2, $id, $col) = @_;
-
-  my $out = "<!-- table row -->\n";
-  $out .=
-  "<div class='Row'>
-    <div class='Cell'>
-      <span>$p1</span>
-    </div>
-    <div class='Cell'>
-       <span>$p2</span>
-    </div>
-    <div class='Cell'>
-      <div id='edited" . $col . $id . "'>checking ...</div>
-    </div>
-  </div>\n";
-  $out .= "<!-- end table row -->\n";
-  return $out;
-}
 
 
 ################################################################################
@@ -554,10 +536,11 @@ sub maplinks()
 sub static_map()
 ################################################################################
 {
+#minimap smallmap
   my ($lat, $lon) = @_;
   my $out = "<!-- static map -->";
 
-  $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=15&size=200,200&type=map&imagetype=png&pois=";
+  $static_map = "http://open.mapquestapi.com/staticmap/v4/getmap?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h&center=$lat,$lon&zoom=15&size=200,200&type=map&imagetype=png&pois=x,$lat,$lon";
 #  $out .=  "<img src='http://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=14&size=200x200&maptype=mapnik&markers=$lat,$lon,lightblue1' />";
 
 #  $out .=  "<span class='staticmap'>\n";
@@ -568,18 +551,6 @@ sub static_map()
   return $out;
 }
 
-################################################################################
-sub t()
-################################################################################
-{
-  my ($s, $lang) = @_;
-
-  if ($s eq "Click to show items containing") {return "Zobraz položky obsahující"};
-  if ($s eq "note") {return "Poznámka"};
-  if ($s eq "remove_picture") {return "Smazat obrázek. Smazána budou pouze metadata, fotka bude skryta."};
-
-  return $s;
-}
 
 ################################################################################
 sub id_stuff
@@ -606,16 +577,61 @@ sub id_stuff
   $ret .= "</div>\n";
   $ret .= "</div>\n";
   $ret .= "</div>\n";
+
   $ret .= "
   <script>
-  
   \$('#remove$id').click(function() {
-    alert('remove$id');
-    \$('#remove$id').text='x';
+    \$.ajax({
+       url: 'http://api.openstreetmap.cz/table/remove/$id',
+    }).done(function() {
+      \$('#remove$id').html('marked for deletion')
+    });  
   });
   </script>
   ";
+
   return $ret;
+}
+
+################################################################################
+sub t()
+################################################################################
+{
+  my ($s, $lang) = @_;
+
+  if ($s eq "Click to show items containing") {return "Zobraz položky obsahující"};
+  if ($s eq "note") {return "Poznámka"};
+  if ($s eq "remove_picture") {return "Smazat obrázek. Smazána budou pouze metadata, fotka bude skryta."};
+
+#  return  utf8::decode($s);
+  return $s;
+}
+
+################################################################################
+sub show_table_row()
+################################################################################
+{
+  my ($p1, $p2, $id, $col) = @_;
+
+  syslog('info', "p1 " . $p1);
+  syslog('info', "p2 " . $p2);
+
+  my $out = "<!-- table row -->\n";
+  $out .=
+  "<div class='Row'>
+    <div class='Cell'>
+      <span>". $p1 ."</span>
+    </div>
+    <div class='Cell'>
+       <span>" . $p2 . "</span>
+    </div>
+    <div class='Cell'>
+      <div id='edited" . $col . $id . "'>checking ...</div>
+    </div>
+  </div>\n";
+  $out .= "<!-- end table row -->\n";
+
+  return $out;
 }
 
 ################################################################################
@@ -623,17 +639,18 @@ sub edit_stuff
 ################################################################################
 {
   my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @_;
-my $out = "";
+
+  my $out;
 
   $out .= "<div class='Table'>";
 
   $out .= &show_table_row("latitude", $lat, $id, "lat");
   $out .= &show_table_row("longtitude", $lon, $id, "lon");
-  $out .= &show_table_row(
-    "<a title='" . &t("Click to show items containing") . " ref' href='/table/ref/$ref'>" . &t("ref") . "</a>:",
-    "<div class='edit' id='ref_$id'>$ref</div>",
-    $id, "ref"
-  );
+
+  my $p1 = $ref;#"<a title='" . &t("Click to show items containing") . " ref' href='/table/ref/" . $ref . "'>" . &t("ref") . "</a>:";
+  my $p2 = "<div class='edit' id='ref_$id'>" . $ref . "</div>";
+  $out .= &show_table_row($p1, $p2, $id, "ref");
+
   $out .= &show_table_row(
    "<a title='" . &t("Click to show items containing") . " name' href='/table/name/$attribution'>" . &t("by") . "</a>:",
    "<div class='edit' id='attribution_$id'>$attribution</div>",
@@ -646,6 +663,9 @@ my $out = "";
   );
 
   $out .= "</div>";
+
+#  if (utf8::is_utf8($out)) {print "is";} else {print "is"};
+
   return $out;
 }
 
@@ -673,6 +693,7 @@ sub gp_line()
 
   #edit stuff
   $out .= "<div class='Cell cell_middle'>\n";
+
   $out .= &edit_stuff($id, $lat, $lon, $url, $name, $attribution, $ref, $note);
   $out .= "</div>";
 
@@ -680,8 +701,6 @@ sub gp_line()
 
   $out .= "<script>";
   foreach $col (@attrs) {
-#    $out .= "    \$('#edited" . $col . $id . "').load('http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "');";
-
     $out .= "
   \$.ajax({
     url: 'http://api.openstreetmap.cz/table/isedited/". $col ."/" . $id . "',
@@ -709,9 +728,7 @@ sub gp_line()
 
   $out .= "<div class='Cell'>";
   $full_uri = "http://api.openstreetmap.cz/".$url;
-#  $out .= "<p class='image'>\n";
   $out .= "<a href='$full_uri'><img src='$full_uri' height='150px'><br>$name</a>";
-#  $out .= "</p>\n";
   $out .= "</div>\n";
 
   $out .= "</div> <!-- row -->\n";
@@ -719,11 +736,9 @@ sub gp_line()
   $out .= "</div> <!-- table -->\n";
 
   $out .= "</div> <!-- gp_line -->\n";
-  syslog('info', $out);
+#  syslog('info', $out);
 
-  print $out;
-
-  &init_inplace_edit();
+  return $out;
 }
 
 ################################################################################
@@ -766,7 +781,7 @@ print '</head>
 sub page_footer()
 ################################################################################
 {
-print '
+return '
 </body>
 </html>
 ';
@@ -781,7 +796,6 @@ sub set_by_id()
   my @data = split("_", $id);
   $db_id = $data[1];
   $db_col = $data[0];
-#  $val =~ s/[^A-Za-z0-9óěščřžýáíéůúĚŘČŽÁÉŠŇŤÁÍÝÓťľ]//g;
   $query = "insert into changes (gp_id, col, value) values ($db_id, '$db_col', '$val')";
   syslog('info', $query);
   my $sth = $dbh->prepare($query);
@@ -825,13 +839,11 @@ sub review_entry
   print "<div id='reviewdiv$req_id'>";
   print "<table>";
   print "<tr>";
+  print "<td>change id:$id";
+  print "<td>guidepost id:<a href='http://api.openstreetmap.cz/table/id/$gp_id'>$gp_id</a>";
   if ($action eq "remove") {
-    print "<td>change id:$id";
-    print "<td>guidepost id:$gp_id";
     print "<td>DELETE";
   } else {
-    print "<td>change id:$id";
-    print "<td>guidepost id:$gp_id";
     print "<td>column: $col";
     print "<td>original value: $original";
     print "<td>value: $value";
@@ -863,7 +875,7 @@ sub review_form
 ################################################################################
 {
 
-  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value, changes.action from changes, guidepost where changes.gp_id=guidepost.id limit 50";
+  my $query = "select guidepost.name, changes.id, changes.gp_id, changes.col, changes.value, changes.action from changes, guidepost where changes.gp_id=guidepost.id limit 20";
   $res = $dbh->selectall_arrayref($query);
   print $DBI::errstr;
 #http://code.jquery.com/jquery-1.11.3.min.js
@@ -958,19 +970,22 @@ sub approve_edit
 
   syslog('info', "accepting change id: " . $id);
 
-  my $query = "select * from changes where id=$id";
+  my $query = "select * from changes where id='$id'";
   syslog('info', "0 " . $query);
   @res = $dbh->selectrow_array($query) or return $DBI::errstr;
-  ($xid, $gp_id, $col, $value) = @res;
+  my ($xid, $gp_id, $col, $value, $action) = @res;
 
-  my $query = "update guidepost set $col='$value' where id=$gp_id";
-  syslog('info', "1 " . $query);
-  $rv  = $dbh->do($query) or return $dbh->errstr;
+  if ($action eq "remove") {
+    &delete_id($gp_id);
+  } else {
+    my $query = "update guidepost set $col='$value' where id=$gp_id";
+    syslog('info', "1 " . $query);
+    $rv  = $dbh->do($query) or return $dbh->errstr;
 
-  my $query = "delete from changes where id=$id";
-  syslog('info', "2 " . $query);
-  $rv  = $dbh->do($query) or return $dbh->errstr;
-
+    my $query = "delete from changes where id=$id";
+    syslog('info', "2 " . $query);
+    $rv  = $dbh->do($query) or return $dbh->errstr;
+  }
   return "OK $id changed";
 }
 
@@ -989,18 +1004,15 @@ sub delete_id
   my $original_file = "/home/walley/www/mapy/img/guidepost/" . $res->{$id}->{name};
   my $new_file = "/home/walley/www/mapy/img/guidepost/deleted/" . $res->{$id}->{name};
 
-
-#delete from db
-  $query = "delete from guidepost where id=$id";
-
 #move picture to backup directory
-# somewhere in the code ...
   syslog('info', "Moving $original_file to $new_file");
-
-# the perl move file function
   if (!move($original_file, $new_file)) {
     syslog('info', "Move failed($original_file,$new_file): $!");
   }
+
+#delete from db
+  $query = "delete from guidepost where id='$id'";
+  $dbh->do($query);
 }
 
 ################################################################################
