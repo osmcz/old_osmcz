@@ -174,7 +174,7 @@ function new_data()
   clear_data();
   gml.loaded = false;
   kokot = map.getExtent().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-  gml.url = "http://osmxapi.hypercube.telascience.org/api/0.6/way[kct_red|kct_blue|kct_green|kct_yellow][bbox="+kokot.toBBOX()+"]";
+  gml.url = "http://open.mapquestapi.com/xapi/api/0.6/way[kct_red|kct_blue|kct_green|kct_yellow=major][bbox="+kokot.toBBOX()+"]?key=Fmjtd%7Cluu22qu1nu%2Cbw%3Do5-h6b2h";
   gml.loadGML();
 }
 
@@ -533,7 +533,7 @@ function handler(request)
     popupClass = AutoSizeFramedCloudMaxSize;
     html_content = "guidepost";
     html_content += " by ";
-    html_content += "<a href='http://api.openstreetmap.cz/table/name/" + b.id + "'>" + b.attribution + "</a>";
+    html_content += "<a href='http://api.openstreetmap.cz/table/name/" + b.attribution + "'>" + b.attribution + "</a>";
     html_content += " ";
     html_content += "<a href='http://api.openstreetmap.cz/table/id/" + b.id + "'>edit</a>";
     html_content += "<br>"

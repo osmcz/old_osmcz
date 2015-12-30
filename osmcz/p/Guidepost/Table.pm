@@ -566,7 +566,7 @@ sub delete_button
   my $ret = "";
   $ret .= "<span title='" . &t("remove_picture") ."'>";
   $ret .= "delete <img src='http://api.openstreetmap.cz/img/delete.png' width=16 height=16>";
-  $ret .= "</span>\n";
+  $ret .= "</span>";
   return $ret;
 }
 
@@ -629,9 +629,6 @@ sub show_table_row()
 {
   my ($p1, $p2, $id, $col) = @_;
 
-  syslog('info', "p1 " . $p1);
-  syslog('info', "p2 " . $p2);
-
   my $out = "<!-- table row -->\n";
   $out .=
   "<div class='Row'>
@@ -663,7 +660,7 @@ sub edit_stuff
   $out .= &show_table_row("latitude", $lat, $id, "lat");
   $out .= &show_table_row("longtitude", $lon, $id, "lon");
 
-  my $p1 = $ref;#"<a title='" . &t("Click to show items containing") . " ref' href='/table/ref/" . $ref . "'>" . &t("ref") . "</a>:";
+  my $p1 = "<a title='" . &t("Click to show items containing") . " ref' href='/table/ref/" . $ref . "'>" . &t("ref") . "</a>:";
   my $p2 = "<div class='edit' id='ref_$id'>" . $ref . "</div>";
   $out .= &show_table_row($p1, $p2, $id, "ref");
 
@@ -679,8 +676,6 @@ sub edit_stuff
   );
 
   $out .= "</div>";
-
-#  if (utf8::is_utf8($out)) {print "is";} else {print "is"};
 
   return $out;
 }
@@ -733,6 +728,7 @@ sub gp_line()
   }
 
     $out .= "
+  var text = \"" . &delete_button() . "\";
   \$.ajax({
     url: 'http://api.openstreetmap.cz/table/isdeleted/" . $id . "',
     timeout:3000
@@ -741,12 +737,11 @@ sub gp_line()
     if (data.indexOf('marked') > -1) {
       \$('#remove" . $id . "').text(data);
     } else {
-      var text = \"" . &delete_button() . "\"
-      \$('#remove" . $id . "').text(text);
+      \$('#remove" . $id . "').html(text);
     }
   })
   .fail(function() {
-    \$('#remove" . $id . "').text('State not known, delete');
+    \$('#remove" . $id . "').html(text + '??');
   })
   .always(function(data) {
   });";
@@ -1022,21 +1017,21 @@ sub approve_edit
   syslog('info', "accepting change id: " . $id);
 
   my $query = "select * from changes where id='$id'";
-  syslog('info', "0 " . $query);
   @res = $dbh->selectrow_array($query) or return $DBI::errstr;
   my ($xid, $gp_id, $col, $value, $action) = @res;
 
   if ($action eq "remove") {
+    syslog('info', "deleting");
     &delete_id($gp_id);
   } else {
     my $query = "update guidepost set $col='$value' where id=$gp_id";
-    syslog('info', "1 " . $query);
-    $rv  = $dbh->do($query) or return $dbh->errstr;
-
-    my $query = "delete from changes where id=$id";
-    syslog('info', "2 " . $query);
+    syslog('info', "updating" . $query);
     $rv  = $dbh->do($query) or return $dbh->errstr;
   }
+
+  my $query = "delete from changes where id=$id";
+  syslog('info', "removing change request" . $query);
+  $rv  = $dbh->do($query) or return $dbh->errstr;
   return "OK $id changed";
 }
 
