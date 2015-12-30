@@ -113,6 +113,8 @@ sub handler
   } elsif ($uri =~ "isedited") {
     #/isedited/ref/id
     &is_edited($uri_components[3], $uri_components[4]);
+  } elsif ($uri =~ "isdeleted") {
+    &is_deleted($uri_components[3]);
   } elsif ($uri =~ "/table/approve") {
     &approve_edit($uri_components[3]);
   } elsif ($uri =~ "/table/reject") {
@@ -371,6 +373,7 @@ sub output_html
   }
 
   $out .= "<script>wheelzoom(document.querySelectorAll('img'));</script>";
+  $out .= &init_inplace_edit();
   $out .= &page_footer();
 
 #  $r->print($out);
@@ -447,6 +450,7 @@ sub table_get
     print "</p>\n";
   }
 
+  print &init_inplace_edit();
   print "<script>wheelzoom(document.querySelectorAll('img'));</script>";
 
 }
@@ -494,18 +498,21 @@ sub init_inplace_edit()
 ################################################################################
 {
   my $url = "http://api.openstreetmap.cz/table/setbyid";
+  my $out = "";
 
-  print "<script>\n";
-  print "  \$('.edit').editable('" . $url. "', {\n";
-  print "     indicator : 'Saving...',\n";
-  print "     cancel    : 'Cancel',\n";
-  print "     submit    : 'OK',\n";
-  print "     event     : 'click',\n";
-  print "     width     : 100,\n";
-  print "     select    : true,\n";
-  print "     tooltip   : 'Click to edit...'\n";
-  print "  });\n";
-  print "</script>\n";
+  $out .= "<script>\n";
+  $out .= "  \$('.edit').editable('" . $url. "', {\n";
+  $out .= "     indicator : 'Saving...',\n";
+  $out .= "     cancel    : 'Cancel',\n";
+  $out .= "     submit    : 'OK',\n";
+  $out .= "     event     : 'click',\n";
+  $out .= "     width     : 100,\n";
+  $out .= "     select    : true,\n";
+  $out .= "     tooltip   : 'Click to edit...'\n";
+  $out .= "  });\n";
+  $out .= "</script>\n";
+
+  return $out;
 }
 
 
@@ -553,6 +560,17 @@ sub static_map()
 
 
 ################################################################################
+sub delete_button
+################################################################################
+{
+  my $ret = "";
+  $ret .= "<span title='" . &t("remove_picture") ."'>";
+  $ret .= "delete <img src='http://api.openstreetmap.cz/img/delete.png' width=16 height=16>";
+  $ret .= "</span>\n";
+  return $ret;
+}
+
+################################################################################
 sub id_stuff
 ################################################################################
 {
@@ -568,9 +586,7 @@ sub id_stuff
   $ret .= "<div class='Cell'>\n";
 
   $ret .= "<div id='remove$id'>\n";
-  $ret .= "<span title='" . &t("remove_picture") . "' xonclick='alert(\"x\")'>";
-  $ret .= "delete <img src='http://api.openstreetmap.cz/img/delete.png' width=16 height=16>";
-  $ret .= "</span>\n";
+  $ret .= &delete_button();
   $ret .= "</div>";
 
 
@@ -713,8 +729,28 @@ sub gp_line()
     \$('#edited" . $col . $id . "').text('error');
   })
   .always(function(data) {
-  });"
+  });";
   }
+
+    $out .= "
+  \$.ajax({
+    url: 'http://api.openstreetmap.cz/table/isdeleted/" . $id . "',
+    timeout:3000
+  })
+  .done(function(data) {
+    if (data.indexOf('marked') > -1) {
+      \$('#remove" . $id . "').text(data);
+    } else {
+      var text = \"" . &delete_button() . "\"
+      \$('#remove" . $id . "').text(text);
+    }
+  })
+  .fail(function() {
+    \$('#remove" . $id . "').text('State not known, delete');
+  })
+  .always(function(data) {
+  });";
+
   $out .= "  </script>";
 
   $out .= "<div class='Cell cell_middle'>";
@@ -944,6 +980,21 @@ sub is_edited
   print $DBI::errstr;
   if ($out[0] > 0) {
     print " edited " . $out[0] . "x";
+  } else {
+    print "";
+  }
+}
+
+################################################################################
+sub is_deleted
+################################################################################
+{
+  my ($id) = @_;
+  my $query = "select count() from changes where gp_id=$id and action='remove'";
+  @out = $dbh->selectrow_array($query);
+  print $DBI::errstr;
+  if ($out[0] > 0) {
+    print "marked for delete " . $out[0] . " times";
   } else {
     print "";
   }
