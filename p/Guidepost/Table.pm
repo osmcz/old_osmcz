@@ -502,13 +502,21 @@ sub init_inplace_edit()
 
   $out .= "<script>\n";
   $out .= "  \$('.edit').editable('" . $url. "', {\n";
-  $out .= "     indicator : 'Saving...',\n";
-  $out .= "     cancel    : 'Cancel',\n";
-  $out .= "     submit    : 'OK',\n";
-  $out .= "     event     : 'click',\n";
-  $out .= "     width     : 100,\n";
-  $out .= "     select    : true,\n";
-  $out .= "     tooltip   : 'Click to edit...'\n";
+  $out .= "     indicator   : 'Saving...',\n";
+  $out .= "     cancel      : 'Cancel',\n";
+  $out .= "     submit      : 'OK',\n";
+  $out .= "     event       : 'click',\n";
+  $out .= "     width       : 100,\n";
+  $out .= "     select      : true,\n";
+  $out .= "     placeholder : '" . &t("edited") . "',\n";
+  $out .= "     tooltip     : '" . &t("Click to edit...") . "',\n";
+  $out .= " 
+  callback : function(value, settings) {
+    console.log(this);
+    console.log(value);
+    console.log(settings);
+  }
+  ";
   $out .= "  });\n";
   $out .= "</script>\n";
 
@@ -615,9 +623,17 @@ sub t()
 {
   my ($s, $lang) = @_;
 
-  if ($s eq "Click to show items containing") {return "Zobraz položky obsahující"};
-  if ($s eq "note") {return "Poznámka"};
-  if ($s eq "remove_picture") {return "Smazat obrázek. Smazána budou pouze metadata, fotka bude skryta."};
+  if ($s eq "Click to show items containing") {return "Zobraz položky obsahující";}
+  if ($s eq "note") {return "Poznámka";}
+  if ($s eq "nothing") {return "Vlož text ...";}
+  if ($s eq "edited") {return "Editováno ...";}
+  if ($s eq "remove_picture") {return "Smazat obrázek. Smazána budou pouze metadata, fotka bude skryta.";}
+  if ($s eq "attribute") {return "Atribut";}
+  if ($s eq "value") {return "Hodnota";}
+  if ($s eq "isedited") {return "Bylo editováno?";}
+  if ($s eq "Click to edit...") {return "Klikněte a editujte...";}
+  if ($s eq "marked for delete") {return "Označeno pro smazání";}
+  if ($s eq "times") {return "krát";}
 
 #  return  utf8::decode($s);
   return $s;
@@ -648,6 +664,30 @@ sub show_table_row()
 }
 
 ################################################################################
+sub show_table_header()
+################################################################################
+{
+  my ($c1, $c2, $c3) = @_;
+
+  my $out = "<!-- table header -->\n";
+  $out .=
+  "<div class='Row'>
+    <div class='Cell'>
+      <span>". $c1 ."</span>
+    </div>
+    <div class='Cell'>
+       <span>" . $c2 . "</span>
+    </div>
+    <div class='Cell'>
+       <span>" . $c3 . "</span>
+    </div>
+  </div>\n";
+  $out .= "<!-- end table row -->\n";
+
+  return $out;
+}
+
+################################################################################
 sub edit_stuff
 ################################################################################
 {
@@ -656,7 +696,7 @@ sub edit_stuff
   my $out;
 
   $out .= "<div class='Table'>";
-
+  $out .= &show_table_header(&t("attribute"),&t("value"),&t("isedited"));
   $out .= &show_table_row("latitude", $lat, $id, "lat");
   $out .= &show_table_row("longtitude", $lon, $id, "lon");
 
@@ -687,8 +727,13 @@ sub gp_line()
   my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @_;
 
   my $out = "<!-- GP LINE -->";
+
   if ($ref eq "") {
     $ref = "none";
+  }
+
+  if ($note eq "") {
+    $note = &t("nothing");
   }
 
   $out .= "<hr>\n";
@@ -734,7 +779,7 @@ sub gp_line()
     timeout:3000
   })
   .done(function(data) {
-    if (data.indexOf('marked') > -1) {
+    if (data.length > 1) {
       \$('#remove" . $id . "').text(data);
     } else {
       \$('#remove" . $id . "').html(text);
@@ -989,7 +1034,7 @@ sub is_deleted
   @out = $dbh->selectrow_array($query);
   print $DBI::errstr;
   if ($out[0] > 0) {
-    print "marked for delete " . $out[0] . " times";
+    print &t("marked for delete") . " " . $out[0] . " " . &t("times");
   } else {
     print "";
   }
