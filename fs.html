@@ -34,12 +34,54 @@ body {
 
 <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script src='jquery-1.11.3.min.js'></script>
 
 <script>
 var map;
 var ajaxRequest;
 var plotlist;
 var plotlayers=[];
+var gj_guidepost = new L.GeoJSON();
+
+function retrieve_geojson(data)
+{
+  alert("ok" + data);
+  gj_guidepost.addData(JSON.parse(data));
+  map.addLayer(gj_guidepost);
+};
+
+function error_gj(data)
+{
+  console.log(data);
+  alert("error" + data);
+};
+
+function load_data()
+{
+  if(map.getZoom() > 1) {
+    var geoJsonUrl ='http://map.openstreetmap.cz/table/all'; 
+    var defaultParameters = {
+        outputFormat: 'application/json'
+        };
+
+    var customParams = {
+        output: 'geojson',
+        bbox: map.getBounds().toBBoxString(),
+        };
+    var parameters = L.Util.extend(defaultParameters, customParams);
+
+    alert(geoJsonUrl + L.Util.getParamString(parameters));
+
+    $.ajax({
+      url: geoJsonUrl + L.Util.getParamString(parameters),
+      success: retrieve_geojson,
+      error: error_gj
+    });
+
+  } else {
+    map.removeLayer(gj_guidepost);
+  }
+}
 
 function initmap() {
 // set up the map
@@ -53,6 +95,7 @@ var osm = new L.TileLayer(osmUrl, {minZoom: 4, maxZoom: 19, attribution: osmAttr
 // start the map in South-East England
 map.setView(new L.LatLng(49.5, 17), 7);
 map.addLayer(osm);
+map.on('moveend', load_data);
 }
 
 </script>
