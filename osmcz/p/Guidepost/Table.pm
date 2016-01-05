@@ -204,8 +204,9 @@ sub parse_query_string
 
   #sanitize
   foreach (sort keys %currargs) {
+    $currargs{$_} =~ s/\%2C/,/g;
     if (lc $_ eq "bbox" ) {
-      $currargs{$_} =~ s/[^A-Za-z0-9,-]//g;
+      $currargs{$_} =~ s/[^A-Za-z0-9\.,-]//g;
     } else {
       $currargs{$_} =~ s/[^A-Za-z0-9 ]//g;
     }
