@@ -1,6 +1,6 @@
 /*
 * osmcz.js - openstreetmap.cz support file
-* Copyright (C) 2010  Michal Grezl
+* Copyright (C) 2010-2015  Michal Grezl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
