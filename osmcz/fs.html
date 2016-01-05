@@ -36,28 +36,37 @@ body {
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 <script src='jquery-1.11.3.min.js'></script>
 
+<link rel="stylesheet" href="../dist/MarkerCluster.css" />
+<link rel="stylesheet" href="../dist/MarkerCluster.Default.css" />
+<script src="../dist/leaflet.markercluster-src.js"></script>
+
 <script>
 var map;
-var ajaxRequest;
+var xhr;
 var plotlist;
 var plotlayers=[];
 var gj_guidepost = new L.GeoJSON();
+var markers = L.markerClusterGroup();
 
 function retrieve_geojson(data)
 {
-  alert("ok" + data);
+//  alert("ok" + data);
   gj_guidepost.addData(JSON.parse(data));
-  map.addLayer(gj_guidepost);
+  markers.addLayer(gj_guidepost);
+  map.addLayer(markers);
 };
 
 function error_gj(data)
 {
   console.log(data);
-  alert("error" + data);
+//  alert("error" + data);
 };
 
 function load_data()
 {
+  if (typeof xhr !== 'undefined') {
+    xhr.abort();
+  }
   if(map.getZoom() > 1) {
     var geoJsonUrl ='http://map.openstreetmap.cz/table/all'; 
     var defaultParameters = {
@@ -70,9 +79,9 @@ function load_data()
         };
     var parameters = L.Util.extend(defaultParameters, customParams);
 
-    alert(geoJsonUrl + L.Util.getParamString(parameters));
+//    alert(geoJsonUrl + L.Util.getParamString(parameters));
 
-    $.ajax({
+    xhr = $.ajax({
       url: geoJsonUrl + L.Util.getParamString(parameters),
       success: retrieve_geojson,
       error: error_gj
@@ -105,9 +114,7 @@ map.on('moveend', load_data);
 <BODY onload="initmap()">
 
 <div id="map"></div>
-
 <div id="text">
-
 <div id="docs">
 <script type="text/javascript">
 google_ad_client = "pub-7270111774772584";
@@ -118,7 +125,6 @@ google_ad_height = 90;
 </script>
 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
-
 
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
