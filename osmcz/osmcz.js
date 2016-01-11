@@ -240,6 +240,24 @@ function get_center()
   set_cookie("osm_position", lon+";"+lat+";12", 2);
 }
 
+function get_lat()
+{
+  var b = map.getCenter();
+  var a = b.transform(map.getProjectionObject(),map.displayProjection);
+  var lat = a.lat;
+  var lon = a.lon;
+  return lat;
+}
+
+function get_lon()
+{
+  var b = map.getCenter();
+  var a = b.transform(map.getProjectionObject(),map.displayProjection);
+  var lat = a.lat;
+  var lon = a.lon;
+  return lon;
+}
+
 function init()
 {
 

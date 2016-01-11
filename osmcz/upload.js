@@ -22,6 +22,8 @@ var lat = 40;
 var zoom = 5;
 var upload_map, select;
 var form_file;
+var parent_lat;
+var parent_lon;
 
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
   defaultHandlerOptions: {
@@ -94,7 +96,11 @@ function upload_init()
   );
   upload_map.addLayer(layer_kctcz);
   upload_map.addLayer(mapnik);
-  upload_map.zoomToExtent(new OpenLayers.Bounds(15, 49, 16, 50).transform(upload_map.displayProjection, upload_map.projection));
+
+  var parent_lat = parent.get_lat();
+  var parent_lon = parent.get_lon();
+
+  upload_map.zoomToExtent(new OpenLayers.Bounds(parent_lon, parent_lat, parent_lon+1, parent_lat+1).transform(upload_map.displayProjection, upload_map.projection));
   var click = new OpenLayers.Control.Click();
   upload_map.addControl(click);
   click.activate();
@@ -196,7 +202,9 @@ function auto_rename_handler()
 }
 
 
+/******************************************************************************/
 function exif_present()
+/******************************************************************************/
 {
    document.getElementById('lat').value = 0;
    document.getElementById('lat').readOnly = true;
@@ -204,13 +212,17 @@ function exif_present()
    document.getElementById('lon').readOnly = true;
 }
 
+/******************************************************************************/
 function no_exif()
+/******************************************************************************/
 {
    document.getElementById('lat').readOnly = false;
    document.getElementById('lon').readOnly = false;
 }
 
+/******************************************************************************/
 function exif_checkbox_action()
+/******************************************************************************/
 {
   if (document.getElementById('exif_checkbox').checked) {
     exif_present();
@@ -219,7 +231,9 @@ function exif_checkbox_action()
   }
 }
 
+/******************************************************************************/
 function upbox_off()
+/******************************************************************************/
 {
   document.getElementById('upbox').style.display = 'none' ;
 }

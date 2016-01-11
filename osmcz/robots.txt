@@ -3,4 +3,6 @@ Disallow: /osm
 Disallow: /tms
 Disallow: /kct_tiles
 Disallow: /garmin
-Allow: /
+Disallow: /editor.html
+Disallow: /table/delete/
+Disallow: /table/remove/
