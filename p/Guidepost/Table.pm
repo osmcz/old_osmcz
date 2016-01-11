@@ -41,6 +41,7 @@ use Encode;
 #binmode STDIN, ':utf8';
 #binmode STDOUT, ':utf8';
 
+use Net::Subnet;
 
 my $dbh;
 my $BBOX = 0;
@@ -57,6 +58,10 @@ sub handler
   $r = shift;
   openlog('guidepostapi', 'cons,pid', 'user');
 
+  if (&check_ban()) {
+    syslog('info', 'access denied:' . $r->connection->remote_ip);
+    return Apache2::Const::OK;
+  }
 #  syslog('info', 'start method:'. $r->method());
 
   $r->content_type('text/html');
@@ -135,6 +140,32 @@ sub handler
 
    $dbh->disconnect;
    return Apache2::Const::OK;
+}
+
+################################################################################
+sub check_ban()
+################################################################################
+{
+  my $banned = subnet_matcher qw(
+    66.249.69.0/24
+  );
+#doubrava  185.93.61.0/24
+  return ($banned->($r->connection->remote_ip));
+}
+
+################################################################################
+sub check_privileged_access()
+################################################################################
+{
+  my $ok = subnet_matcher qw(
+    185.93.61.1/32
+  );
+  if ($ok->($r->connection->remote_ip)) {
+    return 1;
+  } else {
+    syslog('info', 'privileged access denied:' . $r->connection->remote_ip);
+    return 0;
+  }
 }
 
 ################################################################################
@@ -399,7 +430,7 @@ sub output_geojson
   print $DBI::errstr;
 
   foreach my $row (@$res) {
-    my ($id, $lat, $lon, $url, $name, $attribution, $ref) = @$row;
+    my ($id, $lat, $lon, $url, $name, $attribution, $ref, $note) = @$row;
     my $fixed_lat = looks_like_number($lat) ? $lat : 0;
     my $fixed_lon = looks_like_number($lon) ? $lon : 0;
 
@@ -409,9 +440,12 @@ sub output_geojson
     });
 
     my %properties = (
-      'ref' => $ref,
-      'name' => $attribution,
       'id' => $id,
+      'url' => $url,
+      'attribution' => $attribution,
+      'name' => $name,
+      'ref' => $ref,
+      'note' => $note,
     );
 
     $ft = Geo::JSON::Feature->new({
@@ -874,7 +908,8 @@ sub set_by_id()
   $db_id = $data[1];
   $db_col = $data[0];
   $query = "insert into changes (gp_id, col, value) values ($db_id, '$db_col', '$val')";
-  syslog('info', $query);
+#  syslog('info', $query);
+  syslog('info', $r->connection->remote_ip . " wants to change $gp_id, $db_col to $val");
   my $sth = $dbh->prepare($query);
   my $rv = $sth->execute() or die $DBI::errstr;
 }
@@ -1060,6 +1095,8 @@ sub approve_edit
 {
   my ($id) = @_;
 
+  if (!&check_privileged_access()) {return;}
+
   syslog('info', "accepting change id: " . $id);
 
   my $query = "select * from changes where id='$id'";
@@ -1071,12 +1108,12 @@ sub approve_edit
     &delete_id($gp_id);
   } else {
     my $query = "update guidepost set $col='$value' where id=$gp_id";
-    syslog('info', "updating" . $query);
+    syslog('info', "updating " . $query);
     $rv  = $dbh->do($query) or return $dbh->errstr;
   }
 
   my $query = "delete from changes where id=$id";
-  syslog('info', "removing change request" . $query);
+  syslog('info', "removing change request " . $query);
   $rv  = $dbh->do($query) or return $dbh->errstr;
   return "OK $id changed";
 }
@@ -1086,6 +1123,8 @@ sub delete_id
 ################################################################################
 {
   my ($id) = @_;
+
+  if (!&check_privileged_access()) {return;}
 
   syslog('info', "deleting id: " . $id);
 
@@ -1112,9 +1151,8 @@ sub remove
 ################################################################################
 {
   my ($id) = @_;
-  syslog('info', "removing $id");
+  syslog('info', $r->connection->remote_ip . " wants to remove $id");
   $query = "insert into changes (gp_id, action) values ($id, 'remove')";
-  syslog('info', $query);
   my $sth = $dbh->prepare($query);
   my $rv = $sth->execute() or die $DBI::errstr;
   print $query;

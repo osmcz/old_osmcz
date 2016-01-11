@@ -74,7 +74,7 @@ function show_upload_dialog()
   print "  </head>
   <body onload='upload_init()'>\n";
 
-$title_help = "Pokud má obrázek Exif souřadnice, můžete nechat lat, lon na 0,0";
+$title_help = "Pokud víte že má obrázek Exif souřadnice, můžete nechat lat, lon na 0,0 (není nutno zatrhávat exif)";
 
   print "
 <div id='map' class='mapmap'></div>
